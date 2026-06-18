@@ -7,8 +7,15 @@
 	<string name="show_system_apps_summary">Display system applications in the list</string>
 	<string name="show_persistent_apps">Show persistent apps</string>
 	<string name="show_persistent_apps_summary">Display persistent applications in the list</string>
-	<string name="auto_refresh">Auto refresh</string>
-	<string name="auto_refresh_summary">Automatically refresh the app list</string>
+	<string name="apps_auto_refresh">Apps auto refresh</string>
+	<string name="apps_auto_refresh_interval_title">Apps auto refresh interval</string>
+	<string name="apps_ram_usage_auto_refresh">Apps RAM usage auto refresh</string>
+	<string name="apps_ram_usage_auto_refresh_interval_title">Apps RAM usage refresh interval</string>
+	<string name="ram_usage_bar_refresh_ms">RAM usage bar refresh ms</string>
+	<string name="ram_usage_bar_refresh_interval_title">RAM usage bar refresh interval</string>
+	<string name="refresh_interval_value">%1$d ms</string>
+	<string name="refresh_interval_ms">Refresh interval (ms)</string>
+	<string name="reset">Reset</string>
 	<string-array name="theme_options">
 		<item>Dark</item>
 		<item>White</item>
@@ -25,7 +32,46 @@
 	<string name="permission_mode_root">Root</string>
 	<string name="permission_mode_shizuku">Shizuku</string>
 	<string name="permission_denied">Permission denied</string>
+	<string name="running_apps_default">Running apps:</string>
+	<string name="running_apps_count">Running apps: %1$d</string>
+	<string name="ram_usage">RAM Usage: %1$dMB / %2$dMB</string>
+	<string name="ram_usage_unknown">RAM Usage: --</string>
+	<string name="sort_apps">Sort apps</string>
+	<string name="sort_apps_title">Sort apps by</string>
+	<string name="sort_by_name">Name</string>
+	<string name="sort_by_ram_usage">RAM usage</string>
+	<string name="sort_descending">Descending</string>
+	<string name="ok">Ok</string>
+	<string name="cancel">Cancel</string>
+	<string name="save">Save</string>
 	<string name="search_apps">Search apps</string>
+	<string name="apps_filter">Apps filter</string>
+	<string name="filter_dialog_title">Select the apps you want to hide</string>
+	<string name="donate">Donate</string>
+	<string name="donate_summary">Support development</string>
+	<string name="donate_url" translatable="false">https://www.paypal.com/ncp/payment/7X44EWSM9KAVW</string>
+	<string name="source_code">Source Code</string>
+	<string name="source_code_summary">Open project repository</string>
+	<string name="source_code_url" translatable="false">https://github.com/YasserNull/shappky</string>
+	<string name="refresh">Refresh</string>
+	<string name="more">More</string>
+	<string name="select_all">Select all</string>
+	<string name="unselect_all">Unselect all</string>
+	<string name="force_stop">Force stop</string>
+	<string name="force_stop_selected">Force stop selected</string>
+	<string name="selected">Selected</string>
+	<string name="back">Back</string>
+	<string name="full_screen">Full screen</string>
+	<string name="full_screen_summary">Hide the status bar and use the full screen</string>
+	<string name="shappky_service">Shappky Service</string>
+	<string name="shappky_service_running">Running...</string>
+	<string name="shappky_service_notification_text">Killing background apps...</string>
+	<string name="shappky_service_channel">Shappky Foreground Service</string>
+	<string name="shell_permission_required">Shizuku/Root permission required</string>
+	<string name="no_apps_to_kill">No apps to kill</string>
+	<string name="service_stopped">Shappky Service Stopped</string>
+	<string name="free_up_memory">Free up %1$s</string>
+	<string name="error_getting_running_apps">Error getting running apps: %1$s</string>
 	<string name="restart_required_title">Restart required</string>
 	<string name="restart_required_message">Please restart the app to apply this change.</string>
 	<string name="restart_now">Restart</string>
