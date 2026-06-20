@@ -28,12 +28,17 @@ class BackgroundAppManager(
     private val sharedpreferences =
         context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
 
-    private fun formatMemorySize(kb: Long): String =
-        when {
-            kb < 1024 -> "$kb KB"
-            kb < 1024 * 1024 -> String.format(Locale.getDefault(), "%.2f MB", kb / 1024f)
-            else -> String.format(Locale.getDefault(), "%.2f GB", kb / (1024f * 1024f))
-        }
+    @Volatile
+    private var isCurrentlyLoadingApps = false
+
+    @Volatile
+    private var isCurrentlyLoadingRam = false
+
+    fun formatMemorySize(kb: Long): String = when {
+        kb < 1024 -> context.getString(R.string.kb_format, kb)
+        kb < 1024 * 1024 -> context.getString(R.string.mb_format, kb / 1024f)
+        else -> context.getString(R.string.gb_format, kb / (1024f * 1024f))
+    }
 
     private fun parseMemoryToKb(ram: String?): Long {
         if (ram.isNullOrEmpty() || ram == "-") return 0
@@ -52,6 +57,11 @@ class BackgroundAppManager(
     }
 
     fun loadBackgroundApps(callback: Consumer<List<AppModel>>?) {
+        if (isCurrentlyLoadingApps) {
+            Log.d(TAG, "loadBackgroundApps skipped because another load is already in progress")
+            return
+        }
+        isCurrentlyLoadingApps = true
         executor.execute {
             val startTime = System.currentTimeMillis()
             Log.d(
@@ -59,184 +69,192 @@ class BackgroundAppManager(
                 "loadBackgroundApps started showSystemApps=$showSystemApps, showPersistentApps=$showPersistentApps",
             )
             val result = mutableListOf<AppModel>()
-            val packageManager = context.packageManager
-            val runningPackagesFromPs = mutableSetOf<String>()
-            val hiddenApps = getHiddenApps()
-            Log.d(TAG, "Hidden apps loaded count=${hiddenApps.size}, values=$hiddenApps")
+            try {
+                val packageManager = context.packageManager
+                val runningPackagesFromPs = mutableSetOf<String>()
+                val hiddenApps = getHiddenApps()
+                Log.d(TAG, "Hidden apps loaded count=${hiddenApps.size}, values=$hiddenApps")
 
-            var currentKeyboardPackage =
-                Settings.Secure.getString(context.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
-            if (currentKeyboardPackage != null && currentKeyboardPackage.contains("/")) {
-                currentKeyboardPackage = currentKeyboardPackage.split("/")[0]
-            }
-            Log.d(TAG, "Current keyboard package=$currentKeyboardPackage")
+                var currentKeyboardPackage =
+                    Settings.Secure.getString(context.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
+                if (currentKeyboardPackage != null && currentKeyboardPackage.contains("/")) {
+                    currentKeyboardPackage = currentKeyboardPackage.split("/")[0]
+                }
+                Log.d(TAG, "Current keyboard package=$currentKeyboardPackage")
 
-            val launcherIntent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
-            val resolveInfo = packageManager.resolveActivity(launcherIntent, PackageManager.MATCH_DEFAULT_ONLY)
-            val currentLauncherPackage = resolveInfo?.activityInfo?.packageName
-            Log.d(TAG, "Current launcher package=$currentLauncherPackage")
+                val launcherIntent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+                val resolveInfo = packageManager.resolveActivity(launcherIntent, PackageManager.MATCH_DEFAULT_ONLY)
+                val currentLauncherPackage = resolveInfo?.activityInfo?.packageName
+                Log.d(TAG, "Current launcher package=$currentLauncherPackage")
 
-            if (shellManager.isShellCommandReady()) {
-                val command = "ps -A -o rss,name | grep '\\.' | grep -v '[-:@]'"
-                try {
-                    Log.d(TAG, "Running process command: $command")
-                    val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
-                    if (fullOutput != null) {
-                        Log.d(TAG, "Process command outputLength=${fullOutput.length}")
-                        BufferedReader(StringReader(fullOutput)).use { reader ->
-                            var line = reader.readLine()
-                            var lineCount = 0
-                            var parsedCount = 0
-                            var ignoredShortLineCount = 0
-                            var ignoredInvalidPackageCount = 0
-                            var missingPackageCount = 0
-                            while (line != null) {
-                                lineCount++
-                                Log.d(TAG, "ps line#$lineCount raw=$line")
-                                val parts = line.trim().split(Regex("\\s+"))
-                                if (parts.size >= 2) {
-                                    val packageName = parts[1].trim()
-                                    val appRam = parts[0].trim()
-                                    Log.d(TAG, "ps line#$lineCount parsed package=$packageName, rssKb=$appRam, parts=${parts.size}")
-                                    if (
-                                        packageName.isNotEmpty() &&
-                                        packageName.contains(".") &&
-                                        !packageName.startsWith("ERROR:")
-                                    ) {
-                                        try {
-                                            packageManager.getApplicationInfo(packageName, 0)
-                                            runningPackagesFromPs.add("$packageName:$appRam")
-                                            parsedCount++
-                                            Log.d(
-                                                TAG,
-                                                "ps accepted package=$packageName, rssKb=$appRam, uniqueSoFar=${runningPackagesFromPs.size}",
-                                            )
-                                        } catch (_: PackageManager.NameNotFoundException) {
-                                            missingPackageCount++
-                                            Log.d(TAG, "ps package missing from PackageManager package=$packageName")
+                if (shellManager.isShellCommandReady()) {
+                    val command = "ps -A -o rss,name | grep '\\.' | grep -v '[-:@]'"
+                    try {
+                        Log.d(TAG, "Running process command: $command")
+                        val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
+                        if (fullOutput != null) {
+                            Log.d(TAG, "Process command outputLength=${fullOutput.length}")
+                            BufferedReader(StringReader(fullOutput)).use { reader ->
+                                var line = reader.readLine()
+                                var lineCount = 0
+                                var parsedCount = 0
+                                var ignoredShortLineCount = 0
+                                var ignoredInvalidPackageCount = 0
+                                var missingPackageCount = 0
+                                while (line != null) {
+                                    lineCount++
+                                    Log.d(TAG, "ps line#$lineCount raw=$line")
+                                    val parts = line.trim().split(Regex("\\s+"))
+                                    if (parts.size >= 2) {
+                                        val packageName = parts[1].trim()
+                                        val appRam = parts[0].trim()
+                                        Log.d(TAG, "ps line#$lineCount parsed package=$packageName, rssKb=$appRam, parts=${parts.size}")
+                                        if (
+                                            packageName.isNotEmpty() &&
+                                            packageName.contains(".") &&
+                                            !packageName.startsWith("ERROR:")
+                                        ) {
+                                            try {
+                                                packageManager.getApplicationInfo(packageName, 0)
+                                                runningPackagesFromPs.add("$packageName:$appRam")
+                                                parsedCount++
+                                                Log.d(
+                                                    TAG,
+                                                    "ps accepted package=$packageName, rssKb=$appRam, uniqueSoFar=${runningPackagesFromPs.size}",
+                                                )
+                                            } catch (_: PackageManager.NameNotFoundException) {
+                                                missingPackageCount++
+                                                Log.d(TAG, "ps package missing from PackageManager package=$packageName")
+                                            }
+                                        } else {
+                                            ignoredInvalidPackageCount++
+                                            Log.d(TAG, "ps ignored invalid package line#$lineCount package=$packageName")
                                         }
                                     } else {
-                                        ignoredInvalidPackageCount++
-                                        Log.d(TAG, "ps ignored invalid package line#$lineCount package=$packageName")
+                                        ignoredShortLineCount++
+                                        Log.d(TAG, "ps ignored short line#$lineCount parts=${parts.size}")
                                     }
-                                } else {
-                                    ignoredShortLineCount++
-                                    Log.d(TAG, "ps ignored short line#$lineCount parts=${parts.size}")
+                                    line = reader.readLine()
                                 }
-                                line = reader.readLine()
+                                Log.d(
+                                    TAG,
+                                    "Process output lines=$lineCount, parsedPackages=$parsedCount, uniquePackages=${runningPackagesFromPs.size}, ignoredShort=$ignoredShortLineCount, ignoredInvalid=$ignoredInvalidPackageCount, missingPackages=$missingPackageCount",
+                                )
                             }
-                            Log.d(
-                                TAG,
-                                "Process output lines=$lineCount, parsedPackages=$parsedCount, uniquePackages=${runningPackagesFromPs.size}, ignoredShort=$ignoredShortLineCount, ignoredInvalid=$ignoredInvalidPackageCount, missingPackages=$missingPackageCount",
-                            )
+                        } else {
+                            Log.w(TAG, "Process command returned null output")
                         }
-                    } else {
-                        Log.w(TAG, "Process command returned null output")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error getting running apps", e)
+                        handler.post {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.error_getting_running_apps, e.message.orEmpty()),
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        }
                     }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error getting running apps", e)
-                    handler.post {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.error_getting_running_apps, e.message.orEmpty()),
-                            Toast.LENGTH_SHORT,
-                        ).show()
+                } else {
+                    Log.w(TAG, "Shell command backend is not ready while loading background apps")
+                }
+
+                var hiddenSkippedCount = 0
+                var systemSkippedCount = 0
+                var persistentSkippedCount = 0
+                var missingDuringBuildCount = 0
+                Log.d(TAG, "Building AppModel list from runningPackages size=${runningPackagesFromPs.size}")
+                for (packageEntry in runningPackagesFromPs) {
+                    val parts = packageEntry.split(":")
+                    val packageName = parts[0]
+                    val ramUsage = parts.getOrNull(1)?.toLongOrNull() ?: 0
+                    Log.d(TAG, "Evaluating running package package=$packageName, ramKb=$ramUsage, rawEntry=$packageEntry")
+
+                    try {
+                        if (hiddenApps.contains(packageName)) {
+                            hiddenSkippedCount++
+                            Log.d(TAG, "Skipping hidden app package=$packageName")
+                            continue
+                        }
+
+                        val isProtected =
+                            packageName == "com.yn.shappky" ||
+                                packageName == "com.google.android.gms" ||
+                                packageName == "com.android.systemui" ||
+                                packageName == "com.android.bluetooth" ||
+                                packageName == "com.android.externalstorage" ||
+                                packageName == "com.google.android.providers.media.module" ||
+                                packageName == "com.miui.miwallpaper" ||
+                                packageName == "com.android.camera" ||
+                                packageName == currentKeyboardPackage ||
+                                packageName == currentLauncherPackage
+
+                        val appInfo = packageManager.getApplicationInfo(packageName, 0)
+                        val isPersistentApp = appInfo.flags and ApplicationInfo.FLAG_PERSISTENT != 0
+                        val isSystemApp = appInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
+                        val label = packageManager.getApplicationLabel(appInfo).toString()
+
+                        if (!showSystemApps && isSystemApp) {
+                            systemSkippedCount++
+                            Log.d(TAG, "Skipping system app package=$packageName, label=$label")
+                            continue
+                        }
+                        if (!showPersistentApps && isPersistentApp) {
+                            persistentSkippedCount++
+                            Log.d(TAG, "Skipping persistent app package=$packageName, label=$label")
+                            continue
+                        }
+
+                        result.add(
+                            AppModel(
+                                appName = label,
+                                packageName = packageName,
+                                appRam = formatMemorySize(ramUsage),
+                                ramKb = ramUsage,
+                                appIcon = packageManager.getApplicationIcon(appInfo),
+                                isSystemApp = isSystemApp,
+                                isPersistentApp = isPersistentApp,
+                                isProtected = isProtected,
+                            ),
+                        )
+                        Log.d(
+                            TAG,
+                            "Added running app label=$label, package=$packageName, ram=${formatMemorySize(ramUsage)}, system=$isSystemApp, persistent=$isPersistentApp, protected=$isProtected",
+                        )
+                    } catch (_: PackageManager.NameNotFoundException) {
+                        missingDuringBuildCount++
+                        Log.d(TAG, "Package disappeared while building app list package=$packageName")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error processing application info for package=$packageName", e)
                     }
                 }
-            } else {
-                Log.w(TAG, "Shell command backend is not ready while loading background apps")
-            }
-
-            var hiddenSkippedCount = 0
-            var systemSkippedCount = 0
-            var persistentSkippedCount = 0
-            var missingDuringBuildCount = 0
-            Log.d(TAG, "Building AppModel list from runningPackages size=${runningPackagesFromPs.size}")
-            for (packageEntry in runningPackagesFromPs) {
-                val parts = packageEntry.split(":")
-                val packageName = parts[0]
-                val ramUsage = parts.getOrNull(1)?.toLongOrNull() ?: 0
-                Log.d(TAG, "Evaluating running package package=$packageName, ramKb=$ramUsage, rawEntry=$packageEntry")
-
-                try {
-                    if (hiddenApps.contains(packageName)) {
-                        hiddenSkippedCount++
-                        Log.d(TAG, "Skipping hidden app package=$packageName")
-                        continue
-                    }
-
-                    val isProtected =
-                        packageName == "com.yn.shappky" ||
-                            packageName == "com.google.android.gms" ||
-                            packageName == "com.android.systemui" ||
-                            packageName == "com.android.bluetooth" ||
-                            packageName == "com.android.externalstorage" ||
-                            packageName == "com.google.android.providers.media.module" ||
-                            packageName == "com.miui.miwallpaper" ||
-                            packageName == "com.android.camera" ||
-                            packageName == currentKeyboardPackage ||
-                            packageName == currentLauncherPackage
-
-                    val appInfo = packageManager.getApplicationInfo(packageName, 0)
-                    val isPersistentApp = appInfo.flags and ApplicationInfo.FLAG_PERSISTENT != 0
-                    val isSystemApp = appInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
-                    val label = packageManager.getApplicationLabel(appInfo).toString()
-
-                    if (!showSystemApps && isSystemApp) {
-                        systemSkippedCount++
-                        Log.d(TAG, "Skipping system app package=$packageName, label=$label")
-                        continue
-                    }
-                    if (!showPersistentApps && isPersistentApp) {
-                        persistentSkippedCount++
-                        Log.d(TAG, "Skipping persistent app package=$packageName, label=$label")
-                        continue
-                    }
-
-                    result.add(
-                        AppModel(
-                            appName = label,
-                            packageName = packageName,
-                            appRam = formatMemorySize(ramUsage),
-                            appIcon = packageManager.getApplicationIcon(appInfo),
-                            isSystemApp = isSystemApp,
-                            isPersistentApp = isPersistentApp,
-                            isProtected = isProtected,
-                        ),
-                    )
+                Log.d(
+                    TAG,
+                    "Pre-sort app list size=${result.size}, hiddenSkipped=$hiddenSkippedCount, systemSkipped=$systemSkippedCount, persistentSkipped=$persistentSkippedCount, missingDuringBuild=$missingDuringBuildCount",
+                )
+                result.sortWith(
+                    compareBy<AppModel> { it.isSystemApp }
+                        .thenBy { it.isPersistentApp }
+                        .thenBy { it.appName.lowercase(Locale.getDefault()) },
+                )
+                result.forEachIndexed { index, app ->
                     Log.d(
                         TAG,
-                        "Added running app label=$label, package=$packageName, ram=${formatMemorySize(ramUsage)}, system=$isSystemApp, persistent=$isPersistentApp, protected=$isProtected",
+                        "Sorted app[$index] label=${app.appName}, package=${app.packageName}, ram=${app.appRam}, system=${app.isSystemApp}, persistent=${app.isPersistentApp}, protected=${app.isProtected}",
                     )
-                } catch (_: PackageManager.NameNotFoundException) {
-                    missingDuringBuildCount++
-                    Log.d(TAG, "Package disappeared while building app list package=$packageName")
                 }
-            }
-            Log.d(
-                TAG,
-                "Pre-sort app list size=${result.size}, hiddenSkipped=$hiddenSkippedCount, systemSkipped=$systemSkippedCount, persistentSkipped=$persistentSkippedCount, missingDuringBuild=$missingDuringBuildCount",
-            )
-            result.sortWith(
-                compareBy<AppModel> { it.isSystemApp }
-                    .thenBy { it.isPersistentApp }
-                    .thenBy { it.appName.lowercase(Locale.getDefault()) },
-            )
-            result.forEachIndexed { index, app ->
-                Log.d(
-                    TAG,
-                    "Sorted app[$index] label=${app.appName}, package=${app.packageName}, ram=${app.appRam}, system=${app.isSystemApp}, persistent=${app.isPersistentApp}, protected=${app.isProtected}",
-                )
-            }
-
-            handler.post {
-                Log.d(
-                    TAG,
-                    "loadBackgroundApps finished resultSize=${result.size}, durationMs=${System.currentTimeMillis() - startTime}",
-                )
-                currentAppsList.clear()
-                currentAppsList.addAll(result)
-                callback?.accept(ArrayList(result))
+            } catch (t: Throwable) {
+                Log.e(TAG, "Fatal error in loadBackgroundApps background thread", t)
+            } finally {
+                isCurrentlyLoadingApps = false
+                handler.post {
+                    Log.d(
+                        TAG,
+                        "loadBackgroundApps finished resultSize=${result.size}, durationMs=${System.currentTimeMillis() - startTime}",
+                    )
+                    currentAppsList.clear()
+                    currentAppsList.addAll(result)
+                    callback?.accept(ArrayList(result))
+                }
             }
         }
     }
@@ -265,6 +283,7 @@ class BackgroundAppManager(
                         appName = label,
                         packageName = appInfo.packageName,
                         appRam = "-",
+                        ramKb = 0L,
                         appIcon = pm.getApplicationIcon(appInfo),
                         isSystemApp = isSystem,
                         isPersistentApp = isPersistent,
@@ -278,71 +297,80 @@ class BackgroundAppManager(
         }
     }
 
-    fun loadAppsRamUsage(packageNames: List<String>, callback: Consumer<Map<String, String>>) {
+    fun loadAppsRamUsage(packageNames: List<String>, callback: Consumer<Map<String, Long>>) {
+        if (isCurrentlyLoadingRam) {
+            Log.d(TAG, "loadAppsRamUsage skipped because another RAM load is in progress")
+            return
+        }
+        isCurrentlyLoadingRam = true
         executor.execute {
             val startTime = System.currentTimeMillis()
             val requestedPackages = packageNames.toSet()
             val ramUsageByPackage = mutableMapOf<String, Long>()
-            Log.d(TAG, "loadAppsRamUsage started requestedCount=${requestedPackages.size}, requested=$requestedPackages")
-            if (requestedPackages.isNotEmpty() && shellManager.isShellCommandReady()) {
-                val command = "ps -A -o rss,name | grep '\\.' | grep -v '[-:@]'"
-                try {
-                    Log.d(TAG, "loadAppsRamUsage running command=$command")
-                    val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
-                    if (fullOutput != null) {
-                        Log.d(TAG, "loadAppsRamUsage command outputLength=${fullOutput.length}")
-                        BufferedReader(StringReader(fullOutput)).use { reader ->
-                            var line = reader.readLine()
-                            var lineCount = 0
-                            var matchedCount = 0
-                            while (line != null) {
-                                lineCount++
-                                Log.d(TAG, "loadAppsRamUsage ps line#$lineCount raw=$line")
-                                val parts = line.trim().split(Regex("\\s+"))
-                                if (parts.size >= 2) {
-                                    val ramUsage = parts[0].trim().toLongOrNull() ?: 0L
-                                    val packageName = parts[1].trim()
-                                    if (packageName in requestedPackages) {
-                                        matchedCount++
-                                        ramUsageByPackage[packageName] =
-                                            (ramUsageByPackage[packageName] ?: 0L) + ramUsage
-                                        Log.d(
-                                            TAG,
-                                            "loadAppsRamUsage matched package=$packageName, ramKb=$ramUsage, totalKb=${ramUsageByPackage[packageName]}",
-                                        )
+            try {
+                Log.d(TAG, "loadAppsRamUsage started requestedCount=${requestedPackages.size}, requested=$requestedPackages")
+                if (requestedPackages.isNotEmpty() && shellManager.isShellCommandReady()) {
+                    val command = "ps -A -o rss,name | grep '\\.' | grep -v '[-:@]'"
+                    try {
+                        Log.d(TAG, "loadAppsRamUsage running command=$command")
+                        val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
+                        if (fullOutput != null) {
+                            Log.d(TAG, "loadAppsRamUsage command outputLength=${fullOutput.length}")
+                            BufferedReader(StringReader(fullOutput)).use { reader ->
+                                var line = reader.readLine()
+                                var lineCount = 0
+                                var matchedCount = 0
+                                while (line != null) {
+                                    lineCount++
+                                    Log.d(TAG, "loadAppsRamUsage ps line#$lineCount raw=$line")
+                                    val parts = line.trim().split(Regex("\\s+"))
+                                    if (parts.size >= 2) {
+                                        val ramUsage = parts[0].trim().toLongOrNull() ?: 0L
+                                        val packageName = parts[1].trim()
+                                        if (packageName in requestedPackages) {
+                                            matchedCount++
+                                            ramUsageByPackage[packageName] =
+                                                (ramUsageByPackage[packageName] ?: 0L) + ramUsage
+                                            Log.d(
+                                                TAG,
+                                                "loadAppsRamUsage matched package=$packageName, ramKb=$ramUsage, totalKb=${ramUsageByPackage[packageName]}",
+                                            )
+                                        } else {
+                                            Log.d(TAG, "loadAppsRamUsage ignored package=$packageName not requested")
+                                        }
                                     } else {
-                                        Log.d(TAG, "loadAppsRamUsage ignored package=$packageName not requested")
+                                        Log.d(TAG, "loadAppsRamUsage ignored short line#$lineCount parts=${parts.size}")
                                     }
-                                } else {
-                                    Log.d(TAG, "loadAppsRamUsage ignored short line#$lineCount parts=${parts.size}")
+                                    line = reader.readLine()
                                 }
-                                line = reader.readLine()
+                                Log.d(TAG, "loadAppsRamUsage parsed lines=$lineCount, matched=$matchedCount")
                             }
-                            Log.d(TAG, "loadAppsRamUsage parsed lines=$lineCount, matched=$matchedCount")
+                        } else {
+                            Log.w(TAG, "loadAppsRamUsage command returned null output")
                         }
-                    } else {
-                        Log.w(TAG, "loadAppsRamUsage command returned null output")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error updating app RAM usage", e)
                     }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error updating app RAM usage", e)
+                } else {
+                    Log.w(
+                        TAG,
+                        "loadAppsRamUsage skipped requestedEmpty=${requestedPackages.isEmpty()}, shellReady=${shellManager.isShellCommandReady()}",
+                    )
                 }
-            } else {
-                Log.w(
+                Log.d(
                     TAG,
-                    "loadAppsRamUsage skipped requestedEmpty=${requestedPackages.isEmpty()}, shellReady=${shellManager.isShellCommandReady()}",
+                    "loadAppsRamUsage finished count=${ramUsageByPackage.size}, values=$ramUsageByPackage, durationMs=${System.currentTimeMillis() - startTime}",
                 )
+                handler.post { callback.accept(ramUsageByPackage) }
+            } catch (t: Throwable) {
+                Log.e(TAG, "Fatal error in loadAppsRamUsage background thread", t)
+            } finally {
+                isCurrentlyLoadingRam = false
             }
-            val formattedRamUsage = ramUsageByPackage.mapValues { (_, ramUsage) -> formatMemorySize(ramUsage) }
-            Log.d(
-                TAG,
-                "loadAppsRamUsage finished formattedCount=${formattedRamUsage.size}, values=$formattedRamUsage, durationMs=${System.currentTimeMillis() - startTime}",
-            )
-            handler.post { callback.accept(formattedRamUsage) }
         }
     }
 
-    fun getHiddenApps(): Set<String> =
-        sharedpreferences.getStringSet(KEY_HIDDEN_APPS, HashSet()) ?: HashSet()
+    fun getHiddenApps(): Set<String> = sharedpreferences.getStringSet(KEY_HIDDEN_APPS, HashSet()) ?: HashSet()
 
     fun saveHiddenApps(hiddenApps: Set<String>) {
         sharedpreferences.edit().putStringSet(KEY_HIDDEN_APPS, hiddenApps).apply()
@@ -363,7 +391,7 @@ class BackgroundAppManager(
         var totalKb = 0L
         for (pkg in packageNames) {
             currentAppsList.firstOrNull { it.packageName == pkg }?.let {
-                totalKb += parseMemoryToKb(it.appRam)
+                totalKb += it.ramKb
             }
         }
 
@@ -385,7 +413,7 @@ class BackgroundAppManager(
         }
         shellManager.runShellCommand("am force-stop $packageName", onComplete)
         currentAppsList.firstOrNull { it.packageName == packageName }?.let { app ->
-            val message = context.getString(R.string.free_up_memory, formatMemorySize(parseMemoryToKb(app.appRam)))
+            val message = context.getString(R.string.free_up_memory, formatMemorySize(app.ramKb))
             handler.post { Toast.makeText(context, message, Toast.LENGTH_LONG).show() }
         }
     }

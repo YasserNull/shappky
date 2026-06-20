@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.PushPin
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,7 +41,12 @@ import com.yn.shappky.model.AppModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AppRow(app: AppModel, onToggle: () -> Unit, onKill: () -> Unit) {
+fun AppRow(
+    app: AppModel,
+    showAppTypeIcons: Boolean,
+    onToggle: () -> Unit,
+    onKill: () -> Unit,
+) {
     val interactionSource = remember { MutableInteractionSource() }
     val rowBackgroundColor =
         if (app.isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
@@ -79,12 +87,28 @@ fun AppRow(app: AppModel, onToggle: () -> Unit, onKill: () -> Unit) {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(
-                text = app.appRam,
-                color = secondaryTextColor,
-                fontSize = 12.sp,
-                lineHeight = 13.sp,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (showAppTypeIcons) {
+                    val icon = when {
+                        app.isPersistentApp -> Icons.Outlined.PushPin
+                        app.isSystemApp -> Icons.Outlined.Settings
+                        else -> Icons.Outlined.Person
+                    }
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(12.dp),
+                        tint = secondaryTextColor,
+                    )
+                    Spacer(Modifier.width(4.dp))
+                }
+                Text(
+                    text = app.appRam,
+                    color = secondaryTextColor,
+                    fontSize = 12.sp,
+                    lineHeight = 13.sp,
+                )
+            }
         }
         if (!app.isProtected && !app.isSelected) {
             IconButton(

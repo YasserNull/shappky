@@ -1,10 +1,11 @@
 package com.yn.shappky.ui.dialogs
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -23,12 +24,13 @@ fun RefreshIntervalDialog(
     title: String,
     currentIntervalMs: Long,
     defaultIntervalMs: Long,
+    minIntervalMs: Long,
     onApply: (Long) -> Unit,
     onDismiss: () -> Unit,
 ) {
     var intervalText by remember { mutableStateOf(currentIntervalMs.toString()) }
     val intervalMs = intervalText.toLongOrNull()
-    val isValid = intervalMs != null && intervalMs > 0
+    val isValid = intervalMs != null && intervalMs >= minIntervalMs
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -39,6 +41,15 @@ fun RefreshIntervalDialog(
                     value = intervalText,
                     onValueChange = { intervalText = it.filter(Char::isDigit) },
                     label = { Text(stringResource(R.string.refresh_interval_ms)) },
+                    supportingText = {
+                        if (intervalMs != null && intervalMs < minIntervalMs) {
+                            Text(
+                                text = stringResource(R.string.min_interval_warning, minIntervalMs),
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
+                    },
+                    isError = intervalMs != null && intervalMs < minIntervalMs,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),

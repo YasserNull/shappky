@@ -11,9 +11,9 @@ import android.util.Log
 import com.topjohnwu.superuser.Shell
 import com.yn.shappky.IShizukuShellService
 import com.yn.shappky.shizuku.ShizukuShellService
+import rikka.shizuku.Shizuku
 import java.util.concurrent.ExecutorService
 import java.util.function.Consumer
-import rikka.shizuku.Shizuku
 
 class ShellManager(
     private val context: Context,
@@ -90,9 +90,8 @@ class ShellManager(
         Shizuku.addBinderDeadListener(shizukuBinderDeadListener)
     }
 
-    private fun getPermissionMode(): String =
-        context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-            .getString("permissionMode", "shizuku") ?: "shizuku"
+    private fun getPermissionMode(): String = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        .getString("permissionMode", "shizuku") ?: "shizuku"
 
     fun setShizukuPermissionListener(listener: Shizuku.OnRequestPermissionResultListener?) {
         shizukuPermissionListener = listener
@@ -142,21 +141,19 @@ class ShellManager(
         return granted
     }
 
-    private fun safeGetShizukuVersion(): Int =
-        try {
-            Shizuku.getVersion()
-        } catch (e: RuntimeException) {
-            Log.w(TAG, "Unable to read Shizuku version", e)
-            -1
-        }
+    private fun safeGetShizukuVersion(): Int = try {
+        Shizuku.getVersion()
+    } catch (e: RuntimeException) {
+        Log.w(TAG, "Unable to read Shizuku version", e)
+        -1
+    }
 
-    private fun safeGetShizukuUid(): Int =
-        try {
-            Shizuku.getUid()
-        } catch (e: RuntimeException) {
-            Log.w(TAG, "Unable to read Shizuku uid", e)
-            -1
-        }
+    private fun safeGetShizukuUid(): Int = try {
+        Shizuku.getUid()
+    } catch (e: RuntimeException) {
+        Log.w(TAG, "Unable to read Shizuku uid", e)
+        -1
+    }
 
     private fun waitForShizukuService(timeoutMs: Long): Boolean {
         if (!hasShizukuPermission()) {
@@ -366,25 +363,24 @@ class ShellManager(
         command: String,
         onSuccess: Runnable?,
         outputProcessor: Consumer<String>?,
-    ): Boolean =
-        try {
-            Log.d(TAG, "Root command executing command=$command")
-            val result = Shell.cmd(command).exec()
-            Log.d(
-                TAG,
-                "Root command result success=${result.isSuccess}, outLines=${result.out.size}, errLines=${result.err.size}",
-            )
-            if (outputProcessor != null) {
-                result.out.forEach { line -> handler.post { outputProcessor.accept(line) } }
-                result.err.forEach { line -> handler.post { outputProcessor.accept("ERROR: $line") } }
-            }
-            onSuccess?.let { handler.post(it) }
-            result.isSuccess
-        } catch (e: Exception) {
-            Log.e(TAG, "Root command failed command=$command", e)
-            e.printStackTrace()
-            false
+    ): Boolean = try {
+        Log.d(TAG, "Root command executing command=$command")
+        val result = Shell.cmd(command).exec()
+        Log.d(
+            TAG,
+            "Root command result success=${result.isSuccess}, outLines=${result.out.size}, errLines=${result.err.size}",
+        )
+        if (outputProcessor != null) {
+            result.out.forEach { line -> handler.post { outputProcessor.accept(line) } }
+            result.err.forEach { line -> handler.post { outputProcessor.accept("ERROR: $line") } }
         }
+        onSuccess?.let { handler.post(it) }
+        result.isSuccess
+    } catch (e: Exception) {
+        Log.e(TAG, "Root command failed command=$command", e)
+        e.printStackTrace()
+        false
+    }
 
     private fun executeShizukuCommand(command: String, onSuccess: Runnable?): Boolean {
         return try {
@@ -441,22 +437,21 @@ class ShellManager(
         }
     }
 
-    private fun executeShizukuCommandAndGetFullOutput(command: String): String? =
-        try {
-            if (!waitForShizukuService(SHIZUKU_BIND_TIMEOUT_MS)) {
-                Log.w(TAG, "Shizuku command skipped because service is not ready command=$command")
-                null
-            } else {
-                Log.d(TAG, "Shizuku full output command executing command=$command")
-                val output = shizukuService?.runCommand(command)
-                Log.d(TAG, "Shizuku command finished outputLength=${output?.length ?: -1}")
-                output
-            }
-        } catch (e: RemoteException) {
-            Log.e(TAG, "Shizuku command failed command=$command", e)
-            e.printStackTrace()
+    private fun executeShizukuCommandAndGetFullOutput(command: String): String? = try {
+        if (!waitForShizukuService(SHIZUKU_BIND_TIMEOUT_MS)) {
+            Log.w(TAG, "Shizuku command skipped because service is not ready command=$command")
             null
+        } else {
+            Log.d(TAG, "Shizuku full output command executing command=$command")
+            val output = shizukuService?.runCommand(command)
+            Log.d(TAG, "Shizuku command finished outputLength=${output?.length ?: -1}")
+            output
         }
+    } catch (e: RemoteException) {
+        Log.e(TAG, "Shizuku command failed command=$command", e)
+        e.printStackTrace()
+        null
+    }
 
     companion object {
         private const val TAG = "ShappkyShell"

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Shappky</string>
+    <string name="kb_format">%1$d KB</string>
+    <string name="mb_format">%1$.2f MB</string>
+    <string name="gb_format">%1$.2f GB</string>
+    <string name="settings">सेटिंग्स</string>
+    <string name="show_system_apps">सिस्टम ऐप्स दिखाएं</string>
+    <string name="show_system_apps_summary">सूची में सिस्टम एप्लिकेशन प्रदर्शित करें</string>
+    <string name="show_persistent_apps">पर्सिस्टेंट ऐप्स दिखाएं</string>
+    <string name="show_persistent_apps_summary">सूची में पर्सिस्टेंट एप्लिकेशन प्रदर्शित करें</string>
+    <string name="show_app_type_icons">ऐप प्रकार के आइकन दिखाएं</string>
+    <string name="show_app_type_icons_summary">ऐप प्रकार को दर्शाने के लिए रैम उपयोग के आगे छोटे आइकन दिखाएं</string>
+    <string name="apps_auto_refresh">ऐप्स ऑटो रिफ्रेश</string>
+    <string name="apps_auto_refresh_interval_title">ऐप्स ऑटो रिफ्रेश अंतराल</string>
+    <string name="apps_ram_usage_auto_refresh">ऐप्स रैम उपयोग ऑटो रिफ्रेश</string>
+    <string name="apps_ram_usage_auto_refresh_interval_title">ऐप्स रैम उपयोग रिफ्रेश अंतराल</string>
+    <string name="ram_usage_bar_refresh_ms">रैम उपयोग बार रिफ्रेश (ms)</string>
+    <string name="ram_usage_bar_refresh_interval_title">रैम उपयोग बार रिफ्रेश अंतराल</string>
+    <string name="refresh_interval_value">%1$d ms</string>
+    <string name="refresh_interval_ms">रिफ्रेश अंतराल (ms)</string>
+    <string name="min_interval_warning">न्यूनतम अंतराल %1$d ms है</string>
+    <string name="reset">रीसेट</string>
+    <string-array name="theme_options">
+        <item>डार्क</item>
+        <item>व्हाइट</item>
+        <item>ब्लैक</item>
+    </string-array>
+    <string name="theme">थीम</string>
+    <string name="theme_summary">डार्क, व्हाइट या ब्लैक चुनें</string>
+    <string name="theme_dialog_title">थीम चुनें</string>
+    <string name="language">भाषा</string>
+    <string name="language_summary">एप्लिकेशन की भाषा बदलें</string>
+    <string name="language_dialog_title">भाषा चुनें</string>
+    <string-array name="language_options">
+        <item>सिस्टम डिफ़ॉल्ट</item>
+        <item>العربية (Arabic)</item>
+        <item>中文 (Chinese)</item>
+        <item>हिन्दी (Hindi)</item>
+        <item>Français (French)</item>
+        <item>日本語 (Japanese)</item>
+        <item>Español (Spanish)</item>
+    </string-array>
+    <string name="dynamic_colors">डायनामिक कलर्स</string>
+    <string name="dynamic_colors_summary">मटेरियल यू कलर्स का उपयोग करें (Android 12+)</string>
+    <string name="permission_mode">अनुमति मोड</string>
+    <string name="permission_mode_summary">Shizuku या Root चुनें</string>
+    <string name="permission_mode_dialog_title">अनुमति मोड चुनें</string>
+    <string name="permission_mode_root">रूट</string>
+    <string name="permission_mode_shizuku">शिज़ुकु</string>
+    <string name="permission_denied">अनुमति अस्वीकृत</string>
+    <string name="running_apps_default">चल रहे ऐप्स:</string>
+    <string name="running_apps_count">चल रहे ऐप्स: %1$d</string>
+    <string name="ram_usage">रैम उपयोग: %1$dMB / %2$dMB</string>
+    <string name="ram_usage_unknown">रैम उपयोग: --</string>
+    <string name="sort_apps">ऐप्स सॉर्ट करें</string>
+    <string name="sort_apps_title">ऐप्स सॉर्ट करें</string>
+    <string name="sort_by_name">नाम</string>
+    <string name="sort_by_ram_usage">रैम उपयोग</string>
+    <string name="sort_descending">अवरोही क्रम</string>
+    <string name="ok">ठीक है</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="save">सहेजें</string>
+    <string name="search_apps">ऐप्स खोजें</string>
+    <string name="apps_filter">ऐप्स फ़िल्टर</string>
+    <string name="filter_dialog_title">उन ऐप्स को चुनें जिन्हें आप छिपाना चाहते हैं</string>
+    <string name="donate">दान करें</string>
+    <string name="donate_summary">विकास का समर्थन करें</string>
+    <string name="source_code">सोर्स कोड</string>
+    <string name="source_code_summary">प्रोजेक्ट रिपॉजिटरी खोलें</string>
+    <string name="refresh">रिफ्रेश</string>
+    <string name="more">अधिक</string>
+    <string name="select_all">सभी चुनें</string>
+    <string name="unselect_all">सभी अचयनित करें</string>
+    <string name="force_stop">फ़ोर्स स्टॉप</string>
+    <string name="force_stop_selected">चयनित फ़ोर्स स्टॉप करें</string>
+    <string name="selected">चयनित</string>
+    <string name="back">पीछे</string>
+    <string name="full_screen">पूर्ण स्क्रीन</string>
+    <string name="full_screen_summary">स्टेटस बार छुपाएं और पूर्ण स्क्रीन का उपयोग करें</string>
+    <string name="shappky_service">Shappky सेवा</string>
+    <string name="shappky_service_running">चल रहा है...</string>
+    <string name="shappky_service_notification_text">बैकग्राउंड ऐप्स को फ़ोर्स स्टॉप किया जा रहा है...</string>
+    <string name="shappky_service_channel">Shappky फ़ोरग्राउंड सेवा</string>
+    <string name="shell_permission_required">Shizuku/Root अनुमति आवश्यक है</string>
+    <string name="no_apps_to_kill">स्टॉप करने के लिए कोई ऐप नहीं है</string>
+    <string name="service_stopped">Shappky सेवा बंद कर दी गई है</string>
+    <string name="free_up_memory">%1$s मुक्त करें</string>
+    <string name="error_getting_running_apps">चल रहे ऐप्स प्राप्त करने में त्रुटि: %1$s</string>
+    <string name="restart_required_title">पुनरारंभ आवश्यक है</string>
+    <string name="restart_required_message">इस बदलाव को लागू करने के लिए कृपया ऐप को पुनरारंभ करें।</string>
+    <string name="restart_now">पुनरारंभ करें</string>
+    <string name="restart_later">बाद में</string>
+</resources>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Shappky</string>
+    <string name="kb_format">%1$d KB</string>
+    <string name="mb_format">%1$.2f MB</string>
+    <string name="gb_format">%1$.2f GB</string>
+    <string name="settings">設定</string>
+    <string name="show_system_apps">システムアプリを表示</string>
+    <string name="show_system_apps_summary">システムアプリケーションをリストに表示する</string>
+    <string name="show_persistent_apps">常駐アプリを表示</string>
+    <string name="show_persistent_apps_summary">常駐アプリケーションをリストに表示する</string>
+    <string name="show_app_type_icons">アプリタイプのアイコンを表示</string>
+    <string name="show_app_type_icons_summary">RAM使用量の横にアプリタイプを示す小さなアイコンを表示する</string>
+    <string name="apps_auto_refresh">アプリの自動更新</string>
+    <string name="apps_auto_refresh_interval_title">アプリの自動更新間隔</string>
+    <string name="apps_ram_usage_auto_refresh">アプリRAM使用量の自動更新</string>
+    <string name="apps_ram_usage_auto_refresh_interval_title">アプリRAM使用量の更新間隔</string>
+    <string name="ram_usage_bar_refresh_ms">RAM使用量バーの更新（ミリ秒）</string>
+    <string name="ram_usage_bar_refresh_interval_title">RAM使用量バーの更新間隔</string>
+    <string name="refresh_interval_value">%1$d ミリ秒</string>
+    <string name="refresh_interval_ms">更新間隔（ミリ秒）</string>
+    <string name="min_interval_warning">最小間隔は %1$d ミリ秒です</string>
+    <string name="reset">リセット</string>
+    <string-array name="theme_options">
+        <item>ダーク</item>
+        <item>ライト</item>
+        <item>ブラック</item>
+    </string-array>
+    <string name="theme">テーマ</string>
+    <string name="theme_summary">ダーク、ライト、またはブラックを選択</string>
+    <string name="theme_dialog_title">テーマを選択</string>
+    <string name="language">言語</string>
+    <string name="language_summary">アプリの言語を変更する</string>
+    <string name="language_dialog_title">言語を選択</string>
+    <string-array name="language_options">
+        <item>システムデフォルト</item>
+        <item>العربية (Arabic)</item>
+        <item>中文 (Chinese)</item>
+        <item>हिन्दी (Hindi)</item>
+        <item>Français (French)</item>
+        <item>日本語 (Japanese)</item>
+        <item>Español (Spanish)</item>
+    </string-array>
+    <string name="dynamic_colors">ダイナミックカラー</string>
+    <string name="dynamic_colors_summary">Material Youカラーを使用する (Android 12+)</string>
+    <string name="permission_mode">権限モード</string>
+    <string name="permission_mode_summary">ShizukuまたはRootを選択</string>
+    <string name="permission_mode_dialog_title">権限モードを選択</string>
+    <string name="permission_mode_root">ルート</string>
+    <string name="permission_mode_shizuku">Shizuku</string>
+    <string name="permission_denied">権限が拒否されました</string>
+    <string name="running_apps_default">実行中のアプリ：</string>
+    <string name="running_apps_count">実行中のアプリ：%1$d</string>
+    <string name="ram_usage">RAM使用量：%1$dMB / %2$dMB</string>
+    <string name="ram_usage_unknown">RAM使用量：--</string>
+    <string name="sort_apps">アプリの並べ替え</string>
+    <string name="sort_apps_title">アプリの並べ替え基準</string>
+    <string name="sort_by_name">名前</string>
+    <string name="sort_by_ram_usage">RAM使用量</string>
+    <string name="sort_descending">降順</string>
+    <string name="ok">OK</string>
+    <string name="cancel">キャンセル</string>
+    <string name="save">保存</string>
+    <string name="search_apps">アプリを検索</string>
+    <string name="apps_filter">アプリフィルター</string>
+    <string name="filter_dialog_title">非表示にするアプリを選択</string>
+    <string name="donate">寄付</string>
+    <string name="donate_summary">開発を支援する</string>
+    <string name="source_code">ソースコード</string>
+    <string name="source_code_summary">プロジェクトのリポジトリを開く</string>
+    <string name="refresh">更新</string>
+    <string name="more">その他</string>
+    <string name="select_all">すべて選択</string>
+    <string name="unselect_all">選択解除</string>
+    <string name="force_stop">強制停止</string>
+    <string name="force_stop_selected">選択したアプリを強制停止</string>
+    <string name="selected">選択済み</string>
+    <string name="back">戻る</string>
+    <string name="full_screen">全画面表示</string>
+    <string name="full_screen_summary">ステータスバーを非表示にして全画面を使用する</string>
+    <string name="shappky_service">Shappkyサービス</string>
+    <string name="shappky_service_running">実行中...</string>
+    <string name="shappky_service_notification_text">バックグラウンドアプリを強制停止中...</string>
+    <string name="shappky_service_channel">Shappkyフォアグラウンドサービス</string>
+    <string name="shell_permission_required">ShizukuまたはRootの権限が必要です</string>
+    <string name="no_apps_to_kill">停止するアプリがありません</string>
+    <string name="service_stopped">Shappkyサービスが停止しました</string>
+    <string name="free_up_memory">%1$s を解放</string>
+    <string name="error_getting_running_apps">実行中のアプリ取得エラー：%1$s</string>
+    <string name="restart_required_title">再起動が必要です</string>
+    <string name="restart_required_message">変更を適用するにはアプリを再起動してください。</string>
+    <string name="restart_now">再起動</string>
+    <string name="restart_later">後で</string>
+</resources>

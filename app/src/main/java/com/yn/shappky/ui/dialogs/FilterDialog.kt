@@ -108,8 +108,11 @@ fun FilterDialog(
                                     checked = selectedPackages.contains(app.packageName),
                                     onCheckedChange = { checked ->
                                         selectedPackages =
-                                            if (checked) selectedPackages + app.packageName
-                                            else selectedPackages - app.packageName
+                                            if (checked) {
+                                                selectedPackages + app.packageName
+                                            } else {
+                                                selectedPackages - app.packageName
+                                            }
                                     },
                                 )
                             }

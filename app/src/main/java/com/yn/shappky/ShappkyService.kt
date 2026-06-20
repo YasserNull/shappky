@@ -140,17 +140,16 @@ class ShappkyService : Service() {
         packageName: String,
         currentKeyboardPackage: String?,
         currentLauncherPackage: String?,
-    ): Boolean =
-        packageName == "com.yn.shappky" ||
-            packageName == "com.google.android.gms" ||
-            packageName == "com.android.systemui" ||
-            packageName == "com.android.bluetooth" ||
-            packageName == "com.android.externalstorage" ||
-            packageName == "com.google.android.providers.media.module" ||
-            packageName == "com.miui.miwallpaper" ||
-            packageName == "com.android.camera" ||
-            packageName == currentKeyboardPackage ||
-            packageName == currentLauncherPackage
+    ): Boolean = packageName == "com.yn.shappky" ||
+        packageName == "com.google.android.gms" ||
+        packageName == "com.android.systemui" ||
+        packageName == "com.android.bluetooth" ||
+        packageName == "com.android.externalstorage" ||
+        packageName == "com.google.android.providers.media.module" ||
+        packageName == "com.miui.miwallpaper" ||
+        packageName == "com.android.camera" ||
+        packageName == currentKeyboardPackage ||
+        packageName == currentLauncherPackage
 
     override fun onDestroy() {
         isRunning = false

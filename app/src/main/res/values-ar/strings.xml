@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">شابكي</string>
+    <string name="kb_format">%1$d ك.ب</string>
+    <string name="mb_format">%1$.2f م.ب</string>
+    <string name="gb_format">%1$.2f ج.ب</string>
+    <string name="settings">الإعدادات</string>
+    <string name="show_system_apps">إظهار تطبيقات النظام</string>
+    <string name="show_system_apps_summary">عرض تطبيقات النظام في القائمة</string>
+    <string name="show_persistent_apps">إظهار التطبيقات المستمرة</string>
+    <string name="show_persistent_apps_summary">عرض التطبيقات المستمرة في القائمة</string>
+    <string name="show_app_type_icons">إظهار أيقونات نوع التطبيق</string>
+    <string name="show_app_type_icons_summary">إظهار أيقونات صغيرة بجانب استهلاك الرام لتوضيح نوع التطبيق</string>
+    <string name="apps_auto_refresh">التحديث التلقائي للتطبيقات</string>
+    <string name="apps_auto_refresh_interval_title">فترة التحديث التلقائي للتطبيقات</string>
+    <string name="apps_ram_usage_auto_refresh">التحديث التلقائي لاستهلاك الرام للتطبيقات</string>
+    <string name="apps_ram_usage_auto_refresh_interval_title">فترة تحديث استهلاك الرام للتطبيقات</string>
+    <string name="ram_usage_bar_refresh_ms">تحديث شريط استهلاك الرام (ملي ثانية)</string>
+    <string name="ram_usage_bar_refresh_interval_title">فترة تحديث شريط استهلاك الرام</string>
+    <string name="refresh_interval_value">%1$d ملي ثانية</string>
+    <string name="refresh_interval_ms">فترة التحديث (ملي ثانية)</string>
+    <string name="min_interval_warning">الحد الأدنى للفترة هو %1$d ملي ثانية</string>
+    <string name="reset">إعادة تعيين</string>
+    <string-array name="theme_options">
+        <item>داكن</item>
+        <item>أبيض</item>
+        <item>أسود</item>
+    </string-array>
+    <string name="theme">المظهر</string>
+    <string name="theme_summary">اختر داكن، أبيض، أو أسود</string>
+    <string name="theme_dialog_title">اختر المظهر</string>
+    <string name="language">اللغة</string>
+    <string name="language_summary">تغيير لغة التطبيق</string>
+    <string name="language_dialog_title">اختر اللغة</string>
+    <string-array name="language_options">
+        <item>افتراضي النظام</item>
+        <item>العربية (Arabic)</item>
+        <item>中文 (Chinese)</item>
+        <item>हिन्दी (Hindi)</item>
+        <item>Français (French)</item>
+        <item>日本語 (Japanese)</item>
+        <item>Español (Spanish)</item>
+    </string-array>
+    <string name="dynamic_colors">الألوان الديناميكية</string>
+    <string name="dynamic_colors_summary">استخدام ألوان Material You (أندرويد 12+)</string>
+    <string name="permission_mode">وضع الصلاحية</string>
+    <string name="permission_mode_summary">اختر Shizuku أو Root</string>
+    <string name="permission_mode_dialog_title">اختر وضع الصلاحية</string>
+    <string name="permission_mode_root">روت</string>
+    <string name="permission_mode_shizuku">شيزوكو</string>
+    <string name="permission_denied">تم رفض الصلاحية</string>
+    <string name="running_apps_default">التطبيقات المشغلة:</string>
+    <string name="running_apps_count">التطبيقات المشغلة: %1$d</string>
+    <string name="ram_usage">استهلاك الرام: %1$d ميجابايت / %2$d ميجابايت</string>
+    <string name="ram_usage_unknown">استهلاك الرام: --</string>
+    <string name="sort_apps">ترتيب التطبيقات</string>
+    <string name="sort_apps_title">ترتيب التطبيقات حسب</string>
+    <string name="sort_by_name">الاسم</string>
+    <string name="sort_by_ram_usage">استهلاك الرام</string>
+    <string name="sort_descending">تنازلي</string>
+    <string name="ok">موافق</string>
+    <string name="cancel">إلغاء</string>
+    <string name="save">حفظ</string>
+    <string name="search_apps">البحث عن التطبيقات</string>
+    <string name="apps_filter">تصفية التطبيقات</string>
+    <string name="filter_dialog_title">اختر التطبيقات التي تريد إخفاءها</string>
+    <string name="donate">تبرع</string>
+    <string name="donate_summary">دعم التطوير</string>
+    <string name="source_code">الكود المصدري</string>
+    <string name="source_code_summary">فتح مستودع المشروع</string>
+    <string name="refresh">تحديث</string>
+    <string name="more">المزيد</string>
+    <string name="select_all">تحديد الكل</string>
+    <string name="unselect_all">إلغاء تحديد الكل</string>
+    <string name="force_stop">إيقاف إجباري</string>
+    <string name="force_stop_selected">إيقاف إجباري للمحدد</string>
+    <string name="selected">محدد</string>
+    <string name="back">رجوع</string>
+    <string name="full_screen">ملء الشاشة</string>
+    <string name="full_screen_summary">إخفاء شريط الحالة واستخدام الشاشة الكاملة</string>
+    <string name="shappky_service">خدمة Shappky</string>
+    <string name="shappky_service_running">قيد التشغيل...</string>
+    <string name="shappky_service_notification_text">إيقاف تطبيقات الخلفية...</string>
+    <string name="shappky_service_channel">خدمة Shappky الأمامية</string>
+    <string name="shell_permission_required">مطلوب صلاحية Shizuku/Root</string>
+    <string name="no_apps_to_kill">لا توجد تطبيقات لإيقافها</string>
+    <string name="service_stopped">تم إيقاف خدمة Shappky</string>
+    <string name="free_up_memory">تحرير %1$s</string>
+    <string name="error_getting_running_apps">خطأ في جلب التطبيقات المشغلة: %1$s</string>
+    <string name="restart_required_title">مطلوب إعادة تشغيل</string>
+    <string name="restart_required_message">الرجاء إعادة تشغيل التطبيق لتطبيق هذا التغيير.</string>
+    <string name="restart_now">إعادة التشغيل</string>
+    <string name="restart_later">لاحقاً</string>
+</resources>

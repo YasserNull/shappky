@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Shappky</string>
+    <string name="kb_format">%1$d KB</string>
+    <string name="mb_format">%1$.2f MB</string>
+    <string name="gb_format">%1$.2f GB</string>
+    <string name="settings">Ajustes</string>
+    <string name="show_system_apps">Mostrar aplicaciones del sistema</string>
+    <string name="show_system_apps_summary">Mostrar aplicaciones del sistema en la lista</string>
+    <string name="show_persistent_apps">Mostrar aplicaciones persistentes</string>
+    <string name="show_persistent_apps_summary">Mostrar aplicaciones persistentes en la lista</string>
+    <string name="show_app_type_icons">Mostrar iconos de tipo de aplicación</string>
+    <string name="show_app_type_icons_summary">Mostrar iconos pequeños junto al uso de RAM para indicar el tipo de aplicación</string>
+    <string name="apps_auto_refresh">Actualización automática de aplicaciones</string>
+    <string name="apps_auto_refresh_interval_title">Intervalo de actualización de aplicaciones</string>
+    <string name="apps_ram_usage_auto_refresh">Actualización automática de RAM</string>
+    <string name="apps_ram_usage_auto_refresh_interval_title">Intervalo de actualización de RAM de aplicaciones</string>
+    <string name="ram_usage_bar_refresh_ms">Actualización de barra de RAM (ms)</string>
+    <string name="ram_usage_bar_refresh_interval_title">Intervalo de actualización de barra de RAM</string>
+    <string name="refresh_interval_value">%1$d ms</string>
+    <string name="refresh_interval_ms">Intervalo de actualización (ms)</string>
+    <string name="min_interval_warning">El intervalo mínimo es de %1$d ms</string>
+    <string name="reset">Restablecer</string>
+    <string-array name="theme_options">
+        <item>Oscuro</item>
+        <item>Claro</item>
+        <item>Negro</item>
+    </string-array>
+    <string name="theme">Tema</string>
+    <string name="theme_summary">Elegir Oscuro, Claro o Negro</string>
+    <string name="theme_dialog_title">Elegir tema</string>
+    <string name="language">Idioma</string>
+    <string name="language_summary">Cambiar el idioma de la aplicación</string>
+    <string name="language_dialog_title">Elegir idioma</string>
+    <string-array name="language_options">
+        <item>Predeterminado del sistema</item>
+        <item>العربية (Arabic)</item>
+        <item>中文 (Chinese)</item>
+        <item>हिन्दी (Hindi)</item>
+        <item>Français (French)</item>
+        <item>日本語 (Japanese)</item>
+        <item>Español (Spanish)</item>
+    </string-array>
+    <string name="dynamic_colors">Colores dinámicos</string>
+    <string name="dynamic_colors_summary">Usar colores Material You (Android 12+)</string>
+    <string name="permission_mode">Modo de permiso</string>
+    <string name="permission_mode_summary">Elegir Shizuku o Root</string>
+    <string name="permission_mode_dialog_title">Elegir modo de permiso</string>
+    <string name="permission_mode_root">Root</string>
+    <string name="permission_mode_shizuku">Shizuku</string>
+    <string name="permission_denied">Permiso denegado</string>
+    <string name="running_apps_default">Aplicaciones en ejecución:</string>
+    <string name="running_apps_count">Aplicaciones en ejecución: %1$d</string>
+    <string name="ram_usage">Uso de RAM: %1$d MB / %2$d MB</string>
+    <string name="ram_usage_unknown">Uso de RAM: --</string>
+    <string name="sort_apps">Ordenar aplicaciones</string>
+    <string name="sort_apps_title">Ordenar aplicaciones por</string>
+    <string name="sort_by_name">Nombre</string>
+    <string name="sort_by_ram_usage">Uso de RAM</string>
+    <string name="sort_descending">Descendente</string>
+    <string name="ok">Aceptar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="save">Guardar</string>
+    <string name="search_apps">Buscar aplicaciones</string>
+    <string name="apps_filter">Filtro de aplicaciones</string>
+    <string name="filter_dialog_title">Selecciona las aplicaciones que deseas ocultar</string>
+    <string name="donate">Donar</string>
+    <string name="donate_summary">Apoyar el desarrollo</string>
+    <string name="source_code">Código fuente</string>
+    <string name="source_code_summary">Abrir el repositorio del proyecto</string>
+    <string name="refresh">Actualizar</string>
+    <string name="more">Más</string>
+    <string name="select_all">Seleccionar todo</string>
+    <string name="unselect_all">Deseleccionar todo</string>
+    <string name="force_stop">Forzar detención</string>
+    <string name="force_stop_selected">Forzar detención de seleccionadas</string>
+    <string name="selected">Seleccionada</string>
+    <string name="back">Atrás</string>
+    <string name="full_screen">Pantalla completa</string>
+    <string name="full_screen_summary">Ocultar la barra de estado y usar la pantalla completa</string>
+    <string name="shappky_service">Servicio Shappky</string>
+    <string name="shappky_service_running">En ejecución...</string>
+    <string name="shappky_service_notification_text">Forzando detención de aplicaciones en segundo plano...</string>
+    <string name="shappky_service_channel">Servicio de primer plano Shappky</string>
+    <string name="shell_permission_required">Se requiere permiso de Shizuku/Root</string>
+    <string name="no_apps_to_kill">No hay aplicaciones para detener</string>
+    <string name="service_stopped">Servicio Shappky detenido</string>
+    <string name="free_up_memory">Liberar %1$s</string>
+    <string name="error_getting_running_apps">Error al obtener aplicaciones en ejecución: %1$s</string>
+    <string name="restart_required_title">Se requiere reiniciar</string>
+    <string name="restart_required_message">Reinicie la aplicación para aplicar este cambio.</string>
+    <string name="restart_now">Reiniciar</string>
+    <string name="restart_later">Más tarde</string>
+</resources>

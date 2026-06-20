@@ -68,8 +68,7 @@ class ShizukuShellService : IShizukuShellService.Stub {
     companion object {
         private const val TAG = "ShappkyShizukuSvc"
 
-        private fun StringBuilder.lineCount(): Int =
-            if (isEmpty()) 0 else count { it == '\n' }
+        private fun StringBuilder.lineCount(): Int = if (isEmpty()) 0 else count { it == '\n' }
 
         private fun readStream(stream: InputStream, output: StringBuilder, isError: Boolean) {
             try {

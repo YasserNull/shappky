@@ -31,16 +31,16 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.color.DynamicColors
 import com.yn.shappky.R
-import com.yn.shappky.ui.activities.SettingsActivity
 import com.yn.shappky.model.AppModel
+import com.yn.shappky.ui.activities.SettingsActivity
 import com.yn.shappky.util.BackgroundAppManager
 import com.yn.shappky.util.RamMonitor
 import com.yn.shappky.util.RamState
 import com.yn.shappky.util.ShellManager
+import rikka.shizuku.Shizuku
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import rikka.shizuku.Shizuku
 
 class MainActivity : ComponentActivity() {
     private lateinit var sharedpreferences: SharedPreferences
@@ -55,6 +55,7 @@ class MainActivity : ComponentActivity() {
     private var ramState by mutableStateOf(RamState())
     private var showSystemApps by mutableStateOf(false)
     private var showPersistentApps by mutableStateOf(false)
+    private var showAppTypeIcons by mutableStateOf(true)
     private var appsAutoRefresh = false
     private var appsRamUsageAutoRefresh = false
     private var appsAutoRefreshIntervalMs = DEFAULT_APPS_AUTO_REFRESH_INTERVAL_MS
@@ -62,6 +63,7 @@ class MainActivity : ComponentActivity() {
     private var ramUsageBarRefreshIntervalMs = DEFAULT_RAM_USAGE_BAR_REFRESH_INTERVAL_MS
     private var currentTheme = "dark"
     private var currentDynamicColors = false
+    private var currentLanguage = "system"
     private var backgroundLoadRetryCount = 0
     private var appsAutoRefreshRunnable: Runnable? = null
     private var appsRamUsageRunnable: Runnable? = null
@@ -81,6 +83,21 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+    override fun attachBaseContext(newBase: Context) {
+        val prefs = newBase.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val language = prefs.getString("appLanguage", "system") ?: "system"
+        val context = if (language != "system") {
+            val locale = java.util.Locale.forLanguageTag(language)
+            java.util.Locale.setDefault(locale)
+            val config = android.content.res.Configuration(newBase.resources.configuration)
+            config.setLocale(locale)
+            newBase.createConfigurationContext(config)
+        } else {
+            newBase
+        }
+        super.attachBaseContext(context)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyPendingFullScreenPreference()
@@ -89,6 +106,7 @@ class MainActivity : ComponentActivity() {
         sharedpreferences = getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
         currentTheme = sharedpreferences.getString(KEY_THEME, "dark") ?: "dark"
         currentDynamicColors = sharedpreferences.getBoolean(KEY_DYNAMIC_COLORS, false)
+        currentLanguage = sharedpreferences.getString(KEY_LANGUAGE, "system") ?: "system"
 
         if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -107,19 +125,21 @@ class MainActivity : ComponentActivity() {
         ramMonitor = RamMonitor(handler) { ramState = it }
         showSystemApps = sharedpreferences.getBoolean(KEY_SHOW_SYSTEM_APPS, false)
         showPersistentApps = sharedpreferences.getBoolean(KEY_SHOW_PERSISTENT_APPS, false)
+        showAppTypeIcons = sharedpreferences.getBoolean(KEY_SHOW_APP_TYPE_ICONS, true)
         appsAutoRefresh = sharedpreferences.getBoolean(KEY_APPS_AUTO_REFRESH, false)
         appsRamUsageAutoRefresh = sharedpreferences.getBoolean(KEY_APPS_RAM_USAGE_AUTO_REFRESH, false)
         appsAutoRefreshIntervalMs = sharedpreferences.getLong(KEY_APPS_AUTO_REFRESH_INTERVAL_MS, DEFAULT_APPS_AUTO_REFRESH_INTERVAL_MS)
+            .coerceAtLeast(1000L)
         appsRamUsageRefreshIntervalMs =
             sharedpreferences.getLong(
                 KEY_APPS_RAM_USAGE_REFRESH_INTERVAL_MS,
                 DEFAULT_APPS_RAM_USAGE_REFRESH_INTERVAL_MS,
-            )
+            ).coerceAtLeast(1000L)
         ramUsageBarRefreshIntervalMs =
             sharedpreferences.getLong(
                 KEY_RAM_USAGE_BAR_REFRESH_INTERVAL_MS,
                 DEFAULT_RAM_USAGE_BAR_REFRESH_INTERVAL_MS,
-            )
+            ).coerceAtLeast(500L)
         ramMonitor.setRefreshIntervalMs(ramUsageBarRefreshIntervalMs)
         appManager.setShowSystemApps(showSystemApps)
         appManager.setShowPersistentApps(showPersistentApps)
@@ -147,6 +167,7 @@ class MainActivity : ComponentActivity() {
                     isLoadingBackgroundApps = isLoadingBackgroundApps,
                     showSystemApps = showSystemApps,
                     showPersistentApps = showPersistentApps,
+                    showAppTypeIcons = showAppTypeIcons,
                     initialSortMode = sharedpreferences.getString(KEY_SORT_MODE, SORT_BY_NAME) ?: SORT_BY_NAME,
                     initialSortDescending = sharedpreferences.getBoolean(KEY_SORT_DESCENDING, false),
                     sortByName = SORT_BY_NAME,
@@ -269,8 +290,16 @@ class MainActivity : ComponentActivity() {
             }
             backgroundLoadRetryCount = 0
             Log.d(TAG, "loadBackgroundApps replacing list oldSize=${appsDataList.size}, newSize=${result.size}")
+            val selectedPackages = appsDataList.filter { it.isSelected }.map { it.packageName }.toSet()
+            val updatedResult = result.map { app ->
+                if (selectedPackages.contains(app.packageName)) {
+                    app.copy(isSelected = true)
+                } else {
+                    app
+                }
+            }
             appsDataList.clear()
-            appsDataList.addAll(result)
+            appsDataList.addAll(updatedResult)
             Log.d(TAG, "loadBackgroundApps sorting list")
             sortAppsDataList()
             Log.d(TAG, "loadBackgroundApps updating select menu visibility")
@@ -316,13 +345,19 @@ class MainActivity : ComponentActivity() {
         val comparator =
             if (sortMode == SORT_BY_RAM) {
                 val ramComparator =
-                    if (descending) compareByDescending<AppModel> { parseMemoryToKb(it.appRam) }
-                    else compareBy { parseMemoryToKb(it.appRam) }
+                    if (descending) {
+                        compareByDescending<AppModel> { it.ramKb }
+                    } else {
+                        compareBy { it.ramKb }
+                    }
                 appTypeComparator.then(ramComparator).thenBy(String.CASE_INSENSITIVE_ORDER) { it.appName }
             } else {
                 val nameComparator =
-                    if (descending) compareByDescending<AppModel> { it.appName.lowercase(Locale.getDefault()) }
-                    else compareBy { it.appName.lowercase(Locale.getDefault()) }
+                    if (descending) {
+                        compareByDescending<AppModel> { it.appName.lowercase(Locale.getDefault()) }
+                    } else {
+                        compareBy { it.appName.lowercase(Locale.getDefault()) }
+                    }
                 appTypeComparator.then(nameComparator)
             }
         val sorted = appsDataList.sortedWith(comparator)
@@ -416,12 +451,15 @@ class MainActivity : ComponentActivity() {
             if (ramUsageByPackage.isNotEmpty()) {
                 val updatedApps =
                     appsDataList.map { app ->
-                        val newRam = ramUsageByPackage[app.packageName] ?: app.appRam
+                        val newRamKb = ramUsageByPackage[app.packageName] ?: app.ramKb
                         Log.d(
                             TAG,
-                            "refreshAppsRamUsage app package=${app.packageName}, oldRam=${app.appRam}, newRam=$newRam",
+                            "refreshAppsRamUsage app package=${app.packageName}, oldRamKb=${app.ramKb}, newRamKb=$newRamKb",
                         )
-                        app.copy(appRam = ramUsageByPackage[app.packageName] ?: app.appRam)
+                        app.copy(
+                            ramKb = newRamKb,
+                            appRam = if (newRamKb > 0) appManager.formatMemorySize(newRamKb) else app.appRam,
+                        )
                     }
                 appsDataList.clear()
                 appsDataList.addAll(updatedApps)
@@ -452,46 +490,58 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         val themeNow = sharedpreferences.getString(KEY_THEME, "dark")
         val dynamicNow = sharedpreferences.getBoolean(KEY_DYNAMIC_COLORS, false)
-        if (themeNow != currentTheme || dynamicNow != currentDynamicColors) {
+        val languageNow = sharedpreferences.getString(KEY_LANGUAGE, "system") ?: "system"
+        if (themeNow != currentTheme || dynamicNow != currentDynamicColors || languageNow != currentLanguage) {
             recreate()
             return
         }
         applySystemBars()
-        updatePermissionUi()
-        val appsAutoRefreshNow = sharedpreferences.getBoolean(KEY_APPS_AUTO_REFRESH, false)
-        val appsAutoRefreshIntervalNow =
-            sharedpreferences.getLong(KEY_APPS_AUTO_REFRESH_INTERVAL_MS, DEFAULT_APPS_AUTO_REFRESH_INTERVAL_MS)
-        if (appsAutoRefreshNow != appsAutoRefresh || appsAutoRefreshIntervalNow != appsAutoRefreshIntervalMs) {
-            appsAutoRefresh = appsAutoRefreshNow
-            appsAutoRefreshIntervalMs = appsAutoRefreshIntervalNow
-            stopAppsAutoRefresh()
-            updateAppsAutoRefresh()
+
+        // Sync settings from preferences if changed in settings activity
+        val showSystemAppsNow = sharedpreferences.getBoolean(KEY_SHOW_SYSTEM_APPS, false)
+        val showPersistentAppsNow = sharedpreferences.getBoolean(KEY_SHOW_PERSISTENT_APPS, false)
+        val showAppTypeIconsNow = sharedpreferences.getBoolean(KEY_SHOW_APP_TYPE_ICONS, true)
+        var settingsChanged = false
+        if (showSystemAppsNow != showSystemApps || showPersistentAppsNow != showPersistentApps) {
+            showSystemApps = showSystemAppsNow
+            showPersistentApps = showPersistentAppsNow
+            appManager.setShowSystemApps(showSystemApps)
+            appManager.setShowPersistentApps(showPersistentApps)
+            appsDataList.replaceAllSelection(false)
+            settingsChanged = true
         }
-        val appsRamUsageAutoRefreshNow = sharedpreferences.getBoolean(KEY_APPS_RAM_USAGE_AUTO_REFRESH, false)
-        val appsRamUsageRefreshIntervalNow =
-            sharedpreferences.getLong(
-                KEY_APPS_RAM_USAGE_REFRESH_INTERVAL_MS,
-                DEFAULT_APPS_RAM_USAGE_REFRESH_INTERVAL_MS,
-            )
-        if (appsRamUsageAutoRefreshNow != appsRamUsageAutoRefresh) {
-            appsRamUsageAutoRefresh = appsRamUsageAutoRefreshNow
-            appsRamUsageRefreshIntervalMs = appsRamUsageRefreshIntervalNow
-            stopAppsRamUsageAutoRefresh()
-            updateAppsRamUsageAutoRefresh()
-        } else if (appsRamUsageRefreshIntervalNow != appsRamUsageRefreshIntervalMs) {
-            appsRamUsageRefreshIntervalMs = appsRamUsageRefreshIntervalNow
-            stopAppsRamUsageAutoRefresh()
-            updateAppsRamUsageAutoRefresh()
+        if (showAppTypeIconsNow != showAppTypeIcons) {
+            showAppTypeIcons = showAppTypeIconsNow
+            settingsChanged = true
         }
-        val ramUsageBarRefreshIntervalNow =
-            sharedpreferences.getLong(
-                KEY_RAM_USAGE_BAR_REFRESH_INTERVAL_MS,
-                DEFAULT_RAM_USAGE_BAR_REFRESH_INTERVAL_MS,
-            )
-        if (ramUsageBarRefreshIntervalNow != ramUsageBarRefreshIntervalMs) {
-            ramUsageBarRefreshIntervalMs = ramUsageBarRefreshIntervalNow
-            ramMonitor.setRefreshIntervalMs(ramUsageBarRefreshIntervalMs)
-        }
+
+        appsAutoRefresh = sharedpreferences.getBoolean(KEY_APPS_AUTO_REFRESH, false)
+        appsAutoRefreshIntervalMs = sharedpreferences.getLong(KEY_APPS_AUTO_REFRESH_INTERVAL_MS, DEFAULT_APPS_AUTO_REFRESH_INTERVAL_MS)
+            .coerceAtLeast(1000L)
+        updateAppsAutoRefresh()
+
+        appsRamUsageAutoRefresh = sharedpreferences.getBoolean(KEY_APPS_RAM_USAGE_AUTO_REFRESH, false)
+        appsRamUsageRefreshIntervalMs = sharedpreferences.getLong(
+            KEY_APPS_RAM_USAGE_REFRESH_INTERVAL_MS,
+            DEFAULT_APPS_RAM_USAGE_REFRESH_INTERVAL_MS,
+        ).coerceAtLeast(1000L)
+        updateAppsRamUsageAutoRefresh()
+
+        ramUsageBarRefreshIntervalMs = sharedpreferences.getLong(
+            KEY_RAM_USAGE_BAR_REFRESH_INTERVAL_MS,
+            DEFAULT_RAM_USAGE_BAR_REFRESH_INTERVAL_MS,
+        ).coerceAtLeast(500L)
+        ramMonitor.setRefreshIntervalMs(ramUsageBarRefreshIntervalMs)
+        ramMonitor.startMonitoring()
+
+        updatePermissionUi(forceRefresh = settingsChanged)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        ramMonitor.stopMonitoring()
+        stopAppsAutoRefresh()
+        stopAppsRamUsageAutoRefresh()
     }
 
     private fun applySystemBars() {
@@ -530,6 +580,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun applyDynamicColorsFromPreferences() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
         val prefs = getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
         if (prefs.getBoolean(KEY_DYNAMIC_COLORS, false)) {
             DynamicColors.applyToActivityIfAvailable(this)
@@ -553,11 +604,16 @@ class MainActivity : ComponentActivity() {
         return value.data
     }
 
-    private fun updatePermissionUi() {
+    private fun updatePermissionUi(forceRefresh: Boolean = false) {
         val previous = hasPermission
         hasPermission = shellManager.hasAnyShellPermission()
         Log.d(TAG, "updatePermissionUi previous=$previous, current=$hasPermission")
-        if (hasPermission) loadBackgroundApps()
+        if (hasPermission) {
+            val permissionJustGranted = !previous && hasPermission
+            if (forceRefresh || permissionJustGranted || appsDataList.isEmpty() || appsAutoRefresh) {
+                loadBackgroundApps(showRefreshIndicator = forceRefresh || appsDataList.isEmpty())
+            }
+        }
     }
 
     companion object {
@@ -566,6 +622,7 @@ class MainActivity : ComponentActivity() {
         private const val PREFERENCES_NAME = "AppPreferences"
         private const val KEY_SHOW_SYSTEM_APPS = "showSystemApps"
         private const val KEY_SHOW_PERSISTENT_APPS = "showPersistentApps"
+        private const val KEY_SHOW_APP_TYPE_ICONS = "showAppTypeIcons"
         private const val KEY_APPS_AUTO_REFRESH = "appsAutoRefresh"
         private const val KEY_APPS_RAM_USAGE_AUTO_REFRESH = "appsRamUsageAutoRefresh"
         private const val KEY_APPS_AUTO_REFRESH_INTERVAL_MS = "appsAutoRefreshIntervalMs"
@@ -574,6 +631,7 @@ class MainActivity : ComponentActivity() {
         private const val KEY_FULL_SCREEN = "fullScreen"
         private const val KEY_THEME = "appTheme"
         private const val KEY_DYNAMIC_COLORS = "dynamicColors"
+        private const val KEY_LANGUAGE = "appLanguage"
         private const val KEY_SORT_MODE = "sortMode"
         private const val KEY_SORT_DESCENDING = "sortDescending"
         private const val DEFAULT_APPS_AUTO_REFRESH_INTERVAL_MS = 5000L

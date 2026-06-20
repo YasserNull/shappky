@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
 import androidx.activity.ComponentActivity
@@ -33,6 +34,9 @@ class SettingsActivity : ComponentActivity() {
     private var showRamUsageBarRefreshIntervalDialog by mutableStateOf(false)
     private var showSystemApps by mutableStateOf(false)
     private var showPersistentApps by mutableStateOf(false)
+    private var showAppTypeIcons by mutableStateOf(true)
+    private var showLanguageDialog by mutableStateOf(false)
+    private var languageValue by mutableStateOf("system")
     private var appsAutoRefresh by mutableStateOf(false)
     private var appsRamUsageAutoRefresh by mutableStateOf(false)
     private var appsAutoRefreshIntervalMs by mutableStateOf(DEFAULT_APPS_AUTO_REFRESH_INTERVAL_MS)
@@ -42,6 +46,21 @@ class SettingsActivity : ComponentActivity() {
     private var dynamicColors by mutableStateOf(false)
     private var themeValue by mutableStateOf("dark")
     private var permissionMode by mutableStateOf("shizuku")
+
+    override fun attachBaseContext(newBase: Context) {
+        val prefs = newBase.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val language = prefs.getString("appLanguage", "system") ?: "system"
+        val context = if (language != "system") {
+            val locale = java.util.Locale.forLanguageTag(language)
+            java.util.Locale.setDefault(locale)
+            val config = android.content.res.Configuration(newBase.resources.configuration)
+            config.setLocale(locale)
+            newBase.createConfigurationContext(config)
+        } else {
+            newBase
+        }
+        super.attachBaseContext(context)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +74,7 @@ class SettingsActivity : ComponentActivity() {
                 SettingsScreen(
                     showSystemApps = showSystemApps,
                     showPersistentApps = showPersistentApps,
+                    showAppTypeIcons = showAppTypeIcons,
                     appsAutoRefresh = appsAutoRefresh,
                     appsRamUsageAutoRefresh = appsRamUsageAutoRefresh,
                     appsAutoRefreshIntervalMs = appsAutoRefreshIntervalMs,
@@ -67,9 +87,11 @@ class SettingsActivity : ComponentActivity() {
                     dynamicColors = dynamicColors,
                     themeValue = themeValue,
                     permissionMode = permissionMode,
+                    languageValue = languageValue,
                     showRestartDialog = showRestartDialog,
                     showThemeDialog = showThemeDialog,
                     showPermissionDialog = showPermissionDialog,
+                    showLanguageDialog = showLanguageDialog,
                     showAppsAutoRefreshIntervalDialog = showAppsAutoRefreshIntervalDialog,
                     showAppsRamUsageRefreshIntervalDialog = showAppsRamUsageRefreshIntervalDialog,
                     showRamUsageBarRefreshIntervalDialog = showRamUsageBarRefreshIntervalDialog,
@@ -82,15 +104,17 @@ class SettingsActivity : ComponentActivity() {
                         showPersistentApps = it
                         sharedPreferences.edit().putBoolean(KEY_SHOW_PERSISTENT_APPS, it).apply()
                     },
+                    onShowAppTypeIconsChange = {
+                        showAppTypeIcons = it
+                        sharedPreferences.edit().putBoolean(KEY_SHOW_APP_TYPE_ICONS, it).apply()
+                    },
                     onAppsAutoRefreshChange = {
                         appsAutoRefresh = it
                         sharedPreferences.edit().putBoolean(KEY_APPS_AUTO_REFRESH, it).apply()
-                        if (it) showAppsAutoRefreshIntervalDialog = true
                     },
                     onAppsRamUsageAutoRefreshChange = {
                         appsRamUsageAutoRefresh = it
                         sharedPreferences.edit().putBoolean(KEY_APPS_RAM_USAGE_AUTO_REFRESH, it).apply()
-                        if (it) showAppsRamUsageRefreshIntervalDialog = true
                     },
                     onFullScreenChange = {
                         fullScreen = it
@@ -115,17 +139,32 @@ class SettingsActivity : ComponentActivity() {
                         sharedPreferences.edit().putString(KEY_PERMISSION_MODE, it).apply()
                         showPermissionDialog = false
                     },
+                    onLanguageSelected = {
+                        if (it != languageValue) {
+                            languageValue = it
+                            sharedPreferences.edit().putString(KEY_LANGUAGE, it).apply()
+                            recreate()
+                        }
+                        showLanguageDialog = false
+                    },
                     onRestart = { restartApp() },
                     onDismissRestart = { showRestartDialog = false },
                     onShowThemeDialog = { showThemeDialog = true },
                     onDismissThemeDialog = { showThemeDialog = false },
                     onShowPermissionDialog = { showPermissionDialog = true },
                     onDismissPermissionDialog = { showPermissionDialog = false },
+                    onShowLanguageDialog = { showLanguageDialog = true },
+                    onDismissLanguageDialog = { showLanguageDialog = false },
                     onShowAppsAutoRefreshIntervalDialog = { showAppsAutoRefreshIntervalDialog = true },
                     onDismissAppsAutoRefreshIntervalDialog = { showAppsAutoRefreshIntervalDialog = false },
                     onApplyAppsAutoRefreshInterval = {
-                        appsAutoRefreshIntervalMs = it
-                        sharedPreferences.edit().putLong(KEY_APPS_AUTO_REFRESH_INTERVAL_MS, it).apply()
+                        val coerced = it.coerceAtLeast(1000L)
+                        appsAutoRefreshIntervalMs = coerced
+                        sharedPreferences.edit().putLong(KEY_APPS_AUTO_REFRESH_INTERVAL_MS, coerced).apply()
+                        if (!appsAutoRefresh) {
+                            appsAutoRefresh = true
+                            sharedPreferences.edit().putBoolean(KEY_APPS_AUTO_REFRESH, true).apply()
+                        }
                         showAppsAutoRefreshIntervalDialog = false
                     },
                     onShowAppsRamUsageRefreshIntervalDialog = { showAppsRamUsageRefreshIntervalDialog = true },
@@ -133,8 +172,13 @@ class SettingsActivity : ComponentActivity() {
                         showAppsRamUsageRefreshIntervalDialog = false
                     },
                     onApplyAppsRamUsageRefreshInterval = {
-                        appsRamUsageRefreshIntervalMs = it
-                        sharedPreferences.edit().putLong(KEY_APPS_RAM_USAGE_REFRESH_INTERVAL_MS, it).apply()
+                        val coerced = it.coerceAtLeast(1000L)
+                        appsRamUsageRefreshIntervalMs = coerced
+                        sharedPreferences.edit().putLong(KEY_APPS_RAM_USAGE_REFRESH_INTERVAL_MS, coerced).apply()
+                        if (!appsRamUsageAutoRefresh) {
+                            appsRamUsageAutoRefresh = true
+                            sharedPreferences.edit().putBoolean(KEY_APPS_RAM_USAGE_AUTO_REFRESH, true).apply()
+                        }
                         showAppsRamUsageRefreshIntervalDialog = false
                     },
                     onShowRamUsageBarRefreshIntervalDialog = { showRamUsageBarRefreshIntervalDialog = true },
@@ -142,8 +186,9 @@ class SettingsActivity : ComponentActivity() {
                         showRamUsageBarRefreshIntervalDialog = false
                     },
                     onApplyRamUsageBarRefreshInterval = {
-                        ramUsageBarRefreshIntervalMs = it
-                        sharedPreferences.edit().putLong(KEY_RAM_USAGE_BAR_REFRESH_INTERVAL_MS, it).apply()
+                        val coerced = it.coerceAtLeast(500L)
+                        ramUsageBarRefreshIntervalMs = coerced
+                        sharedPreferences.edit().putLong(KEY_RAM_USAGE_BAR_REFRESH_INTERVAL_MS, coerced).apply()
                         showRamUsageBarRefreshIntervalDialog = false
                     },
                     onOpenDonate = {
@@ -160,24 +205,27 @@ class SettingsActivity : ComponentActivity() {
     private fun readPreferences() {
         showSystemApps = sharedPreferences.getBoolean(KEY_SHOW_SYSTEM_APPS, false)
         showPersistentApps = sharedPreferences.getBoolean(KEY_SHOW_PERSISTENT_APPS, false)
+        showAppTypeIcons = sharedPreferences.getBoolean(KEY_SHOW_APP_TYPE_ICONS, true)
         appsAutoRefresh = sharedPreferences.getBoolean(KEY_APPS_AUTO_REFRESH, false)
         appsRamUsageAutoRefresh = sharedPreferences.getBoolean(KEY_APPS_RAM_USAGE_AUTO_REFRESH, false)
         appsAutoRefreshIntervalMs =
             sharedPreferences.getLong(KEY_APPS_AUTO_REFRESH_INTERVAL_MS, DEFAULT_APPS_AUTO_REFRESH_INTERVAL_MS)
+                .coerceAtLeast(1000L)
         appsRamUsageRefreshIntervalMs =
             sharedPreferences.getLong(
                 KEY_APPS_RAM_USAGE_REFRESH_INTERVAL_MS,
                 DEFAULT_APPS_RAM_USAGE_REFRESH_INTERVAL_MS,
-            )
+            ).coerceAtLeast(1000L)
         ramUsageBarRefreshIntervalMs =
             sharedPreferences.getLong(
                 KEY_RAM_USAGE_BAR_REFRESH_INTERVAL_MS,
                 DEFAULT_RAM_USAGE_BAR_REFRESH_INTERVAL_MS,
-            )
+            ).coerceAtLeast(500L)
         fullScreen = sharedPreferences.getBoolean(KEY_FULL_SCREEN, false)
         dynamicColors = sharedPreferences.getBoolean(KEY_DYNAMIC_COLORS, false)
         themeValue = sharedPreferences.getString(KEY_THEME, "dark") ?: "dark"
         permissionMode = sharedPreferences.getString(KEY_PERMISSION_MODE, "shizuku") ?: "shizuku"
+        languageValue = sharedPreferences.getString(KEY_LANGUAGE, "system") ?: "system"
     }
 
     @Composable
@@ -245,6 +293,7 @@ class SettingsActivity : ComponentActivity() {
     }
 
     private fun applyDynamicColorsFromPreferences() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
         val prefs = getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
         if (prefs.getBoolean(KEY_DYNAMIC_COLORS, false)) {
             DynamicColors.applyToActivityIfAvailable(this)
@@ -279,6 +328,7 @@ class SettingsActivity : ComponentActivity() {
         private const val PREFERENCES_NAME = "AppPreferences"
         private const val KEY_SHOW_SYSTEM_APPS = "showSystemApps"
         private const val KEY_SHOW_PERSISTENT_APPS = "showPersistentApps"
+        private const val KEY_SHOW_APP_TYPE_ICONS = "showAppTypeIcons"
         private const val KEY_APPS_AUTO_REFRESH = "appsAutoRefresh"
         private const val KEY_APPS_RAM_USAGE_AUTO_REFRESH = "appsRamUsageAutoRefresh"
         private const val KEY_APPS_AUTO_REFRESH_INTERVAL_MS = "appsAutoRefreshIntervalMs"
@@ -292,5 +342,6 @@ class SettingsActivity : ComponentActivity() {
         private const val KEY_DYNAMIC_COLORS = "dynamicColors"
         private const val KEY_PERMISSION_MODE = "permissionMode"
         private const val KEY_FULLSCREEN_PENDING = "fullScreenPending"
+        private const val KEY_LANGUAGE = "appLanguage"
     }
 }

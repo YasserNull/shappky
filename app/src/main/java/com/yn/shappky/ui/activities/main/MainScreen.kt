@@ -45,8 +45,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -69,6 +69,7 @@ fun MainScreen(
     isLoadingBackgroundApps: Boolean,
     showSystemApps: Boolean,
     showPersistentApps: Boolean,
+    showAppTypeIcons: Boolean,
     initialSortMode: String,
     initialSortDescending: Boolean,
     sortByName: String,
@@ -221,6 +222,7 @@ fun MainScreen(
                     items(apps, key = { it.packageName }) { app ->
                         AppRow(
                             app = app,
+                            showAppTypeIcons = showAppTypeIcons,
                             onToggle = { onToggleApp(app) },
                             onKill = { onKillApp(app) },
                         )

@@ -1,79 +1,106 @@
 <resources>
-	<string name="app_name" translatable="false">Shappky</string>
-	
-	<!-- Settings -->
-	<string name="settings">Settings</string>
-	<string name="show_system_apps">Show system apps</string>
-	<string name="show_system_apps_summary">Display system applications in the list</string>
-	<string name="show_persistent_apps">Show persistent apps</string>
-	<string name="show_persistent_apps_summary">Display persistent applications in the list</string>
-	<string name="apps_auto_refresh">Apps auto refresh</string>
-	<string name="apps_auto_refresh_interval_title">Apps auto refresh interval</string>
-	<string name="apps_ram_usage_auto_refresh">Apps RAM usage auto refresh</string>
-	<string name="apps_ram_usage_auto_refresh_interval_title">Apps RAM usage refresh interval</string>
-	<string name="ram_usage_bar_refresh_ms">RAM usage bar refresh ms</string>
-	<string name="ram_usage_bar_refresh_interval_title">RAM usage bar refresh interval</string>
-	<string name="refresh_interval_value">%1$d ms</string>
-	<string name="refresh_interval_ms">Refresh interval (ms)</string>
-	<string name="reset">Reset</string>
-	<string-array name="theme_options">
-		<item>Dark</item>
-		<item>White</item>
-		<item>Black</item>
-	</string-array>
-	<string name="theme">Theme</string>
-	<string name="theme_summary">Choose Dark, White, or Black</string>
-	<string name="theme_dialog_title">Choose theme</string>
-	<string name="dynamic_colors">Dynamic colors</string>
-	<string name="dynamic_colors_summary">Use Material You colors (Android 12+)</string>
-	<string name="permission_mode">Permission mode</string>
-	<string name="permission_mode_summary">Choose Shizuku or Root</string>
-	<string name="permission_mode_dialog_title">Choose permission mode</string>
-	<string name="permission_mode_root">Root</string>
-	<string name="permission_mode_shizuku">Shizuku</string>
-	<string name="permission_denied">Permission denied</string>
-	<string name="running_apps_default">Running apps:</string>
-	<string name="running_apps_count">Running apps: %1$d</string>
-	<string name="ram_usage">RAM Usage: %1$dMB / %2$dMB</string>
-	<string name="ram_usage_unknown">RAM Usage: --</string>
-	<string name="sort_apps">Sort apps</string>
-	<string name="sort_apps_title">Sort apps by</string>
-	<string name="sort_by_name">Name</string>
-	<string name="sort_by_ram_usage">RAM usage</string>
-	<string name="sort_descending">Descending</string>
-	<string name="ok">Ok</string>
-	<string name="cancel">Cancel</string>
-	<string name="save">Save</string>
-	<string name="search_apps">Search apps</string>
-	<string name="apps_filter">Apps filter</string>
-	<string name="filter_dialog_title">Select the apps you want to hide</string>
-	<string name="donate">Donate</string>
-	<string name="donate_summary">Support development</string>
-	<string name="donate_url" translatable="false">https://www.paypal.com/ncp/payment/7X44EWSM9KAVW</string>
-	<string name="source_code">Source Code</string>
-	<string name="source_code_summary">Open project repository</string>
-	<string name="source_code_url" translatable="false">https://github.com/YasserNull/shappky</string>
-	<string name="refresh">Refresh</string>
-	<string name="more">More</string>
-	<string name="select_all">Select all</string>
-	<string name="unselect_all">Unselect all</string>
-	<string name="force_stop">Force stop</string>
-	<string name="force_stop_selected">Force stop selected</string>
-	<string name="selected">Selected</string>
-	<string name="back">Back</string>
-	<string name="full_screen">Full screen</string>
-	<string name="full_screen_summary">Hide the status bar and use the full screen</string>
-	<string name="shappky_service">Shappky Service</string>
-	<string name="shappky_service_running">Running...</string>
-	<string name="shappky_service_notification_text">Killing background apps...</string>
-	<string name="shappky_service_channel">Shappky Foreground Service</string>
-	<string name="shell_permission_required">Shizuku/Root permission required</string>
-	<string name="no_apps_to_kill">No apps to kill</string>
-	<string name="service_stopped">Shappky Service Stopped</string>
-	<string name="free_up_memory">Free up %1$s</string>
-	<string name="error_getting_running_apps">Error getting running apps: %1$s</string>
-	<string name="restart_required_title">Restart required</string>
-	<string name="restart_required_message">Please restart the app to apply this change.</string>
-	<string name="restart_now">Restart</string>
-	<string name="restart_later">Later</string>
+    <string name="app_name">Shappky</string>
+    <string name="kb_format">%1$d KB</string>
+    <string name="mb_format">%1$.2f MB</string>
+    <string name="gb_format">%1$.2f GB</string>
+
+    <!-- Settings -->
+    <string name="settings">Settings</string>
+    <string name="show_system_apps">Show system apps</string>
+    <string name="show_system_apps_summary">Display system applications in the list</string>
+    <string name="show_persistent_apps">Show persistent apps</string>
+    <string name="show_persistent_apps_summary">Display persistent applications in the list</string>
+    <string name="show_app_type_icons">Show app type icons</string>
+    <string name="show_app_type_icons_summary">Show small icons next to RAM usage indicating app type</string>
+    <string name="apps_auto_refresh">Apps auto refresh</string>
+    <string name="apps_auto_refresh_interval_title">Apps auto refresh interval</string>
+    <string name="apps_ram_usage_auto_refresh">Apps RAM usage auto refresh</string>
+    <string name="apps_ram_usage_auto_refresh_interval_title">Apps RAM usage refresh interval</string>
+    <string name="ram_usage_bar_refresh_ms">RAM usage bar refresh ms</string>
+    <string name="ram_usage_bar_refresh_interval_title">RAM usage bar refresh interval</string>
+    <string name="refresh_interval_value">%1$d ms</string>
+    <string name="refresh_interval_ms">Refresh interval (ms)</string>
+    <string name="min_interval_warning">Minimum interval is %1$d ms</string>
+    <string name="reset">Reset</string>
+    <string-array name="theme_options">
+        <item>Dark</item>
+        <item>White</item>
+        <item>Black</item>
+    </string-array>
+    <string name="theme">Theme</string>
+    <string name="theme_summary">Choose Dark, White, or Black</string>
+    <string name="theme_dialog_title">Choose theme</string>
+    <string name="language">Language</string>
+    <string name="language_summary">Change application language</string>
+    <string name="language_dialog_title">Choose language</string>
+    <string-array name="language_options">
+        <item>System Default</item>
+        <item>العربية (Arabic)</item>
+        <item>中文 (Chinese)</item>
+        <item>हिन्दी (Hindi)</item>
+        <item>Français (French)</item>
+        <item>日本語 (Japanese)</item>
+        <item>Español (Spanish)</item>
+    </string-array>
+    <string-array name="language_values" translatable="false">
+        <item>system</item>
+        <item>ar</item>
+        <item>zh</item>
+        <item>hi</item>
+        <item>fr</item>
+        <item>ja</item>
+        <item>es</item>
+    </string-array>
+    <string name="dynamic_colors">Dynamic colors</string>
+    <string name="dynamic_colors_summary">Use Material You colors (Android 12+)</string>
+    <string name="permission_mode">Permission mode</string>
+    <string name="permission_mode_summary">Choose Shizuku or Root</string>
+    <string name="permission_mode_dialog_title">Choose permission mode</string>
+    <string name="permission_mode_root">Root</string>
+    <string name="permission_mode_shizuku">Shizuku</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="running_apps_default">Running apps:</string>
+    <string name="running_apps_count">Running apps: %1$d</string>
+    <string name="ram_usage">RAM Usage: %1$dMB / %2$dMB</string>
+    <string name="ram_usage_unknown">RAM Usage: --</string>
+    <string name="sort_apps">Sort apps</string>
+    <string name="sort_apps_title">Sort apps by</string>
+    <string name="sort_by_name">Name</string>
+    <string name="sort_by_ram_usage">RAM usage</string>
+    <string name="sort_descending">Descending</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="search_apps">Search apps</string>
+    <string name="apps_filter">Apps filter</string>
+    <string name="filter_dialog_title">Select the apps you want to hide</string>
+    <string name="donate">Donate</string>
+    <string name="donate_summary">Support development</string>
+    <string name="donate_url" translatable="false">https://www.paypal.com/ncp/payment/7X44EWSM9KAVW</string>
+    <string name="source_code">Source Code</string>
+    <string name="source_code_summary">Open project repository</string>
+    <string name="source_code_url" translatable="false">https://github.com/YasserNull/shappky</string>
+    <string name="refresh">Refresh</string>
+    <string name="more">More</string>
+    <string name="select_all">Select all</string>
+    <string name="unselect_all">Unselect all</string>
+    <string name="force_stop">Force stop</string>
+    <string name="force_stop_selected">Force stop selected</string>
+    <string name="selected">Selected</string>
+    <string name="back">Back</string>
+    <string name="full_screen">Full screen</string>
+    <string name="full_screen_summary">Hide the status bar and use the full screen</string>
+    <string name="shappky_service">Shappky Service</string>
+    <string name="shappky_service_running">Running...</string>
+    <string name="shappky_service_notification_text">Killing background apps...</string>
+    <string name="shappky_service_channel">Shappky Foreground Service</string>
+    <string name="shell_permission_required">Shizuku/Root permission required</string>
+    <string name="no_apps_to_kill">No apps to kill</string>
+    <string name="service_stopped">Shappky Service Stopped</string>
+    <string name="free_up_memory">Free up %1$s</string>
+    <string name="error_getting_running_apps">Error getting running apps: %1$s</string>
+    <string name="restart_required_title">Restart required</string>
+    <string name="restart_required_message">Please restart the app to apply this change.</string>
+    <string name="restart_now">Restart</string>
+    <string name="restart_later">Later</string>
 </resources>

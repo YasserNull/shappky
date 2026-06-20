@@ -10,13 +10,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,10 +35,12 @@ import com.yn.shappky.ui.components.ActionSettingRow
 import com.yn.shappky.ui.components.SettingsDivider
 import com.yn.shappky.ui.components.SwitchSettingRow
 import com.yn.shappky.ui.components.ValueSettingRow
+import com.yn.shappky.ui.dialogs.LanguageDialog
 import com.yn.shappky.ui.dialogs.PermissionModeDialog
 import com.yn.shappky.ui.dialogs.RefreshIntervalDialog
 import com.yn.shappky.ui.dialogs.RestartDialog
 import com.yn.shappky.ui.dialogs.ThemeDialog
+import com.yn.shappky.utils.getLanguageLabel
 import com.yn.shappky.utils.getThemeLabel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,6 +48,7 @@ import com.yn.shappky.utils.getThemeLabel
 fun SettingsScreen(
     showSystemApps: Boolean,
     showPersistentApps: Boolean,
+    showAppTypeIcons: Boolean,
     appsAutoRefresh: Boolean,
     appsRamUsageAutoRefresh: Boolean,
     appsAutoRefreshIntervalMs: Long,
@@ -57,27 +61,33 @@ fun SettingsScreen(
     dynamicColors: Boolean,
     themeValue: String,
     permissionMode: String,
+    languageValue: String,
     showRestartDialog: Boolean,
     showThemeDialog: Boolean,
     showPermissionDialog: Boolean,
+    showLanguageDialog: Boolean,
     showAppsAutoRefreshIntervalDialog: Boolean,
     showAppsRamUsageRefreshIntervalDialog: Boolean,
     showRamUsageBarRefreshIntervalDialog: Boolean,
     onBack: () -> Unit,
     onShowSystemAppsChange: (Boolean) -> Unit,
     onShowPersistentAppsChange: (Boolean) -> Unit,
+    onShowAppTypeIconsChange: (Boolean) -> Unit,
     onAppsAutoRefreshChange: (Boolean) -> Unit,
     onAppsRamUsageAutoRefreshChange: (Boolean) -> Unit,
     onFullScreenChange: (Boolean) -> Unit,
     onDynamicColorsChange: (Boolean) -> Unit,
     onThemeSelected: (String) -> Unit,
     onPermissionModeSelected: (String) -> Unit,
+    onLanguageSelected: (String) -> Unit,
     onRestart: () -> Unit,
     onDismissRestart: () -> Unit,
     onShowThemeDialog: () -> Unit,
     onDismissThemeDialog: () -> Unit,
     onShowPermissionDialog: () -> Unit,
     onDismissPermissionDialog: () -> Unit,
+    onShowLanguageDialog: () -> Unit,
+    onDismissLanguageDialog: () -> Unit,
     onShowAppsAutoRefreshIntervalDialog: () -> Unit,
     onDismissAppsAutoRefreshIntervalDialog: () -> Unit,
     onApplyAppsAutoRefreshInterval: (Long) -> Unit,
@@ -131,18 +141,20 @@ fun SettingsScreen(
             )
             SettingsDivider()
             SwitchSettingRow(
+                icon = Icons.Filled.Apps,
+                title = stringResource(R.string.show_app_type_icons),
+                summary = stringResource(R.string.show_app_type_icons_summary),
+                checked = showAppTypeIcons,
+                onCheckedChange = onShowAppTypeIconsChange,
+            )
+            SettingsDivider()
+            SwitchSettingRow(
                 icon = Icons.Filled.Refresh,
                 title = stringResource(R.string.apps_auto_refresh),
                 summary = stringResource(R.string.refresh_interval_value, appsAutoRefreshIntervalMs),
                 checked = appsAutoRefresh,
                 onCheckedChange = onAppsAutoRefreshChange,
-                onClick = {
-                    if (appsAutoRefresh) {
-                        onShowAppsAutoRefreshIntervalDialog()
-                    } else {
-                        onAppsAutoRefreshChange(true)
-                    }
-                },
+                onClick = onShowAppsAutoRefreshIntervalDialog,
             )
             SettingsDivider()
             SwitchSettingRow(
@@ -151,13 +163,7 @@ fun SettingsScreen(
                 summary = stringResource(R.string.refresh_interval_value, appsRamUsageRefreshIntervalMs),
                 checked = appsRamUsageAutoRefresh,
                 onCheckedChange = onAppsRamUsageAutoRefreshChange,
-                onClick = {
-                    if (appsRamUsageAutoRefresh) {
-                        onShowAppsRamUsageRefreshIntervalDialog()
-                    } else {
-                        onAppsRamUsageAutoRefreshChange(true)
-                    }
-                },
+                onClick = onShowAppsRamUsageRefreshIntervalDialog,
             )
             SettingsDivider()
             ActionSettingRow(
@@ -206,6 +212,15 @@ fun SettingsScreen(
                 onClick = onShowThemeDialog,
             )
             SettingsDivider()
+            val languageOptions = stringArrayResource(R.array.language_options)
+            ValueSettingRow(
+                icon = Icons.Filled.Translate,
+                title = stringResource(R.string.language),
+                summary = stringResource(R.string.language_summary),
+                value = getLanguageLabel(languageValue, languageOptions),
+                onClick = onShowLanguageDialog,
+            )
+            SettingsDivider()
             ActionSettingRow(
                 icon = Icons.Filled.Favorite,
                 title = stringResource(R.string.donate),
@@ -225,6 +240,14 @@ fun SettingsScreen(
 
     if (showRestartDialog) {
         RestartDialog(onRestart = onRestart, onDismiss = onDismissRestart)
+    }
+    if (showLanguageDialog) {
+        LanguageDialog(
+            languageValue = languageValue,
+            options = stringArrayResource(R.array.language_options),
+            onLanguageSelected = onLanguageSelected,
+            onDismiss = onDismissLanguageDialog,
+        )
     }
     if (showThemeDialog) {
         ThemeDialog(
@@ -246,6 +269,7 @@ fun SettingsScreen(
             title = stringResource(R.string.apps_auto_refresh_interval_title),
             currentIntervalMs = appsAutoRefreshIntervalMs,
             defaultIntervalMs = defaultAppsAutoRefreshIntervalMs,
+            minIntervalMs = 1000L,
             onApply = onApplyAppsAutoRefreshInterval,
             onDismiss = onDismissAppsAutoRefreshIntervalDialog,
         )
@@ -255,6 +279,7 @@ fun SettingsScreen(
             title = stringResource(R.string.apps_ram_usage_auto_refresh_interval_title),
             currentIntervalMs = appsRamUsageRefreshIntervalMs,
             defaultIntervalMs = defaultAppsRamUsageRefreshIntervalMs,
+            minIntervalMs = 1000L,
             onApply = onApplyAppsRamUsageRefreshInterval,
             onDismiss = onDismissAppsRamUsageRefreshIntervalDialog,
         )
@@ -264,6 +289,7 @@ fun SettingsScreen(
             title = stringResource(R.string.ram_usage_bar_refresh_interval_title),
             currentIntervalMs = ramUsageBarRefreshIntervalMs,
             defaultIntervalMs = defaultRamUsageBarRefreshIntervalMs,
+            minIntervalMs = 500L,
             onApply = onApplyRamUsageBarRefreshInterval,
             onDismiss = onDismissRamUsageBarRefreshIntervalDialog,
         )
