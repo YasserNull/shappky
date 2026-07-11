@@ -19,34 +19,36 @@ import com.yn.shappky.utils.languageFromIndex
 
 @Composable
 fun LanguageDialog(
-    languageValue: String,
-    options: Array<String>,
-    onLanguageSelected: (String) -> Unit,
-    onDismiss: () -> Unit,
+  languageValue: String,
+  options: Array<String>,
+  onLanguageSelected: (String) -> Unit,
+  onDismiss: () -> Unit,
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.language_dialog_title)) },
-        text = {
-            Column {
-                options.forEachIndexed { index, label ->
-                    val newLanguage = languageFromIndex(index)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onLanguageSelected(newLanguage) }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        RadioButton(selected = languageValue == newLanguage, onClick = null)
-                        Text(label)
-                    }
-                }
-            }
-        },
-        confirmButton = {},
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
-        },
-    )
+  AlertDialog(
+    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface,
+    tonalElevation = 8.dp,
+    onDismissRequest = onDismiss,
+    title = { Text(stringResource(R.string.language_dialog_title)) },
+    text = {
+      Column {
+        options.forEachIndexed { index, label ->
+          val newLanguage = languageFromIndex(index)
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .clickable { onLanguageSelected(newLanguage) }
+              .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            RadioButton(selected = languageValue == newLanguage, onClick = null)
+            Text(label)
+          }
+        }
+      }
+    },
+    confirmButton = {},
+    dismissButton = {
+      TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+    },
+  )
 }

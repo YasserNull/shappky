@@ -22,64 +22,72 @@ import com.yn.shappky.R
 
 @Composable
 fun SortDialog(
-    initialSortMode: String,
-    initialDescending: Boolean,
-    sortByName: String,
-    sortByRam: String,
-    onDismiss: () -> Unit,
-    onApply: (sortMode: String, descending: Boolean) -> Unit,
+  initialSortMode: String,
+  initialDescending: Boolean,
+  sortByName: String,
+  sortByRam: String,
+  sortByType: String = "type",
+  onDismiss: () -> Unit,
+  onApply: (sortMode: String, descending: Boolean) -> Unit,
 ) {
-    var selectedSortMode by mutableStateOf(initialSortMode)
-    var descending by mutableStateOf(initialDescending)
+  var selectedSortMode by mutableStateOf(initialSortMode)
+  var descending by mutableStateOf(initialDescending)
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.sort_apps_title)) },
-        text = {
-            Column {
-                DialogRadioRow(
-                    text = stringResource(R.string.sort_by_name),
-                    selected = selectedSortMode == sortByName,
-                    onClick = { selectedSortMode = sortByName },
-                )
-                DialogRadioRow(
-                    text = stringResource(R.string.sort_by_ram_usage),
-                    selected = selectedSortMode == sortByRam,
-                    onClick = { selectedSortMode = sortByRam },
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { descending = !descending }
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Checkbox(checked = descending, onCheckedChange = { descending = it })
-                    Text(stringResource(R.string.sort_descending))
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = { onApply(selectedSortMode, descending) }) {
-                Text(stringResource(R.string.ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
-        },
-    )
+  AlertDialog(
+    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface,
+    tonalElevation = 8.dp,
+    onDismissRequest = onDismiss,
+    title = { Text(stringResource(R.string.sort_apps_title)) },
+    text = {
+      Column {
+        DialogRadioRow(
+          text = stringResource(R.string.sort_by_name),
+          selected = selectedSortMode == sortByName,
+          onClick = { selectedSortMode = sortByName },
+        )
+        DialogRadioRow(
+          text = stringResource(R.string.sort_by_ram_usage),
+          selected = selectedSortMode == sortByRam,
+          onClick = { selectedSortMode = sortByRam },
+        )
+        DialogRadioRow(
+          text = stringResource(R.string.sort_by_type),
+          selected = selectedSortMode == sortByType,
+          onClick = { selectedSortMode = sortByType },
+        )
+        Row(
+          modifier = Modifier
+            .fillMaxWidth()
+            .clickable { descending = !descending }
+            .padding(vertical = 8.dp),
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Checkbox(checked = descending, onCheckedChange = { descending = it })
+          Text(stringResource(R.string.sort_descending))
+        }
+      }
+    },
+    confirmButton = {
+      TextButton(onClick = { onApply(selectedSortMode, descending) }) {
+        Text(stringResource(R.string.ok))
+      }
+    },
+    dismissButton = {
+      TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+    },
+  )
 }
 
 @Composable
 private fun DialogRadioRow(text: String, selected: Boolean, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        RadioButton(selected = selected, onClick = onClick)
-        Text(text)
-    }
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .clickable(onClick = onClick)
+      .padding(vertical = 8.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    RadioButton(selected = selected, onClick = onClick)
+    Text(text)
+  }
 }

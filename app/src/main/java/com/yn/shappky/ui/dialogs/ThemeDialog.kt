@@ -19,34 +19,36 @@ import com.yn.shappky.utils.themeFromIndex
 
 @Composable
 fun ThemeDialog(
-    themeValue: String,
-    options: Array<String>,
-    onThemeSelected: (String) -> Unit,
-    onDismiss: () -> Unit,
+  themeValue: String,
+  options: Array<String>,
+  onThemeSelected: (String) -> Unit,
+  onDismiss: () -> Unit,
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.theme_dialog_title)) },
-        text = {
-            Column {
-                options.forEachIndexed { index, label ->
-                    val newTheme = themeFromIndex(index)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onThemeSelected(newTheme) }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        RadioButton(selected = themeValue == newTheme, onClick = null)
-                        Text(label)
-                    }
-                }
-            }
-        },
-        confirmButton = {},
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
-        },
-    )
+  AlertDialog(
+    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface,
+    tonalElevation = 8.dp,
+    onDismissRequest = onDismiss,
+    title = { Text(stringResource(R.string.theme_dialog_title)) },
+    text = {
+      Column {
+        options.forEachIndexed { index, label ->
+          val newTheme = themeFromIndex(index)
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .clickable { onThemeSelected(newTheme) }
+              .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            RadioButton(selected = themeValue == newTheme, onClick = null)
+            Text(label)
+          }
+        }
+      }
+    },
+    confirmButton = {},
+    dismissButton = {
+      TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+    },
+  )
 }

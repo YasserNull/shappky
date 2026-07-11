@@ -5,8 +5,16 @@
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -15,18 +23,100 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.activities.main.MainActivity"
+            android:exported="true" />
+
+        <activity-alias
+            android:name=".LauncherEnglish"
+            android:targetActivity=".ui.activities.main.MainActivity"
+            android:label="@string/app_name_en"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".LauncherArabic"
+            android:targetActivity=".ui.activities.main.MainActivity"
+            android:label="@string/app_name_ar"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
         <activity
-            android:name=".ui.activities.SettingsActivity"
+            android:name=".ui.activities.settings.SettingsActivity"
             android:exported="false"
             android:theme="@style/AppTheme" />
+        <activity
+            android:name=".ui.activities.serviceCustomization.ServiceCustomizationActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".ui.activities.triggers.TriggersActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".ui.activities.addTrigger.AddTriggerActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".ui.activities.widgetConfig.WidgetConfigActivity"
+            android:exported="true"
+            android:theme="@style/Theme.WidgetConfig">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.activities.listWidgetConfig.ListWidgetConfigActivity"
+            android:exported="true"
+            android:theme="@style/Theme.WidgetConfig">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+        <receiver
+            android:name=".providers.ShappkyWidgetProvider"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.yn.shappky.ACTION_WIDGET_CLICK" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/shappky_widget_info" />
+        </receiver>
+        <receiver
+            android:name=".providers.ShappkyListWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_list_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.yn.shappky.ACTION_APP_CLICK" />
+                <action android:name="com.yn.shappky.ACTION_REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/shappky_list_widget_info" />
+        </receiver>
         <service
-            android:name=".ShappkyQuickTile"
+            android:name=".services.ShappkyWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
+        <service
+            android:name=".services.ShappkyQuickTile"
+            android:icon="@drawable/ic_shappky"
+            android:label="@string/shappky_service"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             android:exported="true">
         <intent-filter>
@@ -34,7 +124,12 @@
         </intent-filter>
        </service>
        <service
-            android:name=".ShappkyService"
+            android:name=".services.ShappkyService"
+            android:exported="false"
+            android:enabled="true">
+        </service>
+        <service
+            android:name=".services.ShappkyTriggerService"
             android:exported="false"
             android:enabled="true"
             android:foregroundServiceType="dataSync">
@@ -46,5 +141,49 @@
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+         <receiver
+             android:name=".receivers.BootReceiver"
+             android:enabled="true"
+             android:exported="true">
+             <intent-filter>
+                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                 <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+             </intent-filter>
+         </receiver>
+         <receiver
+             android:name=".receivers.AlarmReceiver"
+             android:enabled="true"
+             android:exported="false" />
+
+         <receiver
+             android:name=".receivers.ShappkyIntentReceiver"
+             android:exported="true">
+             <intent-filter>
+                 <action android:name="com.yn.shappky.EXECUTE_TRIGGER" />
+                 <action android:name="com.yn.shappky.ENABLE_SERVICE" />
+                 <action android:name="com.yn.shappky.DISABLE_SERVICE" />
+             </intent-filter>
+         </receiver>
+
+         <!-- Tasker Plugin Integration -->
+         <activity
+             android:name=".ui.activities.tasker.TaskerConfigActivity"
+             android:exported="true"
+             android:label="Shappky Action"
+             android:icon="@drawable/ic_shappky"
+             android:theme="@style/AppTheme">
+             <intent-filter>
+                 <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+             </intent-filter>
+         </activity>
+
+         <receiver
+             android:name="com.joaomgcd.taskerpluginlibrary.action.BroadcastReceiverAction"
+             android:exported="true">
+             <intent-filter>
+                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
+             </intent-filter>
+         </receiver>
     </application>
 </manifest>

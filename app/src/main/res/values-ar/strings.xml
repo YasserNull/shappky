@@ -1,23 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">شابكي</string>
+    <string name="app_name_en">Shappky</string>
+    <string name="app_name_ar">شابكي</string>
     <string name="kb_format">%1$d ك.ب</string>
     <string name="mb_format">%1$.2f م.ب</string>
     <string name="gb_format">%1$.2f ج.ب</string>
+    <string name="force_kill_protected_title">هل تريد قتل هذا التطبيق؟</string>
+    <string name="force_kill_protected_message">هذا التطبيق ضمن قائمة التطبيقات المحمية ، هل تريد ايقافه؟</string>
+    <string name="yes">نعم</string>
     <string name="settings">الإعدادات</string>
-    <string name="show_system_apps">إظهار تطبيقات النظام</string>
+    <string name="show_user_apps">عرض تطبيقات المستخدم</string>
+    <string name="show_user_apps_summary">عرض تطبيقات المستخدم المثبتة في القائمة</string>
+    <string name="show_system_apps">عرض تطبيقات النظام</string>
     <string name="show_system_apps_summary">عرض تطبيقات النظام في القائمة</string>
-    <string name="show_persistent_apps">إظهار التطبيقات المستمرة</string>
-    <string name="show_persistent_apps_summary">عرض التطبيقات المستمرة في القائمة</string>
+    <string name="show_persistent_apps">عرض التطبيقات المستمرة</string>
+    <string name="show_persistent_apps_summary">عرض التطبيقات المستمرة التي ترفض التوقف في القائمة</string>
+    <string name="show_protected_apps">عرض التطبيقات المحمية</string>
+    <string name="show_protected_apps_summary">عرض التطبيقات المحمية في القائمة</string>
     <string name="show_app_type_icons">إظهار أيقونات نوع التطبيق</string>
-    <string name="show_app_type_icons_summary">إظهار أيقونات صغيرة بجانب استهلاك الرام لتوضيح نوع التطبيق</string>
+    <string name="show_app_type_icons_summary">إظهار أيقونات صغيرة بجانب استهلاك ذاكرة الوصول العشوائي لتوضيح نوع التطبيق</string>
     <string name="apps_auto_refresh">التحديث التلقائي للتطبيقات</string>
     <string name="apps_auto_refresh_interval_title">فترة التحديث التلقائي للتطبيقات</string>
-    <string name="apps_ram_usage_auto_refresh">التحديث التلقائي لاستهلاك الرام للتطبيقات</string>
-    <string name="apps_ram_usage_auto_refresh_interval_title">فترة تحديث استهلاك الرام للتطبيقات</string>
-    <string name="ram_usage_bar_refresh_ms">تحديث شريط استهلاك الرام (ملي ثانية)</string>
-    <string name="ram_usage_bar_refresh_interval_title">فترة تحديث شريط استهلاك الرام</string>
+    <string name="apps_ram_usage_auto_refresh">التحديث التلقائي لاستهلاك ذاكرة الوصول العشوائي للتطبيقات</string>
+    <string name="apps_ram_usage_auto_refresh_interval_title">فترة تحديث استهلاك ذاكرة الوصول العشوائي للتطبيقات</string>
+    <string name="protected_apps_list_title">قائمة التطبيقات المحمية</string>
+    <string name="protected_apps_list_summary">تحديد التطبيقات المحمية التي يتم تخطيها على مستوى التطبيق</string>
+    <string name="launcher">المشغل (لانشر)</string>
+    <string name="keyboard">الكيبورد</string>
+    <string name="wallpaper">الخلفية</string>
+    <string name="widgets">الويدجات (Widgets)</string>
+    <string name="android_services">خدمات الاندرويد</string>
+    <string name="google_android_services">خدمات جوجل أندرويد</string>
+    <string name="ram_usage_bar_refresh_ms">تحديث شريط استهلاك ذاكرة الوصول العشوائي</string>
+    <string name="ram_usage_bar_refresh_interval_title">فترة تحديث شريط استهلاك ذاكرة الوصول العشوائي</string>
     <string name="refresh_interval_value">%1$d ملي ثانية</string>
+    <string name="refresh_interval_sec">%1$d ثانية</string>
+    <string name="refresh_interval_min">%1$d دقيقة</string>
     <string name="refresh_interval_ms">فترة التحديث (ملي ثانية)</string>
     <string name="min_interval_warning">الحد الأدنى للفترة هو %1$d ملي ثانية</string>
     <string name="reset">إعادة تعيين</string>
@@ -26,43 +45,40 @@
         <item>أبيض</item>
         <item>أسود</item>
     </string-array>
-    <string name="theme">المظهر</string>
-    <string name="theme_summary">اختر داكن، أبيض، أو أسود</string>
-    <string name="theme_dialog_title">اختر المظهر</string>
+    <string name="theme">السمة</string>
+    <string name="theme_summary">تغيير سمة التطبيق</string>
+    <string name="theme_dialog_title">اختر السمة</string>
     <string name="language">اللغة</string>
     <string name="language_summary">تغيير لغة التطبيق</string>
     <string name="language_dialog_title">اختر اللغة</string>
     <string-array name="language_options">
         <item>افتراضي النظام</item>
-        <item>العربية (Arabic)</item>
-        <item>中文 (Chinese)</item>
-        <item>हिन्दी (Hindi)</item>
-        <item>Français (French)</item>
-        <item>日本語 (Japanese)</item>
-        <item>Español (Spanish)</item>
+        <item>العربية</item>
+        <item>English</item>
     </string-array>
     <string name="dynamic_colors">الألوان الديناميكية</string>
-    <string name="dynamic_colors_summary">استخدام ألوان Material You (أندرويد 12+)</string>
+    <string name="dynamic_colors_summary">استخدام ألوان خلفية الجهاز</string>
     <string name="permission_mode">وضع الصلاحية</string>
-    <string name="permission_mode_summary">اختر Shizuku أو Root</string>
+    <string name="permission_mode_summary">اختر الصلاحيات التي تناسبك</string>
     <string name="permission_mode_dialog_title">اختر وضع الصلاحية</string>
-    <string name="permission_mode_root">روت</string>
+    <string name="permission_mode_root">الجذر</string>
     <string name="permission_mode_shizuku">شيزوكو</string>
     <string name="permission_denied">تم رفض الصلاحية</string>
     <string name="running_apps_default">التطبيقات المشغلة:</string>
     <string name="running_apps_count">التطبيقات المشغلة: %1$d</string>
-    <string name="ram_usage">استهلاك الرام: %1$d ميجابايت / %2$d ميجابايت</string>
-    <string name="ram_usage_unknown">استهلاك الرام: --</string>
+    <string name="ram_usage">استهلاك ذاكرة الوصول العشوائي: %1$d ميجابايت / %2$d ميجابايت</string>
+    <string name="ram_usage_unknown">استهلاك ذاكرة الوصول العشوائي: --</string>
     <string name="sort_apps">ترتيب التطبيقات</string>
     <string name="sort_apps_title">ترتيب التطبيقات حسب</string>
     <string name="sort_by_name">الاسم</string>
-    <string name="sort_by_ram_usage">استهلاك الرام</string>
+    <string name="sort_by_ram_usage">استهلاك ذاكرة الوصول العشوائي</string>
+    <string name="sort_by_type">النوع</string>
     <string name="sort_descending">تنازلي</string>
     <string name="ok">موافق</string>
     <string name="cancel">إلغاء</string>
     <string name="save">حفظ</string>
     <string name="search_apps">البحث عن التطبيقات</string>
-    <string name="apps_filter">تصفية التطبيقات</string>
+    <string name="apps_filter">إخفاء تطبيقات من القائمة</string>
     <string name="filter_dialog_title">اختر التطبيقات التي تريد إخفاءها</string>
     <string name="donate">تبرع</string>
     <string name="donate_summary">دعم التطوير</string>
@@ -78,17 +94,149 @@
     <string name="back">رجوع</string>
     <string name="full_screen">ملء الشاشة</string>
     <string name="full_screen_summary">إخفاء شريط الحالة واستخدام الشاشة الكاملة</string>
-    <string name="shappky_service">خدمة Shappky</string>
+    <string name="shappky_service">خدمة شابكي</string>
     <string name="shappky_service_running">قيد التشغيل...</string>
     <string name="shappky_service_notification_text">إيقاف تطبيقات الخلفية...</string>
-    <string name="shappky_service_channel">خدمة Shappky الأمامية</string>
+    <string name="ram_freed_from_pkg">تم تحرير %1$s من %2$s</string>
+    <string name="shappky_service_channel">خدمة شابكي الأمامية</string>
     <string name="shell_permission_required">مطلوب صلاحية Shizuku/Root</string>
     <string name="no_apps_to_kill">لا توجد تطبيقات لإيقافها</string>
-    <string name="service_stopped">تم إيقاف خدمة Shappky</string>
+    <string name="service_stopped">تم إيقاف خدمة شابكي</string>
     <string name="free_up_memory">تحرير %1$s</string>
     <string name="error_getting_running_apps">خطأ في جلب التطبيقات المشغلة: %1$s</string>
     <string name="restart_required_title">مطلوب إعادة تشغيل</string>
     <string name="restart_required_message">الرجاء إعادة تشغيل التطبيق لتطبيق هذا التغيير.</string>
     <string name="restart_now">إعادة التشغيل</string>
     <string name="restart_later">لاحقاً</string>
+
+    <!-- Triggers -->
+    <string name="triggers">المشغلات</string>
+    <string name="add_trigger">إضافة مشغل</string>
+    <string name="edit_trigger">تعديل مشغل</string>
+    <string name="trigger_name">اسم المشغل</string>
+    <string name="select_apps">تحديد التطبيقات</string>
+    <string name="user_apps">تطبيقات المستخدم</string>
+    <string name="system_apps">تطبيقات النظام</string>
+    <string name="persistent_apps">التطبيقات المستمرة</string>
+    <string name="protected_apps">التطبيقات المحمية</string>
+    <string name="exclude_apps">استبعاد تطبيقات</string>
+    <string name="manually_select_apps">تحديد يدوي للتطبيقات</string>
+    <string name="triggers_empty">لم يتم إضافة أي مشغلات بعد</string>
+    <string name="delete_trigger">حذف المشغل</string>
+    <string name="delete_trigger_confirm_message">هل أنت متأكد أنك تريد حذف هذا المشغل؟</string>
+    <string name="delete">حذف</string>
+    <string name="trigger_executed">تم تشغيل المشغل: %1$s</string>
+    <string name="trigger_name_empty">الرجاء إدخال اسم المشغل</string>
+    <string name="default_trigger_name">المشغل %1$d</string>
+
+    <!-- Rules -->
+    <string name="rules">القوانين</string>
+    <string name="add_rule">إضافة قانون</string>
+    <string name="rule_app_opened">عند فتح تطبيق معين</string>
+    <string name="rule_ram_limit">عند وصول ذاكرة الوصول العشوائي لحد معين</string>
+    <string name="rule_app_ram_exceeded">عندما يستهلك التطبيق حد معين من ذاكرة الوصول العشوائي</string>
+    <string name="rule_phone_sleep">عند سكون الهاتف</string>
+    <string name="rule_phone_wake">عند تشغيل الهاتف من وضع السكون</string>
+    <string name="rule_specific_time">عند وقت معين</string>
+
+    <string name="select_condition">اختر الشرط</string>
+    <string name="ram_limit_mb">حد ذاكرة الوصول العشوائي (ميجابايت)</string>
+    <string name="duration_minutes">المدة (بالدقائق)</string>
+    <string name="rule_summary_app_opened">عند فتح: %1$s</string>
+    <string name="rule_summary_ram_limit">عند وصول ذاكرة الوصول العشوائي لـ %1$d م.ب</string>
+    <string name="rule_summary_app_ram">عندما يستهلك %1$s أكثر من %2$d م.ب</string>
+    <string name="rule_summary_phone_sleep">بعد سكون الهاتف بـ %1$d دقيقة</string>
+    <string name="rule_summary_phone_wake">عند تشغيل الهاتف من وضع السكون</string>
+    <string name="rule_summary_specific_time">عند الساعة %1$02d:%2$02d</string>
+    <string name="rules_empty">لم يتم إضافة أي قوانين بعد</string>
+
+    <!-- Enable/Disable Rules -->
+    <string name="enable_rules_title">قواعد التفعيل</string>
+    <string name="add_enable_rule">إضافة قاعدة تفعيل</string>
+    <string name="no_enable_rules">لم يتم إضافة قواعد تفعيل</string>
+    <string name="shappky_service_enabled_notification_text">تم تفعيل خدمة شابكي تلقائياً.</string>
+    <string name="disable_rules_title">قواعد التعطيل</string>
+    <string name="add_disable_rule">إضافة قاعدة تعطيل</string>
+    <string name="no_disable_rules">لم يتم إضافة قواعد تعطيل</string>
+    <string name="shappky_service_disabled_notification_text">تم إيقاف خدمة شابكي تلقائياً.</string>
+
+    <!-- New Rules -->
+    <string name="rule_app_inactivity">بعد مدة من عدم الاستخدام</string>
+    <string name="rule_service_state">عندما تتغير حالة الخدمة</string>
+    <string name="rule_kill_oldest">إيقاف أقدم تطبيق في القائمة تلقائياً</string>
+    <string name="rule_app_resumed">عند استئناف تطبيق معين</string>
+    <string name="rule_app_closed">عند إغلاق تطبيق معين للخلفية</string>
+    <string name="rule_app_killed_manually">عند إيقاف تطبيق معين يدوياً</string>
+
+    <string name="inactivity_duration">مدة عدم الاستعمال (بالدقائق)</string>
+    <string name="select_services">تحديد الخدمات</string>
+
+    <string name="service_wifi">الواي فاي</string>
+    <string name="service_bluetooth">البلوتوث</string>
+    <string name="service_mobile_data">بيانات الهاتف</string>
+    <string name="service_airplane_mode">وضع الطائرة</string>
+    <string name="service_gps">الموقع / GPS</string>
+    <string name="service_hotspot">نقطة الاتصال</string>
+    <string name="service_dnd">وضع عدم الإزعاج</string>
+    <string name="service_nfc">الاتصال قريب المدى / NFC</string>
+
+    <string name="rule_summary_app_inactivity">إيقاف %1$s بعد %2$d دقيقة من عدم الاستعمال</string>
+    <string name="rule_summary_service_state">إيقاف عند تغير خدمة: %1$s</string>
+    <string name="rule_summary_kill_oldest">إيقاف أقدم تطبيق تلقائياً: %1$d دقيقة</string>
+    <string name="rule_summary_app_resumed">عند استئناف: %1$s</string>
+    <string name="rule_summary_app_closed">عند إغلاق للخلفية: %1$s</string>
+    <string name="rule_summary_app_killed_manually">عند الإيقاف اليدوي: %1$s</string>
+
+    <string name="service_active">نشط</string>
+    <string name="service_inactive">غير نشط</string>
+
+    <string name="customize_service">تخصيص الخدمة</string>
+    <string name="customize_service_summary">تخصيص خدمة شابكي</string>
+    <string name="service_execution">التنفيذ</string>
+    <string name="kill_when_reach_ram_limit">القتل عند تجاوز حد معين من ذاكرة الوصول العشوائي</string>
+    <string name="service_duration">المدة الزمنية للخدمة</string>
+    <string name="duration_15s">15 ثانية</string>
+    <string name="duration_30s">30 ثانية</string>
+    <string name="duration_1m">دقيقة واحدة</string>
+    <string name="duration_2m">دقيقتان</string>
+    <string name="duration_5m">5 دقائق</string>
+    <string name="duration_10m">10 دقائق</string>
+    <string name="service_kill_all_on_ram_limit">قتل كل التطبيقات عند بلوغ حد معين من ذاكرة الوصول العشوائي</string>
+    <string name="service_kill_app_on_ram_limit">قتل تطبيق عند وصوله حد معين من ذاكرة الوصول العشوائي</string>
+    <string name="ram_limit_enabled_summary">الحد المسموح: %1$d ميجابايت</string>
+
+    <!-- Settings Categories -->
+    <string name="settings_permissions">الصلاحيات</string>
+    <string name="settings_service">إعدادات الخدمة</string>
+    <string name="settings_ram_usage_bar">شريط استهلاك ذاكرة الوصول العشوائي</string>
+    <string name="settings_apps_list">لائحة التطبيقات</string>
+    <string name="settings_about">حول</string>
+    <string name="triggers_summary">إدارة مشغلات الخلفية التلقائية</string>
+
+    <!-- Widget Config -->
+    <string name="widget_settings">إعدادات الويدجت</string>
+    <string name="widget_bg_size">حجم الخلفية: %1$d dp</string>
+    <string name="widget_select_trigger">تحديد المشغل</string>
+    <string name="widget_icon_color">لون الأيقونة</string>
+    <string name="widget_bg_color">لون الخلفية</string>
+    <string name="widget_show_trigger_name">عرض اسم المشغل</string>
+    <string name="widget_no_triggers_warning">يجب إضافة مشغل أولاً من التطبيق لتتمكن من إعداد الويدجت.</string>
+    <string name="widget_select_color">اختر اللون</string>
+    <string name="widget_brightness">السطوع</string>
+    <string name="widget_opacity">الشفافية</string>
+    <string name="widget_select">تحديد</string>
+    <string name="widget_list_title">قائمة تطبيقات شابكي</string>
+    <string name="widget_list_auto_bg">لون الخلفية التلقائي</string>
+    <string name="widget_list_ram_bar">شريط استهلاك ذاكرة الوصول العشوائي</string>
+    <string name="widget_list_apps_title">لائحة التطبيقات</string>
+    <string name="disable_battery_optimization_title">تجاهل تحسين البطارية</string>
+    <string name="disable_battery_optimization_summary">تعطيل قيود توفير الطاقة لضمان تشغيل وتحديث الويدجت في الخلفية باستمرار ودون توقف</string>
+    <string name="battery_optimization_already_disabled">تحسين البطارية متوقف بالفعل لهذا التطبيق</string>
+    <string name="trigger_service_active">خدمة مشغلات شابكي نشطة</string>
+    <string name="trigger_channel_name">مشغلات شابكي</string>
+    <string name="trigger_channel_desc">تنبيهات مشغلات شابكي عند تفريغ الذاكرة</string>
+    <string name="shappky_trigger">شابكي - مشغل</string>
+    <string name="please_select_trigger">الرجاء تحديد مشغل من الإعدادات</string>
+
+
 </resources>

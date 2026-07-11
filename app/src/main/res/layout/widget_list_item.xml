@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical"
+    android:background="@android:color/transparent">
+
+    <!-- App Icon -->
+    <ImageView
+        android:id="@+id/app_icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="12dp"
+        android:scaleType="fitCenter"
+        tools:src="@drawable/ic_shappky" />
+
+    <!-- App Name and RAM -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/app_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            tools:text="Application Name" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/app_type_icon"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginEnd="4dp"
+                android:tint="#80FFFFFF"
+                android:visibility="gone"
+                tools:src="@drawable/ic_person_outlined"
+                tools:ignore="UseAppTint" />
+
+            <TextView
+                android:id="@+id/app_ram"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#A0FFFFFF"
+                android:textSize="11sp"
+                tools:text="45.2 MB" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Close Button -->
+    <ImageButton
+        android:id="@+id/btn_close_app"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_cancel_outlined"
+        android:tint="#ECEFF1"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:contentDescription="Close App"
+        tools:ignore="UseAppTint" />
+
+</LinearLayout>

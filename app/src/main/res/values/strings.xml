@@ -1,24 +1,43 @@
 <resources>
     <string name="app_name">Shappky</string>
+    <string name="app_name_en">Shappky</string>
+    <string name="app_name_ar">شابكي</string>
     <string name="kb_format">%1$d KB</string>
     <string name="mb_format">%1$.2f MB</string>
     <string name="gb_format">%1$.2f GB</string>
 
     <!-- Settings -->
+    <string name="force_kill_protected_title">Do you want to kill this app?</string>
+    <string name="force_kill_protected_message">This app is in the protected apps list, do you want to force stop it?</string>
+    <string name="yes">Yes</string>
     <string name="settings">Settings</string>
+    <string name="show_user_apps">Show user apps</string>
+    <string name="show_user_apps_summary">Show applications installed by the user in the list</string>
     <string name="show_system_apps">Show system apps</string>
     <string name="show_system_apps_summary">Display system applications in the list</string>
     <string name="show_persistent_apps">Show persistent apps</string>
-    <string name="show_persistent_apps_summary">Display persistent applications in the list</string>
+    <string name="show_persistent_apps_summary">Show persistent apps that refuse to stop in the list</string>
+    <string name="show_protected_apps">Show protected apps</string>
+    <string name="show_protected_apps_summary">Show protected apps in the list</string>
     <string name="show_app_type_icons">Show app type icons</string>
     <string name="show_app_type_icons_summary">Show small icons next to RAM usage indicating app type</string>
     <string name="apps_auto_refresh">Apps auto refresh</string>
     <string name="apps_auto_refresh_interval_title">Apps auto refresh interval</string>
     <string name="apps_ram_usage_auto_refresh">Apps RAM usage auto refresh</string>
     <string name="apps_ram_usage_auto_refresh_interval_title">Apps RAM usage refresh interval</string>
-    <string name="ram_usage_bar_refresh_ms">RAM usage bar refresh ms</string>
+    <string name="protected_apps_list_title">Protected apps list</string>
+    <string name="protected_apps_list_summary">Select protected apps to be bypassed at the application level</string>
+    <string name="launcher">Launcher</string>
+    <string name="keyboard">Keyboard</string>
+    <string name="wallpaper">Wallpaper</string>
+    <string name="widgets">Widgets</string>
+    <string name="android_services">Android Services</string>
+    <string name="google_android_services">Google Android Services</string>
+    <string name="ram_usage_bar_refresh_ms">RAM usage bar refresh</string>
     <string name="ram_usage_bar_refresh_interval_title">RAM usage bar refresh interval</string>
     <string name="refresh_interval_value">%1$d ms</string>
+    <string name="refresh_interval_sec">%1$d s</string>
+    <string name="refresh_interval_min">%1$d min</string>
     <string name="refresh_interval_ms">Refresh interval (ms)</string>
     <string name="min_interval_warning">Minimum interval is %1$d ms</string>
     <string name="reset">Reset</string>
@@ -28,31 +47,23 @@
         <item>Black</item>
     </string-array>
     <string name="theme">Theme</string>
-    <string name="theme_summary">Choose Dark, White, or Black</string>
+    <string name="theme_summary">Change application theme</string>
     <string name="theme_dialog_title">Choose theme</string>
     <string name="language">Language</string>
     <string name="language_summary">Change application language</string>
     <string name="language_dialog_title">Choose language</string>
     <string-array name="language_options">
         <item>System Default</item>
-        <item>العربية (Arabic)</item>
-        <item>中文 (Chinese)</item>
-        <item>हिन्दी (Hindi)</item>
-        <item>Français (French)</item>
-        <item>日本語 (Japanese)</item>
-        <item>Español (Spanish)</item>
+        <item>العربية</item>
+        <item>English</item>
     </string-array>
     <string-array name="language_values" translatable="false">
         <item>system</item>
         <item>ar</item>
-        <item>zh</item>
-        <item>hi</item>
-        <item>fr</item>
-        <item>ja</item>
-        <item>es</item>
+        <item>en</item>
     </string-array>
     <string name="dynamic_colors">Dynamic colors</string>
-    <string name="dynamic_colors_summary">Use Material You colors (Android 12+)</string>
+    <string name="dynamic_colors_summary">Use Material You colors</string>
     <string name="permission_mode">Permission mode</string>
     <string name="permission_mode_summary">Choose Shizuku or Root</string>
     <string name="permission_mode_dialog_title">Choose permission mode</string>
@@ -67,12 +78,13 @@
     <string name="sort_apps_title">Sort apps by</string>
     <string name="sort_by_name">Name</string>
     <string name="sort_by_ram_usage">RAM usage</string>
+    <string name="sort_by_type">Type</string>
     <string name="sort_descending">Descending</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="search_apps">Search apps</string>
-    <string name="apps_filter">Apps filter</string>
+    <string name="apps_filter">Hide apps from list</string>
     <string name="filter_dialog_title">Select the apps you want to hide</string>
     <string name="donate">Donate</string>
     <string name="donate_summary">Support development</string>
@@ -93,6 +105,7 @@
     <string name="shappky_service">Shappky Service</string>
     <string name="shappky_service_running">Running...</string>
     <string name="shappky_service_notification_text">Killing background apps...</string>
+    <string name="ram_freed_from_pkg">Freed %1$s from %2$s</string>
     <string name="shappky_service_channel">Shappky Foreground Service</string>
     <string name="shell_permission_required">Shizuku/Root permission required</string>
     <string name="no_apps_to_kill">No apps to kill</string>
@@ -103,4 +116,135 @@
     <string name="restart_required_message">Please restart the app to apply this change.</string>
     <string name="restart_now">Restart</string>
     <string name="restart_later">Later</string>
+
+    <!-- Triggers -->
+    <string name="triggers">Triggers</string>
+    <string name="add_trigger">Add Trigger</string>
+    <string name="edit_trigger">Edit Trigger</string>
+    <string name="trigger_name">Trigger Name</string>
+    <string name="select_apps">Select apps</string>
+    <string name="user_apps">User apps</string>
+    <string name="system_apps">System apps</string>
+    <string name="persistent_apps">Persistent apps</string>
+    <string name="protected_apps">Protected apps</string>
+    <string name="exclude_apps">Exclude apps</string>
+    <string name="manually_select_apps">Manually select apps</string>
+    <string name="triggers_empty">No triggers added yet</string>
+    <string name="delete_trigger">Delete Trigger</string>
+    <string name="delete_trigger_confirm_message">Are you sure you want to delete this trigger?</string>
+    <string name="delete">Delete</string>
+    <string name="trigger_executed">Trigger executed: %1$s</string>
+    <string name="trigger_name_empty">Please enter a trigger name</string>
+    <string name="default_trigger_name">Trigger %1$d</string>
+
+    <!-- Rules -->
+    <string name="rules">Rules</string>
+    <string name="add_rule">Add Rule</string>
+    <string name="rule_app_opened">When opening a specific app</string>
+    <string name="rule_ram_limit">When RAM reaches a limit</string>
+    <string name="rule_app_ram_exceeded">When an app consumes a limit of RAM</string>
+    <string name="rule_phone_sleep">When the phone goes to sleep</string>
+    <string name="rule_phone_wake">When the phone wakes up from sleep</string>
+    <string name="rule_specific_time">At a specific time</string>
+
+    <string name="select_condition">Select Condition</string>
+    <string name="ram_limit_mb">RAM Limit (MB)</string>
+    <string name="duration_minutes">Duration (Minutes)</string>
+    <string name="rule_summary_app_opened">When opening: %1$s</string>
+    <string name="rule_summary_ram_limit">When RAM reaches %1$d MB</string>
+    <string name="rule_summary_app_ram">When %1$s exceeds %2$d MB</string>
+    <string name="rule_summary_phone_sleep">After sleep: %1$d min</string>
+    <string name="rule_summary_phone_wake">When phone wakes up</string>
+    <string name="rule_summary_specific_time">At %1$02d:%2$02d</string>
+    <string name="rules_empty">No rules added yet</string>
+
+    <!-- Enable/Disable Rules -->
+    <string name="enable_rules_title">Enable Rules</string>
+    <string name="add_enable_rule">Add Enable rule</string>
+    <string name="no_enable_rules">No enable rules added</string>
+    <string name="shappky_service_enabled_notification_text">Shappky Service has been automatically enabled.</string>
+    <string name="disable_rules_title">Disable Rules</string>
+    <string name="add_disable_rule">Add Disable rule</string>
+    <string name="no_disable_rules">No disable rules added</string>
+    <string name="shappky_service_disabled_notification_text">Shappky Service has been automatically disabled.</string>
+
+    <!-- New Rules -->
+    <string name="rule_app_inactivity">after a duration of inactivity</string>
+    <string name="rule_service_state">When service state changes</string>
+    <string name="rule_kill_oldest">Kill oldest app in the list automatically</string>
+    <string name="rule_app_resumed">When resume a specific app</string>
+    <string name="rule_app_closed">When close a specific app</string>
+    <string name="rule_app_killed_manually">When kill a specific app</string>
+
+    <string name="inactivity_duration">Inactivity Duration (Minutes)</string>
+    <string name="select_services">Select Services</string>
+
+    <string name="service_wifi">WiFi</string>
+    <string name="service_bluetooth">Bluetooth</string>
+    <string name="service_mobile_data">Mobile Data</string>
+    <string name="service_airplane_mode">Airplane Mode</string>
+    <string name="service_gps">GPS/Location</string>
+    <string name="service_hotspot">Hotspot</string>
+    <string name="service_dnd">Do Not Disturb</string>
+    <string name="service_nfc">NFC</string>
+
+    <string name="rule_summary_app_inactivity">Kill %1$s after %2$d min of inactivity</string>
+    <string name="rule_summary_service_state">Kill when service changes: %1$s</string>
+    <string name="rule_summary_kill_oldest">Kill oldest app automatically: %1$d min</string>
+    <string name="rule_summary_app_resumed">When resume: %1$s</string>
+    <string name="rule_summary_app_closed">When close: %1$s</string>
+    <string name="rule_summary_app_killed_manually">When kill: %1$s</string>
+
+    <string name="service_active">Active</string>
+    <string name="service_inactive">Inactive</string>
+
+    <string name="customize_service">Customize Service</string>
+    <string name="customize_service_summary">Customize Shappky Service</string>
+    <string name="service_execution">Execution</string>
+    <string name="kill_when_reach_ram_limit">Kill when reaching a RAM limit</string>
+    <string name="service_duration">Service Duration</string>
+    <string name="duration_15s">15 seconds</string>
+    <string name="duration_30s">30 seconds</string>
+    <string name="duration_1m">1 minute</string>
+    <string name="duration_2m">2 minutes</string>
+    <string name="duration_5m">5 minutes</string>
+    <string name="duration_10m">10 minutes</string>
+    <string name="service_kill_all_on_ram_limit">Kill all apps when reaching a certain RAM limit</string>
+    <string name="service_kill_app_on_ram_limit">Kill app when it reaches a certain RAM limit</string>
+    <string name="ram_limit_enabled_summary">Threshold: %1$d MB</string>
+
+    <!-- Settings Categories -->
+    <string name="settings_permissions">Permissions</string>
+    <string name="settings_service">Service Settings</string>
+    <string name="settings_ram_usage_bar">RAM Usage Bar</string>
+    <string name="settings_apps_list">Apps List</string>
+    <string name="settings_about">About</string>
+    <string name="triggers_summary">Manage automated background triggers</string>
+
+    <!-- Widget Config -->
+    <string name="widget_settings">Widget Settings</string>
+    <string name="widget_bg_size">Background Size: %1$d dp</string>
+    <string name="widget_select_trigger">Select Trigger</string>
+    <string name="widget_icon_color">Icon Color</string>
+    <string name="widget_bg_color">Background Color</string>
+    <string name="widget_show_trigger_name">Show Trigger Name</string>
+    <string name="widget_no_triggers_warning">You must add a trigger first from the app to configure the widget.</string>
+    <string name="widget_select_color">Select Color</string>
+    <string name="widget_brightness">Brightness</string>
+    <string name="widget_opacity">Opacity</string>
+    <string name="widget_select">Select</string>
+    <string name="widget_list_title">Shappky Apps List</string>
+    <string name="widget_list_auto_bg">Automatic Background Color</string>
+    <string name="widget_list_ram_bar">RAM Usage Bar</string>
+    <string name="widget_list_apps_title">Applications List</string>
+    <string name="disable_battery_optimization_title">Ignore Battery Optimization</string>
+    <string name="disable_battery_optimization_summary">Disable power saving restrictions to ensure the widget works and updates continuously in the background</string>
+    <string name="battery_optimization_already_disabled">Battery optimization is already disabled for this app</string>
+    <string name="trigger_service_active">Shappky Triggers service is active</string>
+    <string name="trigger_channel_name">Shappky Triggers</string>
+    <string name="trigger_channel_desc">Notifications for Shappky triggers memory cleanup</string>
+    <string name="shappky_trigger">Shappky - Trigger</string>
+    <string name="please_select_trigger">Please select a trigger from settings</string>
+
+
 </resources>

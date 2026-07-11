@@ -1,0 +1,104 @@
+package com.yn.shappky.receivers
+
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import com.yn.shappky.R
+import com.yn.shappky.utils.BackgroundAppManager
+import com.yn.shappky.utils.ShellManager
+import com.yn.shappky.utils.TriggerManager
+import java.util.concurrent.Executors
+
+class ShappkyIntentReceiver : BroadcastReceiver() {
+  companion object {
+    private const val TAG = "ShappkyIntentReceiver"
+    const val ACTION_EXECUTE_TRIGGER = "com.yn.shappky.EXECUTE_TRIGGER"
+    const val ACTION_ENABLE_SERVICE = "com.yn.shappky.ENABLE_SERVICE"
+    const val ACTION_DISABLE_SERVICE = "com.yn.shappky.DISABLE_SERVICE"
+    const val EXTRA_TRIGGER_ID = "TRIGGER_ID"
+    const val EXTRA_TRIGGER_NAME = "TRIGGER_NAME"
+  }
+
+  override fun onReceive(context: Context, intent: Intent?) {
+    Log.d(TAG, "onReceive triggered with action: ${intent?.action}")
+    when (intent?.action) {
+      ACTION_EXECUTE_TRIGGER -> handleExecuteTrigger(context, intent)
+      ACTION_ENABLE_SERVICE -> handleEnableService(context)
+      ACTION_DISABLE_SERVICE -> handleDisableService(context)
+    }
+  }
+
+  private fun handleEnableService(context: Context) {
+    val serviceIntent = Intent(context, com.yn.shappky.services.ShappkyService::class.java)
+    androidx.core.content.ContextCompat.startForegroundService(context, serviceIntent)
+    Log.d(TAG, "Shappky Service enabled via Intent")
+  }
+
+  private fun handleDisableService(context: Context) {
+    val serviceIntent = Intent(context, com.yn.shappky.services.ShappkyService::class.java)
+    context.stopService(serviceIntent)
+    Log.d(TAG, "Shappky Service disabled via Intent")
+  }
+
+  private fun handleExecuteTrigger(context: Context, intent: Intent) {
+    val triggerId = intent.getStringExtra(EXTRA_TRIGGER_ID)
+    val triggerName = intent.getStringExtra(EXTRA_TRIGGER_NAME)
+
+    if (triggerId == null && triggerName == null) {
+      Log.e(TAG, "No TRIGGER_ID or TRIGGER_NAME provided in intent extras")
+      return
+    }
+
+    val triggers = com.yn.shappky.utils.TriggerManager.getTriggers(context)
+    val trigger = triggers.find { it.id == triggerId || (triggerName != null && it.name.equals(triggerName, ignoreCase = true)) }
+
+    if (trigger == null) {
+      Log.e(TAG, "Trigger not found! ID: $triggerId, Name: $triggerName")
+      return
+    }
+
+    Log.d(TAG, "Trigger found: ${trigger.name}. Executing from Intent...")
+    val handler = Handler(Looper.getMainLooper())
+    val executor = Executors.newSingleThreadExecutor()
+    val shellManager = com.yn.shappky.utils.ShellManager(context, handler, executor)
+
+    if (!shellManager.hasAnyShellPermission()) {
+      Log.e(TAG, "Cannot execute trigger: No shell permissions")
+      return
+    }
+
+    val appManager = com.yn.shappky.utils.BackgroundAppManager(context, handler, executor, shellManager)
+
+    val selectUserApps = trigger.selectUserApps
+    val selectSystemApps = trigger.selectSystemApps
+    val selectPersistentApps = trigger.selectPersistentApps
+    val excludedApps = trigger.excludedApps
+    val manuallySelectedApps = trigger.manuallySelectedApps
+
+    appManager.loadBackgroundApps { runningApps ->
+      val toKill = runningApps.filter { app ->
+        val matchesUser = !app.isSystemApp && !app.isPersistentApp && selectUserApps
+        val matchesSystem = app.isSystemApp && selectSystemApps
+        val matchesPersistent = app.isPersistentApp && selectPersistentApps
+        val matchesManual = manuallySelectedApps.contains(app.packageName)
+        val isExcluded = excludedApps.contains(app.packageName)
+
+        (matchesUser || matchesSystem || matchesPersistent || matchesManual) && !isExcluded && !app.isProtected
+      }
+
+      val packageNamesToKill = toKill.map { it.packageName }
+      if (packageNamesToKill.isNotEmpty()) {
+        appManager.killPackages(packageNamesToKill, {
+          val totalKb = toKill.sumOf { it.ramKb }
+          val freedText = context.getString(R.string.free_up_memory, appManager.formatMemorySize(totalKb))
+          Log.d(TAG, "Intent Trigger '${trigger.name}' executed successfully. Freed: $freedText")
+        }, false)
+      } else {
+        Log.d(TAG, "No apps matching trigger rules were running.")
+      }
+    }
+  }
+}
