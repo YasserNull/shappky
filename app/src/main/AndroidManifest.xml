@@ -126,7 +126,8 @@
        <service
             android:name=".services.ShappkyService"
             android:exported="false"
-            android:enabled="true">
+            android:enabled="true"
+            android:foregroundServiceType="dataSync">
         </service>
         <service
             android:name=".services.ShappkyTriggerService"
