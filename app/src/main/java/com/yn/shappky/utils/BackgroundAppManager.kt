@@ -498,11 +498,9 @@ class BackgroundAppManager(
               }
             } catch (e: Exception) {}
 
-            val dumpCommand = "dumpsys activity p " + app.packageName + " | grep 'oom_adj='"
+            val dumpCommand = "dumpsys activity services " + app.packageName + " | grep isForeground=true"
             val dumpOutput = shellManager.runShellCommandAndGetFullOutput(dumpCommand)
-            if (dumpOutput != null && dumpOutput.contains("oom_adj=")) {
-              isForeground = dumpOutput.contains("oom_adj=  0") || dumpOutput.contains("oom_adj=0") || dumpOutput.contains("vis")
-            }
+            isForeground = !dumpOutput.isNullOrBlank() && !dumpOutput.startsWith("ERROR")
 
             val result = com.yn.shappky.data.models.AppDetailedInfo(
               app = app,
