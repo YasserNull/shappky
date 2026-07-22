@@ -119,7 +119,7 @@ class BackgroundAppManager(
           Log.d(TAG, "Found active widget packages: $activeWidgetPackages")
 
           if (shellManager.isShellCommandReady()) {
-            val command = "ps -A -o rss,name | grep '\\.' | grep -v '[-@]'"
+            val command = "${ShellManager.TOYBOX_PATH} ps -A -o rss,name | grep '\\.' | grep -v '[-@]'"
             try {
               Log.d(TAG, "Running process command: $command")
               val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
@@ -361,7 +361,7 @@ class BackgroundAppManager(
         try {
           Log.d(TAG, "loadAppsRamUsage started requestedCount=${requestedPackages.size}, requested=$requestedPackages")
           if (requestedPackages.isNotEmpty() && shellManager.isShellCommandReady()) {
-            val command = "ps -A -o rss,name | grep '\\.' | grep -v '[-@]'"
+            val command = "${ShellManager.TOYBOX_PATH} ps -A -o rss,name | grep '\\.' | grep -v '[-@]'"
             try {
               Log.d(TAG, "loadAppsRamUsage running command=$command")
               val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
@@ -428,7 +428,7 @@ class BackgroundAppManager(
       executor.execute {
         try {
           if (shellManager.isShellCommandReady()) {
-            val command = "ps -A -o pid,user,rss,name | grep '\\.' | grep -v '[-@]' | grep '" + app.packageName + "'"
+            val command = "${ShellManager.TOYBOX_PATH} ps -A -o pid,user,rss,name | grep '\\.' | grep -v '[-@]' | grep '" + app.packageName + "'"
             val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
             val processes = mutableListOf<com.yn.shappky.data.models.ProcessInfo>()
             var mainPid = "-"
@@ -615,7 +615,7 @@ class BackgroundAppManager(
       val killCommands = packageNames.joinToString("; ") { "am kill " + it }
       val forceStopCommands = packageNames.joinToString("; ") { "if pidof " + it + " > /dev/null; then am force-stop " + it + "; fi" }
       val kill9Commands = packageNames.joinToString("; ") {
-        "pids=${'$'}(ps -A -o pid,name | grep '" + it + "' | grep -v '[-@]' | awk '{print ${'$'}1}'); if [ ! -z \"${'$'}pids\" ]; then kill -9 ${'$'}pids 2>/dev/null; fi"
+        "pids=${'$'}(${ShellManager.TOYBOX_PATH} ps -A -o pid,name | grep '" + it + "' | grep -v '[-@]' | awk '{print ${'$'}1}'); if [ ! -z \"${'$'}pids\" ]; then kill -9 ${'$'}pids 2>/dev/null; fi"
       }
       val baseCommand = killCommands + "; sleep 0.2; " + forceStopCommands + "; sleep 0.2; " + kill9Commands
       return if (appendKillAll) baseCommand + "; am kill-all" else baseCommand

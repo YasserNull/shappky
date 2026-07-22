@@ -1,3 +1,6 @@
+import java.net.HttpURLConnection
+import java.net.URL
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.compose)
@@ -20,6 +23,30 @@ android {
     multiDexEnabled = true
   }
 
+  flavorDimensions += "abi"
+  productFlavors {
+    create("arm64-v8a") {
+      dimension = "abi"
+      ndk { abiFilters += listOf("arm64-v8a") }
+    }
+    create("armeabi-v7a") {
+      dimension = "abi"
+      ndk { abiFilters += listOf("armeabi-v7a") }
+    }
+    create("x86_64") {
+      dimension = "abi"
+      ndk { abiFilters += listOf("x86_64") }
+    }
+    create("x86") {
+      dimension = "abi"
+      ndk { abiFilters += listOf("x86") }
+    }
+    create("universal") {
+      dimension = "abi"
+      ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64", "x86") }
+    }
+  }
+
   buildTypes {
     release {
       isMinifyEnabled = true
@@ -39,6 +66,62 @@ android {
   lint {
     baseline = file("lint-baseline.xml")
   }
+  packaging {
+    jniLibs {
+      useLegacyPackaging = true
+    }
+  }
+}
+
+val toyboxUrls = mapOf(
+  "arm64-v8a" to "https://landley.net/toybox/bin/toybox-aarch64",
+  "armeabi-v7a" to "https://landley.net/toybox/bin/toybox-armv7l",
+  "x86_64" to "https://landley.net/toybox/bin/toybox-x86_64",
+  "x86" to "https://landley.net/toybox/bin/toybox-i686",
+)
+
+tasks.register<DownloadToyboxTask>("downloadToybox") {
+  outputDir.set(file("src/main/jniLibs"))
+  urls.set(toyboxUrls)
+}
+
+abstract class DownloadToyboxTask : DefaultTask() {
+  @get:OutputDirectory
+  abstract val outputDir: DirectoryProperty
+
+  @get:Input
+  abstract val urls: MapProperty<String, String>
+
+  @TaskAction
+  fun download() {
+    val out = outputDir.get().asFile
+    out.mkdirs()
+
+    for ((abi, url) in urls.get()) {
+      val dir = File(out, abi)
+      dir.mkdirs()
+      val toyboxFile = File(dir, "libtoybox.so")
+
+      if (toyboxFile.exists()) {
+        logger.lifecycle("Toybox already exists for $abi, skipping download")
+        continue
+      }
+
+      logger.lifecycle("Downloading toybox for $abi from $url")
+      val connection = URL(url).openConnection() as HttpURLConnection
+      connection.inputStream.use { input ->
+        toyboxFile.outputStream().use { output ->
+          input.copyTo(output)
+        }
+      }
+      toyboxFile.setExecutable(true)
+      logger.lifecycle("Downloaded toybox for $abi -> ${toyboxFile.absolutePath}")
+    }
+  }
+}
+
+tasks.named("preBuild") {
+  dependsOn("downloadToybox")
 }
 
 dependencies {

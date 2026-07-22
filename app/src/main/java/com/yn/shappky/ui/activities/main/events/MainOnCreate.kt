@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.yn.shappky.App
 import com.yn.shappky.core.preferences.AppsListPreferences
 import com.yn.shappky.core.preferences.KEY_DYNAMIC_COLORS
 import com.yn.shappky.core.preferences.KEY_LANGUAGE
@@ -72,6 +73,7 @@ fun MainActivity.handleOnCreate(savedInstanceState: Bundle?) {
   PermissionHandler.setupShizukuPermissionListener(this, AppsListLogic.shellManager)
   AppsListLogic.shellManager.setOnShizukuServiceConnected(
     Runnable {
+      AppsListLogic.shellManager.deployToybox(App.nativeLibraryDir)
       if (AppsListLogic.appsDataList.isEmpty()) {
         AppsListLogic.loadBackgroundApps(
           activity = activity,

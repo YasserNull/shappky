@@ -7,6 +7,7 @@ import android.os.Bundle
 class App : Application() {
   override fun onCreate() {
     super.onCreate()
+    nativeLibraryDir = applicationInfo.nativeLibraryDir
     registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
       private var startedActivities = 0
 
@@ -33,5 +34,8 @@ class App : Application() {
   companion object {
     @Volatile
     var isAppInForeground = false
+
+    var nativeLibraryDir: String = ""
+      private set
   }
 }

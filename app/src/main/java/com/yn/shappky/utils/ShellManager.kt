@@ -276,7 +276,33 @@ class ShellManager(
     return method.invoke(null, arrayOf("sh", "-c", command), null, null) as java.lang.Process
   }
 
+  fun deployToybox(nativeLibraryDir: String) {
+    if (!executor.isShutdown) {
+      executor.execute {
+        val mode = getPermissionMode()
+        val source = "$nativeLibraryDir/libtoybox.so"
+        val dest = TOYBOX_PATH
+        val checkCmd = "[ -f $dest ] && [ -x $dest ]"
+        val copyCmd = "cp $source $dest && chmod 755 $dest"
+        val cmd = "if $checkCmd; then exit 0; else $copyCmd; fi"
+        try {
+          when {
+            mode == "root" && hasRootAccess() -> Shell.cmd(cmd).exec()
+            mode == "shizuku" && hasShizukuPermission() -> {
+              val process = createShizukuProcess(cmd)
+              process.waitFor()
+            }
+          }
+          Log.d(TAG, "Toybox deployed to $dest")
+        } catch (e: Exception) {
+          Log.e(TAG, "Failed to deploy toybox", e)
+        }
+      }
+    }
+  }
+
   companion object {
+    const val TOYBOX_PATH = "/data/local/tmp/toybox"
     private const val TAG = "ShappkyShell"
   }
 }

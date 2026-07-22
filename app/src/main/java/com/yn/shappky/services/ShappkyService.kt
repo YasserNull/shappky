@@ -123,7 +123,7 @@ class ShappkyService : Service() {
 
     val dumpOutput = shellManager.runShellCommandAndGetFullOutput("dumpsys activity activities") ?: return
     val psOutput =
-      shellManager.runShellCommandAndGetFullOutput("ps -A -o rss,name | grep '\\.' | grep -v '[-@]'")
+      shellManager.runShellCommandAndGetFullOutput("${com.yn.shappky.utils.ShellManager.TOYBOX_PATH} ps -A -o rss,name | grep '\\.' | grep -v '[-@]'")
         ?: return
 
     val runningPackages = HashSet<String>()

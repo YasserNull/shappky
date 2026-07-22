@@ -168,7 +168,7 @@ class ShappkyTriggerService : Service() {
           if (hasInactivityRules && inactivityCheckCounter >= 5) {
             inactivityCheckCounter = 0
             if (shellManager.isShellCommandReady()) {
-              val psOutput = shellManager.runShellCommandAndGetFullOutput("ps -A -o rss,name | grep '\\.' | grep -v '[-@]'")
+              val psOutput = shellManager.runShellCommandAndGetFullOutput("${com.yn.shappky.utils.ShellManager.TOYBOX_PATH} ps -A -o rss,name | grep '\\.' | grep -v '[-@]'")
               if (psOutput != null) {
                 val runningPackages = mutableSetOf<String>()
                 val packageRamUsage = mutableMapOf<String, Long>()
