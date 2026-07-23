@@ -17,7 +17,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.google.android.material.color.DynamicColors
 import com.yn.shappky.R
 
 const val PREFERENCES_NAME = "AppPreferences"
@@ -35,7 +34,7 @@ fun Activity.applySystemBars() {
   val systemBarColor = when (appTheme) {
     "white" -> {
       if (dynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        dynamicLightColorScheme(this).background.toArgb()
+        dynamicLightColorScheme(this).surface.toArgb()
       } else {
         0xFFFFFFFF.toInt()
       }
@@ -43,7 +42,7 @@ fun Activity.applySystemBars() {
     "black" -> 0xFF000000.toInt()
     else -> { // dark
       if (dynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        dynamicDarkColorScheme(this).background.toArgb()
+        dynamicDarkColorScheme(this).surface.toArgb()
       } else {
         0xFF17181C.toInt()
       }
@@ -51,9 +50,18 @@ fun Activity.applySystemBars() {
   }
 
   @Suppress("DEPRECATION")
-  window.statusBarColor = systemBarColor
-  @Suppress("DEPRECATION")
-  window.navigationBarColor = systemBarColor
+  if (dynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    @Suppress("DEPRECATION")
+    window.statusBarColor = android.graphics.Color.TRANSPARENT
+    @Suppress("DEPRECATION")
+    window.navigationBarColor = android.graphics.Color.TRANSPARENT
+    window.decorView.setBackgroundColor(systemBarColor)
+  } else {
+    @Suppress("DEPRECATION")
+    window.statusBarColor = systemBarColor
+    @Suppress("DEPRECATION")
+    window.navigationBarColor = systemBarColor
+  }
   WindowCompat.setDecorFitsSystemWindows(window, !fullScreen)
   val controller = WindowInsetsControllerCompat(window, window.decorView)
 
@@ -93,7 +101,6 @@ fun Activity.applyDynamicColorsFromPreferences() {
   if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
   val prefs = getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
   if (prefs.getBoolean(KEY_DYNAMIC_COLORS, false)) {
-    DynamicColors.applyToActivityIfAvailable(this)
     if (prefs.getString(KEY_THEME, "dark") == "black") {
       theme.applyStyle(R.style.AppTheme_Dynamic_Black_Override, true)
     }

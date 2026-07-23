@@ -60,4 +60,6 @@ fun MainActivity.handleOnResume() {
 
   AppsListLogic.updatePermissionUi(this, forceRefresh = settingsChanged, appsAutoRefresh = AppsListLogic.appsAutoRefresh)
   AppsRamUsageLogic.refreshAppsRamUsage(this)
+
+  applySystemBars()
 }

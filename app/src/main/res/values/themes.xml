@@ -49,8 +49,6 @@
         <item name="colorSurface">@color/theme_dark_surface</item>
         <item name="colorOnSurface">@color/theme_dark_on_surface</item>
         <item name="android:windowBackground">@color/theme_dark_surface</item>
-        <item name="android:navigationBarColor">@color/theme_dark_surface</item>
-        <item name="android:statusBarColor">@color/theme_dark_surface</item>
         <item name="popupTheme">@style/AppTheme.PopupOverlay.Dark</item>
         <item name="toolbarIconColor">@color/theme_dark_on_primary</item>
     </style>
@@ -58,8 +56,6 @@
         <item name="colorSurface">@color/theme_light_surface</item>
         <item name="colorOnSurface">@color/theme_light_on_surface</item>
         <item name="android:windowBackground">@color/theme_light_surface</item>
-        <item name="android:navigationBarColor">@color/theme_light_surface</item>
-        <item name="android:statusBarColor">@color/theme_light_surface</item>
         <item name="popupTheme">@style/AppTheme.PopupOverlay.Light</item>
         <item name="toolbarIconColor">@color/theme_light_on_primary</item>
     </style>
@@ -67,8 +63,6 @@
         <item name="colorSurface">@color/theme_black_surface</item>
         <item name="colorOnSurface">@color/theme_black_on_surface</item>
         <item name="android:windowBackground">@color/theme_black_surface</item>
-        <item name="android:navigationBarColor">@color/theme_black_surface</item>
-        <item name="android:statusBarColor">@color/theme_black_surface</item>
         <item name="popupTheme">@style/AppTheme.PopupOverlay.Dark</item>
         <item name="toolbarIconColor">@color/theme_black_on_primary</item>
     </style>
@@ -76,8 +70,6 @@
         <item name="colorSurface">@color/theme_black_surface</item>
         <item name="colorOnSurface">@color/theme_black_on_surface</item>
         <item name="android:windowBackground">@color/theme_black_surface</item>
-        <item name="android:navigationBarColor">@color/theme_black_surface</item>
-        <item name="android:statusBarColor">@color/theme_black_surface</item>
     </style>
     <style name="AppTheme.FullScreen" parent="AppTheme">
         <item name="android:windowFullscreen">true</item>
