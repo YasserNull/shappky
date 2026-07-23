@@ -25,13 +25,13 @@ fun ListWidgetConfigAppsList(appWidgetId: Int) {
     mutableStateOf(prefs.getBoolean(WidgetPreferences.getListShowUserAppsKey(appWidgetId), true))
   }
   var showSystemApps by remember {
-    mutableStateOf(prefs.getBoolean(WidgetPreferences.getListShowSystemAppsKey(appWidgetId), false))
+    mutableStateOf(prefs.getBoolean(WidgetPreferences.getListShowSystemAppsKey(appWidgetId), true))
   }
   var showPersistentApps by remember {
     mutableStateOf(prefs.getBoolean(WidgetPreferences.getListShowPersistentAppsKey(appWidgetId), false))
   }
   var showProtectedApps by remember {
-    mutableStateOf(prefs.getBoolean(WidgetPreferences.getListShowProtectedAppsKey(appWidgetId), true))
+    mutableStateOf(prefs.getBoolean(WidgetPreferences.getListShowProtectedAppsKey(appWidgetId), false))
   }
   var showAppTypeIcons by remember {
     mutableStateOf(prefs.getBoolean(WidgetPreferences.getListShowAppTypeIconsKey(appWidgetId), true))
@@ -43,16 +43,16 @@ fun ListWidgetConfigAppsList(appWidgetId: Int) {
     mutableStateOf(prefs.getBoolean(WidgetPreferences.getListSortDescendingKey(appWidgetId), false))
   }
   var autoRefreshApps by remember {
-    mutableStateOf(prefs.getBoolean(WidgetPreferences.getListAutoRefreshAppsKey(appWidgetId), false))
+    mutableStateOf(prefs.getBoolean(WidgetPreferences.getListAutoRefreshAppsKey(appWidgetId), true))
   }
   var autoRefreshRam by remember {
-    mutableStateOf(prefs.getBoolean(WidgetPreferences.getListAutoRefreshRamKey(appWidgetId), false))
+    mutableStateOf(prefs.getBoolean(WidgetPreferences.getListAutoRefreshRamKey(appWidgetId), true))
   }
   var appsAutoRefreshIntervalMs by remember {
-    mutableStateOf(prefs.getLong("appsAutoRefreshIntervalMs", 5000L))
+    mutableStateOf(prefs.getLong("appsAutoRefreshIntervalMs", 1000L))
   }
   var appsRamUsageRefreshIntervalMs by remember {
-    mutableStateOf(prefs.getLong("appsRamUsageRefreshIntervalMs", 3000L))
+    mutableStateOf(prefs.getLong("appsRamUsageRefreshIntervalMs", 1000L))
   }
 
   var showSortDialog by remember { mutableStateOf(false) }

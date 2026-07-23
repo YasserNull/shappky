@@ -97,19 +97,19 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
       var minIntervalMs = Long.MAX_VALUE
 
       for (id in appWidgetIds) {
-        val autoRefresh = prefs.getBoolean("widget_list_auto_refresh_apps_$id", prefs.getBoolean("appsAutoRefresh", false))
-        val ramUsageRefresh = prefs.getBoolean("widget_list_auto_refresh_ram_$id", prefs.getBoolean("appsRamUsageAutoRefresh", false))
+        val autoRefresh = prefs.getBoolean("widget_list_auto_refresh_apps_$id", prefs.getBoolean("appsAutoRefresh", true))
+        val ramUsageRefresh = prefs.getBoolean("widget_list_auto_refresh_ram_$id", prefs.getBoolean("appsRamUsageAutoRefresh", true))
 
         if (autoRefresh || ramUsageRefresh) {
           isRefreshEnabled = true
           val interval = when {
             autoRefresh && ramUsageRefresh -> {
-              val autoInt = prefs.getLong("appsAutoRefreshIntervalMs", 5000L)
-              val ramInt = prefs.getLong("appsRamUsageRefreshIntervalMs", 3000L)
+              val autoInt = prefs.getLong("appsAutoRefreshIntervalMs", 1000L)
+              val ramInt = prefs.getLong("appsRamUsageRefreshIntervalMs", 1000L)
               kotlin.math.min(autoInt, ramInt)
             }
-            autoRefresh -> prefs.getLong("appsAutoRefreshIntervalMs", 5000L)
-            else -> prefs.getLong("appsRamUsageRefreshIntervalMs", 3000L)
+            autoRefresh -> prefs.getLong("appsAutoRefreshIntervalMs", 1000L)
+            else -> prefs.getLong("appsRamUsageRefreshIntervalMs", 1000L)
           }
           if (interval < minIntervalMs) {
             minIntervalMs = interval
@@ -140,19 +140,19 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
           var innerMinInterval = Long.MAX_VALUE
 
           for (id in innerWidgetIds) {
-            val autoRefresh = innerPrefs.getBoolean("widget_list_auto_refresh_apps_$id", innerPrefs.getBoolean("appsAutoRefresh", false))
-            val ramUsageRefresh = innerPrefs.getBoolean("widget_list_auto_refresh_ram_$id", innerPrefs.getBoolean("appsRamUsageAutoRefresh", false))
+            val autoRefresh = innerPrefs.getBoolean("widget_list_auto_refresh_apps_$id", innerPrefs.getBoolean("appsAutoRefresh", true))
+            val ramUsageRefresh = innerPrefs.getBoolean("widget_list_auto_refresh_ram_$id", innerPrefs.getBoolean("appsRamUsageAutoRefresh", true))
 
             if (autoRefresh || ramUsageRefresh) {
               innerRefreshEnabled = true
               val interval = when {
                 autoRefresh && ramUsageRefresh -> {
-                  val autoInt = innerPrefs.getLong("appsAutoRefreshIntervalMs", 5000L)
-                  val ramInt = innerPrefs.getLong("appsRamUsageRefreshIntervalMs", 3000L)
+                  val autoInt = innerPrefs.getLong("appsAutoRefreshIntervalMs", 1000L)
+                  val ramInt = innerPrefs.getLong("appsRamUsageRefreshIntervalMs", 1000L)
                   kotlin.math.min(autoInt, ramInt)
                 }
-                autoRefresh -> innerPrefs.getLong("appsAutoRefreshIntervalMs", 5000L)
-                else -> innerPrefs.getLong("appsRamUsageRefreshIntervalMs", 3000L)
+                autoRefresh -> innerPrefs.getLong("appsAutoRefreshIntervalMs", 1000L)
+                else -> innerPrefs.getLong("appsRamUsageRefreshIntervalMs", 1000L)
               }
               if (interval < innerMinInterval) {
                 innerMinInterval = interval

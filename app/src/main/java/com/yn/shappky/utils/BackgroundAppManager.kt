@@ -22,9 +22,9 @@ class BackgroundAppManager(
 ) {
   private val currentAppsList = mutableListOf<AppModel>()
   private var showUserApps = true
-  private var showSystemApps = false
+  private var showSystemApps = true
   private var showPersistentApps = false
-  private var showProtectedApps = true
+  private var showProtectedApps = false
   private val sharedpreferences =
     context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
 

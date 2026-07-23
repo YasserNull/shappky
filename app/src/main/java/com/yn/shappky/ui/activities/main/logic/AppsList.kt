@@ -77,11 +77,11 @@ object AppsListLogic {
   internal var currentLanguage = "system"
 
   internal var showUserApps by mutableStateOf(true)
-  internal var showSystemApps by mutableStateOf(false)
+  internal var showSystemApps by mutableStateOf(true)
   internal var showPersistentApps by mutableStateOf(false)
-  internal var showProtectedApps by mutableStateOf(true)
+  internal var showProtectedApps by mutableStateOf(false)
   internal var showAppTypeIcons by mutableStateOf(true)
-  internal var appsAutoRefresh = false
+  internal var appsAutoRefresh = true
   internal lateinit var autoRefreshManager: AutoRefreshManager
   private const val TAG = "AppsListLogic"
 
@@ -333,7 +333,7 @@ object AppsListLogic {
   fun setupAutoRefresh(activity: MainActivity) {
     val prefs = activity.getSharedPreferences(com.yn.shappky.core.preferences.PREFERENCES_NAME, android.content.Context.MODE_PRIVATE)
 
-    appsAutoRefresh = prefs.getBoolean(AppsListPreferences.KEY_APPS_AUTO_REFRESH, false)
+    appsAutoRefresh = prefs.getBoolean(AppsListPreferences.KEY_APPS_AUTO_REFRESH, true)
     val appsAutoRefreshIntervalMs = prefs.getLong(AppsListPreferences.KEY_APPS_AUTO_REFRESH_INTERVAL_MS, AppsListPreferences.DEFAULT_APPS_AUTO_REFRESH_INTERVAL_MS).coerceAtLeast(1000L)
 
     autoRefreshManager.updateAppsAutoRefresh(appsAutoRefresh, appsAutoRefreshIntervalMs) {
@@ -345,7 +345,7 @@ object AppsListLogic {
       )
     }
 
-    val appsRamUsageAutoRefresh = prefs.getBoolean(AppsListPreferences.KEY_APPS_RAM_USAGE_AUTO_REFRESH, false)
+    val appsRamUsageAutoRefresh = prefs.getBoolean(AppsListPreferences.KEY_APPS_RAM_USAGE_AUTO_REFRESH, true)
     val appsRamUsageRefreshIntervalMs = prefs.getLong(
       AppsListPreferences.KEY_APPS_RAM_USAGE_REFRESH_INTERVAL_MS,
       AppsListPreferences.DEFAULT_APPS_RAM_USAGE_REFRESH_INTERVAL_MS,

@@ -52,11 +52,11 @@ fun MainActivity.handleOnCreate(savedInstanceState: Bundle?) {
   AppsListLogic.ramMonitor = RamMonitor(AppsListLogic.handler) { AppsListLogic.ramState = it }
 
   AppsListLogic.showUserApps = prefs.getBoolean(AppsListPreferences.KEY_SHOW_USER_APPS, true)
-  AppsListLogic.showSystemApps = prefs.getBoolean(AppsListPreferences.KEY_SHOW_SYSTEM_APPS, false)
+  AppsListLogic.showSystemApps = prefs.getBoolean(AppsListPreferences.KEY_SHOW_SYSTEM_APPS, true)
   AppsListLogic.showPersistentApps = prefs.getBoolean(AppsListPreferences.KEY_SHOW_PERSISTENT_APPS, false)
-  AppsListLogic.showProtectedApps = prefs.getBoolean(AppsListPreferences.KEY_SHOW_PROTECTED_APPS, true)
+  AppsListLogic.showProtectedApps = prefs.getBoolean(AppsListPreferences.KEY_SHOW_PROTECTED_APPS, false)
   AppsListLogic.showAppTypeIcons = prefs.getBoolean(AppsListPreferences.KEY_SHOW_APP_TYPE_ICONS, true)
-  AppsListLogic.appsAutoRefresh = prefs.getBoolean(AppsListPreferences.KEY_APPS_AUTO_REFRESH, false)
+  AppsListLogic.appsAutoRefresh = prefs.getBoolean(AppsListPreferences.KEY_APPS_AUTO_REFRESH, true)
 
   val ramUsageBarRefreshIntervalMs = prefs.getLong(
     RamUsageBarPreferences.KEY_REFRESH_INTERVAL_MS,

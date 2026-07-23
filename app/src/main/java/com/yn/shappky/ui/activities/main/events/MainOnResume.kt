@@ -25,9 +25,9 @@ fun MainActivity.handleOnResume() {
   applySystemBars()
 
   val showUserAppsNow = prefs.getBoolean(AppsListPreferences.KEY_SHOW_USER_APPS, true)
-  val showSystemAppsNow = prefs.getBoolean(AppsListPreferences.KEY_SHOW_SYSTEM_APPS, false)
+  val showSystemAppsNow = prefs.getBoolean(AppsListPreferences.KEY_SHOW_SYSTEM_APPS, true)
   val showPersistentAppsNow = prefs.getBoolean(AppsListPreferences.KEY_SHOW_PERSISTENT_APPS, false)
-  val showProtectedAppsNow = prefs.getBoolean(AppsListPreferences.KEY_SHOW_PROTECTED_APPS, true)
+  val showProtectedAppsNow = prefs.getBoolean(AppsListPreferences.KEY_SHOW_PROTECTED_APPS, false)
   val showAppTypeIconsNow = prefs.getBoolean(AppsListPreferences.KEY_SHOW_APP_TYPE_ICONS, true)
 
   var settingsChanged = false

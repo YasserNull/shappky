@@ -1,6 +1,7 @@
 package com.yn.shappky.utils
 
 import android.app.WallpaperManager
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -108,6 +109,17 @@ object ProtectionManager {
     } catch (e: Exception) {
       Log.e(TAG, "Error getting default wallpaper", e)
     }
+    if (!defaultSet.any { it.contains("wallpaper", ignoreCase = true) }) {
+      try {
+        val wallpaperIntent = Intent("android.service.wallpaper.WallpaperService")
+        val wallpaperServices = pm.queryIntentServices(wallpaperIntent, PackageManager.GET_META_DATA)
+        for (service in wallpaperServices) {
+          service.serviceInfo.packageName?.let { defaultSet.add(it) }
+        }
+      } catch (e: Exception) {
+        Log.e(TAG, "Error finding wallpaper services via PackageManager", e)
+      }
+    }
 
     // com.android.* and android.* packages
     try {
@@ -120,6 +132,32 @@ object ProtectionManager {
       }
     } catch (e: Exception) {
       Log.e(TAG, "Error listing installed packages for default protection", e)
+    }
+
+    // Google Android services
+    try {
+      val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
+      for (appInfo in packages) {
+        val pkg = appInfo.packageName
+        if (pkg.startsWith("com.google.android.") || pkg.startsWith("com.google.android")) {
+          defaultSet.add(pkg)
+        }
+      }
+    } catch (e: Exception) {
+      Log.e(TAG, "Error listing Google services for default protection", e)
+    }
+
+    // Widget providers
+    try {
+      val awm = AppWidgetManager.getInstance(context)
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        val providers = awm.getInstalledProviders()
+        for (provider in providers) {
+          provider.provider.packageName?.let { defaultSet.add(it) }
+        }
+      }
+    } catch (e: Exception) {
+      Log.e(TAG, "Error getting widget providers for default protection", e)
     }
 
     return defaultSet

@@ -35,18 +35,18 @@ fun AppsListSection() {
   val sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
 
   var showUserApps by remember { mutableStateOf(sharedPreferences.getBoolean("showUserApps", true)) }
-  var showSystemApps by remember { mutableStateOf(sharedPreferences.getBoolean("showSystemApps", false)) }
+  var showSystemApps by remember { mutableStateOf(sharedPreferences.getBoolean("showSystemApps", true)) }
   var showPersistentApps by remember { mutableStateOf(sharedPreferences.getBoolean("showPersistentApps", false)) }
-  var showProtectedApps by remember { mutableStateOf(sharedPreferences.getBoolean("showProtectedApps", true)) }
+  var showProtectedApps by remember { mutableStateOf(sharedPreferences.getBoolean("showProtectedApps", false)) }
   var showAppTypeIcons by remember { mutableStateOf(sharedPreferences.getBoolean("showAppTypeIcons", true)) }
 
-  var appsAutoRefresh by remember { mutableStateOf(sharedPreferences.getBoolean("appsAutoRefresh", false)) }
-  var appsRamUsageAutoRefresh by remember { mutableStateOf(sharedPreferences.getBoolean("appsRamUsageAutoRefresh", false)) }
+  var appsAutoRefresh by remember { mutableStateOf(sharedPreferences.getBoolean("appsAutoRefresh", true)) }
+  var appsRamUsageAutoRefresh by remember { mutableStateOf(sharedPreferences.getBoolean("appsRamUsageAutoRefresh", true)) }
   var appsAutoRefreshIntervalMs by remember {
-    mutableStateOf(sharedPreferences.getLong("appsAutoRefreshIntervalMs", 5000L).coerceAtLeast(1000L))
+    mutableStateOf(sharedPreferences.getLong("appsAutoRefreshIntervalMs", 1000L).coerceAtLeast(1000L))
   }
   var appsRamUsageRefreshIntervalMs by remember {
-    mutableStateOf(sharedPreferences.getLong("appsRamUsageRefreshIntervalMs", 3000L).coerceAtLeast(1000L))
+    mutableStateOf(sharedPreferences.getLong("appsRamUsageRefreshIntervalMs", 1000L).coerceAtLeast(1000L))
   }
 
   var sortMode by remember { mutableStateOf(sharedPreferences.getString("sortMode", "name") ?: "name") }

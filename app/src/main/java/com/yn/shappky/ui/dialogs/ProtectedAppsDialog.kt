@@ -72,6 +72,16 @@ fun ProtectedAppsDialog(
       }
     } catch (e: Exception) {
     }
+    if (packages.isEmpty()) {
+      try {
+        val wallpaperIntent = Intent("android.service.wallpaper.WallpaperService")
+        val wallpaperServices = pm.queryIntentServices(wallpaperIntent, PackageManager.GET_META_DATA)
+        for (service in wallpaperServices) {
+          service.serviceInfo.packageName?.let { packages.add(it) }
+        }
+      } catch (e: Exception) {
+      }
+    }
     packages
   }
 
@@ -87,12 +97,44 @@ fun ProtectedAppsDialog(
       .map { it.packageName }
   }
 
+  fun applyRegexToSelectedPackages(regexStr: String) {
+    if (regexStr.isNotBlank() && allApps.isNotEmpty()) {
+      val patterns = regexStr.split("|").map { it.trim() }.filter { it.isNotEmpty() }
+      val matchingApps = allApps.filter { app ->
+        var matches = false
+        for (pattern in patterns) {
+          try {
+            val regex = pattern.replace(".", "\\.").replace("*", ".*").toRegex()
+            if (regex.matches(app.packageName)) {
+              matches = true
+              break
+            }
+          } catch (e: Exception) {
+            if (pattern.endsWith(".*") && app.packageName.startsWith(pattern.removeSuffix(".*"))) {
+              matches = true
+              break
+            } else if (app.packageName == pattern) {
+              matches = true
+              break
+            }
+          }
+        }
+        matches
+      }.map { it.packageName }
+
+      if (matchingApps.isNotEmpty()) {
+        selectedPackages = selectedPackages + matchingApps
+      }
+    }
+  }
+
   LaunchedEffect(Unit) {
     regexText = com.yn.shappky.utils.ProtectionManager.getProtectedRegex(context)
     loadAllApps { result ->
       allApps.clear()
       allApps.addAll(result)
       isLoading = false
+      applyRegexToSelectedPackages(regexText)
     }
 
     withContext(Dispatchers.IO) {
@@ -127,40 +169,12 @@ fun ProtectedAppsDialog(
         }
         activeWidgetPackages = activePackages
       } catch (e: Exception) {
-        // Ignore
       }
     }
   }
 
   LaunchedEffect(regexText) {
-    if (regexText.isNotBlank() && allApps.isNotEmpty()) {
-      val patterns = regexText.split("|").map { it.trim() }.filter { it.isNotEmpty() }
-      val matchingApps = allApps.filter { app ->
-        var matches = false
-        for (pattern in patterns) {
-          try {
-            val regex = pattern.replace(".", "\\.").replace("*", ".*").toRegex()
-            if (regex.matches(app.packageName)) {
-              matches = true
-              break
-            }
-          } catch (e: Exception) {
-            if (pattern.endsWith(".*") && app.packageName.startsWith(pattern.removeSuffix(".*"))) {
-              matches = true
-              break
-            } else if (app.packageName == pattern) {
-              matches = true
-              break
-            }
-          }
-        }
-        matches
-      }.map { it.packageName }
-
-      if (matchingApps.isNotEmpty()) {
-        selectedPackages = selectedPackages + matchingApps
-      }
-    }
+    applyRegexToSelectedPackages(regexText)
   }
 
   AlertDialog(
@@ -404,6 +418,7 @@ fun ProtectedAppsDialog(
           onClick = {
             val defaultSet = ProtectionManager.getDefaultProtectedApps(context)
             selectedPackages = defaultSet
+            applyRegexToSelectedPackages(regexText)
           },
         ) {
           Text(stringResource(R.string.reset))
