@@ -13,6 +13,7 @@ enum class RuleType {
   APP_RESUMED,
   APP_CLOSED,
   APP_KILLED_MANUALLY,
+  APP_BACKGROUND_STARTED,
 }
 
 data class TriggerRule(

@@ -83,6 +83,7 @@ fun ServiceCustomizationRulesDialogs(
     RuleSelectionDialog(
       onDismiss = onDismissRuleSelection,
       onSelectRuleType = onSelectRuleType,
+      excludeRuleTypes = setOf(RuleType.KILL_OLDEST_APP, RuleType.APP_BACKGROUND_STARTED),
     )
   }
 

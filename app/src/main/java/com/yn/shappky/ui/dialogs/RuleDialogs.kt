@@ -43,6 +43,7 @@ import java.util.UUID
 fun RuleSelectionDialog(
   onDismiss: () -> Unit,
   onSelectRuleType: (RuleType) -> Unit,
+  excludeRuleTypes: Set<RuleType> = emptySet(),
 ) {
   AlertDialog(
     containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface,
@@ -152,21 +153,34 @@ fun RuleSelectionDialog(
         }
 
         Button(
-          onClick = { onSelectRuleType(RuleType.KILL_OLDEST_APP) },
-          colors = buttonColors,
-          shape = buttonShape,
-          modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-        ) {
-          Text(stringResource(R.string.rule_kill_oldest))
-        }
-
-        Button(
           onClick = { onSelectRuleType(RuleType.APP_INACTIVITY) },
           colors = buttonColors,
           shape = buttonShape,
           modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         ) {
           Text(stringResource(R.string.rule_app_inactivity))
+        }
+
+        if (RuleType.KILL_OLDEST_APP !in excludeRuleTypes) {
+          Button(
+            onClick = { onSelectRuleType(RuleType.KILL_OLDEST_APP) },
+            colors = buttonColors,
+            shape = buttonShape,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+          ) {
+            Text(stringResource(R.string.rule_kill_oldest))
+          }
+        }
+
+        if (RuleType.APP_BACKGROUND_STARTED !in excludeRuleTypes) {
+          Button(
+            onClick = { onSelectRuleType(RuleType.APP_BACKGROUND_STARTED) },
+            colors = buttonColors,
+            shape = buttonShape,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+          ) {
+            Text(stringResource(R.string.rule_auto_background_started))
+          }
         }
       }
     },

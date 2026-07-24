@@ -33,6 +33,7 @@
     <string name="widgets">Widgets</string>
     <string name="android_services">Android Services</string>
     <string name="google_android_services">Google Android Services</string>
+    <string name="auto_background_apps">Auto-running background apps</string>
     <string name="ram_usage_bar_refresh_ms">RAM usage bar refresh</string>
     <string name="ram_usage_bar_refresh_interval_title">RAM usage bar refresh interval</string>
     <string name="refresh_interval_value">%1$d ms</string>
@@ -175,6 +176,7 @@
     <string name="rule_app_resumed">When resume a specific app</string>
     <string name="rule_app_closed">When close a specific app</string>
     <string name="rule_app_killed_manually">When kill a specific app</string>
+    <string name="rule_auto_background_started">Kill app when it auto-runs in background</string>
 
     <string name="inactivity_duration">Inactivity Duration (Minutes)</string>
     <string name="select_services">Select Services</string>
@@ -194,6 +196,7 @@
     <string name="rule_summary_app_resumed">When resume: %1$s</string>
     <string name="rule_summary_app_closed">When close: %1$s</string>
     <string name="rule_summary_app_killed_manually">When kill: %1$s</string>
+    <string name="rule_summary_auto_background_started">Kill app when it auto-runs in background</string>
 
     <string name="service_active">Active</string>
     <string name="service_inactive">Inactive</string>

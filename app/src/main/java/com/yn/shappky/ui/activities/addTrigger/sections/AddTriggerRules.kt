@@ -51,6 +51,14 @@ fun RulesSection(
             ),
           )
         }
+        RuleType.APP_BACKGROUND_STARTED -> {
+          onRulesChange(
+            rules + TriggerRule(
+              id = UUID.randomUUID().toString(),
+              type = RuleType.APP_BACKGROUND_STARTED,
+            ),
+          )
+        }
         RuleType.APP_OPENED -> showAppOpenedPicker = true
         RuleType.APP_RESUMED -> showAppResumedPicker = true
         RuleType.APP_CLOSED -> showAppClosedPicker = true
@@ -178,6 +186,7 @@ fun RulesSection(
           RuleType.APP_INACTIVITY -> Icons.Filled.Schedule
           RuleType.SERVICE_STATE_CHANGED -> Icons.Filled.Settings
           RuleType.KILL_OLDEST_APP -> Icons.AutoMirrored.Filled.List
+          RuleType.APP_BACKGROUND_STARTED -> Icons.Filled.VisibilityOff
         }
         Icon(
           imageVector = ruleIcon,

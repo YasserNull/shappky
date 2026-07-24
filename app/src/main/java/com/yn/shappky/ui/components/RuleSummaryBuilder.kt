@@ -67,5 +67,8 @@ fun buildRuleSummary(rule: TriggerRule): String {
     RuleType.KILL_OLDEST_APP -> {
       context.getString(R.string.rule_summary_kill_oldest)
     }
+    RuleType.APP_BACKGROUND_STARTED -> {
+      context.getString(R.string.rule_summary_auto_background_started)
+    }
   }
 }

@@ -134,10 +134,11 @@ class ShappkyTriggerService : Service() {
 
           // 2. Evaluate Foreground Apps
           val hasInactivityRules = activeTriggers.any { it.rules.any { r -> r.type == com.yn.shappky.data.models.RuleType.APP_INACTIVITY } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yn.shappky.data.models.RuleType.APP_INACTIVITY })
+          val hasAutoBgRules = activeTriggers.any { it.rules.any { r -> r.type == com.yn.shappky.data.models.RuleType.APP_BACKGROUND_STARTED } }
           val hasAppOpenedRules = activeTriggers.any { it.rules.any { r -> r.type == com.yn.shappky.data.models.RuleType.APP_OPENED } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yn.shappky.data.models.RuleType.APP_OPENED })
 
           var currentForeground: String? = null
-          if (stateTracker.currentInteractive && (hasAppOpenedRules || hasInactivityRules)) {
+          if (stateTracker.currentInteractive && (hasAppOpenedRules || hasInactivityRules || hasAutoBgRules)) {
             if (shellManager.isShellCommandReady()) {
               val dumpOutput = shellManager.runShellCommandAndGetFullOutput("dumpsys activity activities")
               if (dumpOutput != null) {
@@ -165,7 +166,7 @@ class ShappkyTriggerService : Service() {
 
           // 3. Evaluate background / RAM / Inactivity / Killed manually
           inactivityCheckCounter++
-          if (hasInactivityRules && inactivityCheckCounter >= 5) {
+          if ((hasInactivityRules || hasAutoBgRules) && inactivityCheckCounter >= 5) {
             inactivityCheckCounter = 0
             if (shellManager.isShellCommandReady()) {
               val psOutput = shellManager.runShellCommandAndGetFullOutput("${com.yn.shappky.utils.ShellManager.TOYBOX_PATH} ps -A -o rss,name | grep '\\.' | grep -v '[-@]'")
@@ -198,6 +199,19 @@ class ShappkyTriggerService : Service() {
                 if (previousRunningPackages.isNotEmpty()) {
                   val killedPackages = previousRunningPackages - runningPackages
                   ruleEvaluator.evaluateAppKilledManually(activeTriggers, enableRules, disableRules, killedPackages)
+                }
+
+                // Check APP_BACKGROUND_STARTED (new apps running without user foreground interaction)
+                if (hasAutoBgRules) {
+                  ruleEvaluator.evaluateAutoStartedBackgroundRules(
+                    activeTriggers,
+                    enableRules,
+                    disableRules,
+                    runningPackages,
+                    currentForeground,
+                    packageRamUsage,
+                    previousRunningPackages,
+                  )
                 }
                 previousRunningPackages.clear()
                 previousRunningPackages.addAll(runningPackages)

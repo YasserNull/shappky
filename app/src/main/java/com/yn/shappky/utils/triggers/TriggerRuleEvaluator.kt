@@ -408,27 +408,10 @@ class TriggerRuleEvaluator(
 
     if (isShappkyServiceRunning && disableRules.isNotEmpty()) {
       val inactivityDisableRules = disableRules.filter { it.type == RuleType.APP_INACTIVITY }
-      val killOldestDisableRules = disableRules.filter { it.type == RuleType.KILL_OLDEST_APP }
-      var disableTriggered = false
-
       for (rule in inactivityDisableRules) {
         val thresholdMs = rule.inactivityDurationMinutes * 60 * 1000L
         for (pkg in candidatePackagesForServiceRules) {
           if (rule.appPackages.contains(pkg)) {
-            val lastActive = foregroundTracker.getLastActiveTime(pkg, now)
-            if (now - lastActive >= thresholdMs) {
-              disableTriggered = true
-              actionExecutor.disableShappkyService(rule)
-              break
-            }
-          }
-        }
-      }
-
-      if (!disableTriggered) {
-        for (rule in killOldestDisableRules) {
-          val thresholdMs = rule.inactivityDurationMinutes * 60 * 1000L
-          for (pkg in candidatePackagesForServiceRules) {
             val lastActive = foregroundTracker.getLastActiveTime(pkg, now)
             if (now - lastActive >= thresholdMs) {
               actionExecutor.disableShappkyService(rule)
@@ -441,34 +424,66 @@ class TriggerRuleEvaluator(
 
     if (!isShappkyServiceRunning && enableRules.isNotEmpty()) {
       val inactivityRules = enableRules.filter { it.type == RuleType.APP_INACTIVITY }
-      val killOldestRules = enableRules.filter { it.type == RuleType.KILL_OLDEST_APP }
-      var enableTriggered = false
-
       for (rule in inactivityRules) {
         val thresholdMs = rule.inactivityDurationMinutes * 60 * 1000L
         for (pkg in candidatePackagesForServiceRules) {
           if (rule.appPackages.contains(pkg)) {
             val lastActive = foregroundTracker.getLastActiveTime(pkg, now)
             if (now - lastActive >= thresholdMs) {
-              enableTriggered = true
               actionExecutor.enableShappkyService(rule)
               break
             }
           }
         }
       }
+    }
+  }
 
-      if (!enableTriggered) {
-        for (rule in killOldestRules) {
-          val thresholdMs = rule.inactivityDurationMinutes * 60 * 1000L
-          for (pkg in candidatePackagesForServiceRules) {
-            val lastActive = foregroundTracker.getLastActiveTime(pkg, now)
-            if (now - lastActive >= thresholdMs) {
-              actionExecutor.enableShappkyService(rule)
-              break
-            }
-          }
+  fun evaluateAutoStartedBackgroundRules(
+    triggers: List<TriggerModel>,
+    enableRules: List<TriggerRule>,
+    disableRules: List<TriggerRule>,
+    runningPackages: Set<String>,
+    currentForeground: String?,
+    packageRamUsage: Map<String, Long>,
+    previousRunningPackages: Set<String>,
+  ) {
+    if (previousRunningPackages.isEmpty()) return
+    val newPackages = runningPackages - previousRunningPackages
+    val autoStartedPackages = newPackages - (currentForeground?.let { setOf(it) } ?: emptySet())
+    if (autoStartedPackages.isEmpty()) return
+
+    val pm = context.packageManager
+    val protectedApps = ProtectionManager.getProtectedApps(context)
+
+    for (trigger in triggers) {
+      val bgRules = trigger.rules.filter { it.type == RuleType.APP_BACKGROUND_STARTED }
+      if (bgRules.isEmpty()) continue
+      val matchingPackages = autoStartedPackages.filter { pkg ->
+        if (pkg == context.packageName || protectedApps.contains(pkg) || trigger.excludedApps.contains(pkg)) return@filter false
+        if (trigger.manuallySelectedApps.contains(pkg)) return@filter true
+        if (trigger.manuallySelectedApps.isNotEmpty()) return@filter false
+        try {
+          val appInfo = pm.getApplicationInfo(pkg, 0)
+          val isSystem = appInfo.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM != 0
+          val isPersistent = appInfo.flags and android.content.pm.ApplicationInfo.FLAG_PERSISTENT != 0
+          val matchesUser = !isSystem && !isPersistent && trigger.selectUserApps
+          val matchesSystem = isSystem && trigger.selectSystemApps
+          val matchesPersistent = isPersistent && trigger.selectPersistentApps
+          matchesUser || matchesSystem || matchesPersistent
+        } catch (_: Exception) {
+          false
         }
+      }
+      if (matchingPackages.isNotEmpty()) {
+        Log.d(TAG, "APP_BACKGROUND_STARTED MATCH FOUND! Triggering '${trigger.name}' for $matchingPackages")
+        val appManager = BackgroundAppManager(context, handler, executor, shellManager)
+        appManager.killPackages(matchingPackages.toList(), {
+          recentShappkyKills.addAll(matchingPackages)
+          val totalKb = matchingPackages.sumOf { packageRamUsage[it] ?: 0L }
+          val freedText = context.getString(R.string.free_up_memory, appManager.formatMemorySize(totalKb))
+          LanguageHelper.showTriggerFreedMemoryNotification(context, trigger.name, freedText)
+        }, showToast = false)
       }
     }
   }

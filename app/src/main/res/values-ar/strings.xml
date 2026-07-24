@@ -32,6 +32,7 @@
     <string name="widgets">الويدجات (Widgets)</string>
     <string name="android_services">خدمات الاندرويد</string>
     <string name="google_android_services">خدمات جوجل أندرويد</string>
+    <string name="auto_background_apps">التطبيقات الشغالة تلقائياً في الخلفية</string>
     <string name="ram_usage_bar_refresh_ms">تحديث شريط استهلاك ذاكرة الوصول العشوائي</string>
     <string name="ram_usage_bar_refresh_interval_title">فترة تحديث شريط استهلاك ذاكرة الوصول العشوائي</string>
     <string name="refresh_interval_value">%1$d ملي ثانية</string>
@@ -167,6 +168,7 @@
     <string name="rule_app_resumed">عند استئناف تطبيق معين</string>
     <string name="rule_app_closed">عند إغلاق تطبيق معين للخلفية</string>
     <string name="rule_app_killed_manually">عند إيقاف تطبيق معين يدوياً</string>
+    <string name="rule_auto_background_started">إيقاف التطبيق عندما يشتغل في الخلفية تلقائيا</string>
 
     <string name="inactivity_duration">مدة عدم الاستعمال (بالدقائق)</string>
     <string name="select_services">تحديد الخدمات</string>
@@ -186,6 +188,7 @@
     <string name="rule_summary_app_resumed">عند استئناف: %1$s</string>
     <string name="rule_summary_app_closed">عند إغلاق للخلفية: %1$s</string>
     <string name="rule_summary_app_killed_manually">عند الإيقاف اليدوي: %1$s</string>
+    <string name="rule_summary_auto_background_started">إيقاف التطبيق عندما يشتغل في الخلفية تلقائيا</string>
 
     <string name="service_active">نشط</string>
     <string name="service_inactive">غير نشط</string>

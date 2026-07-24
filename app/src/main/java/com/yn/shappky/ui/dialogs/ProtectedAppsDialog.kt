@@ -86,6 +86,7 @@ fun ProtectedAppsDialog(
   }
 
   var activeWidgetPackages by remember { mutableStateOf(emptySet<String>()) }
+  var autoBackgroundPackages by remember { mutableStateOf(emptySet<String>()) }
   var regexText by remember { mutableStateOf("") }
   var showUserApps by remember { mutableStateOf(true) }
   var showSystemApps by remember { mutableStateOf(true) }
@@ -171,6 +172,57 @@ fun ProtectedAppsDialog(
       } catch (e: Exception) {
       }
     }
+
+    withContext(Dispatchers.IO) {
+      try {
+        val shellManager = com.yn.shappky.utils.ShellManager(
+          context,
+          android.os.Handler(android.os.Looper.getMainLooper()),
+          java.util.concurrent.Executors.newSingleThreadExecutor(),
+        )
+        val psOutput = shellManager.runShellCommandAndGetFullOutput("${com.yn.shappky.utils.ShellManager.TOYBOX_PATH} ps -A -o pid,name | grep '\\.' | grep -v '[-@]'") ?: ""
+        val dumpOutput = shellManager.runShellCommandAndGetFullOutput("dumpsys activity activities") ?: ""
+        val runningPackages = mutableSetOf<String>()
+        for (line in psOutput.split('\n')) {
+          val parts = line.trim().split(Regex("\\s+"))
+          if (parts.size >= 2) {
+            val rawPkg = parts[1].trim()
+            val pkg = if (rawPkg.contains(":")) rawPkg.substringBefore(":") else rawPkg
+            if (pkg.isNotEmpty() && pkg.contains(".")) runningPackages.add(pkg)
+          }
+        }
+        var foregroundPackage: String? = null
+        for (line in dumpOutput.split('\n')) {
+          if (line.contains("ResumedActivity") || line.contains("mResumedActivity") || line.contains("topResumedActivity")) {
+            val match = Regex("([a-zA-Z_][a-zA-Z0-9_\\.]*)/").find(line)
+            if (match != null) {
+              val pkg = match.groupValues[1].trim()
+              if (pkg.contains(".") && !pkg.contains(" ")) {
+                foregroundPackage = pkg
+                break
+              }
+            }
+          }
+        }
+        if (foregroundPackage == null) {
+          for (line in dumpOutput.split('\n')) {
+            if (line.contains("mCurrentFocus") || line.contains("mFocusedApp") || line.contains("mFocusedWindow")) {
+              val match = Regex("([a-zA-Z_][a-zA-Z0-9_\\.]*)/").find(line)
+              if (match != null) {
+                val pkg = match.groupValues[1].trim()
+                if (pkg.contains(".") && !pkg.contains(" ")) {
+                  foregroundPackage = pkg
+                  break
+                }
+              }
+            }
+          }
+        }
+        val bgPackages = runningPackages - (foregroundPackage?.let { setOf(it) } ?: emptySet()) - context.packageName
+        autoBackgroundPackages = bgPackages
+      } catch (e: Exception) {
+      }
+    }
   }
 
   LaunchedEffect(regexText) {
@@ -249,6 +301,7 @@ fun ProtectedAppsDialog(
           val googleAndroidPackages = allApps.map { it.packageName }.filter { it.startsWith("com.google.android") }
           val googleAndroidServicesChecked = googleAndroidPackages.isNotEmpty() && googleAndroidPackages.all { selectedPackages.contains(it) }
           val androidServicesChecked = androidPackages.isNotEmpty() && androidPackages.all { selectedPackages.contains(it) }
+          val autoBackgroundChecked = autoBackgroundPackages.isNotEmpty() && autoBackgroundPackages.all { selectedPackages.contains(it) }
 
           LazyColumn {
             // Special checkboxes
@@ -311,6 +364,24 @@ fun ProtectedAppsDialog(
                     selectedPackages + activeWidgetPackages
                   } else {
                     selectedPackages - activeWidgetPackages
+                  }
+                },
+              )
+            }
+            item {
+              val autoBgText = stringResource(R.string.auto_background_apps)
+              SpecialCheckboxRow(
+                text = autoBgText,
+                checked = autoBackgroundChecked,
+                onCheckedChange = { checked ->
+                  if (autoBackgroundPackages.isNotEmpty()) {
+                    selectedPackages = if (checked) {
+                      selectedPackages + autoBackgroundPackages
+                    } else {
+                      selectedPackages - autoBackgroundPackages
+                    }
+                  } else {
+                    Toast.makeText(context, "$autoBgText: Not found", Toast.LENGTH_SHORT).show()
                   }
                 },
               )
