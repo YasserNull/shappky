@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-  namespace = "com.yn.shappky"
+  namespace = "com.yassernull.shappky"
   compileSdk {
     version = release(36) {
       minorApiLevel = 1
@@ -15,7 +15,7 @@ android {
   }
 
   defaultConfig {
-    applicationId = "com.yn.shappky"
+    applicationId = "com.yassernull.shappky"
     minSdk = 24
     targetSdk = 36
     versionCode = 5

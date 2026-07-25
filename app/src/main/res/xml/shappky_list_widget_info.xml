@@ -9,7 +9,7 @@
     android:updatePeriodMillis="0"
     android:initialLayout="@layout/shappky_list_widget"
     android:previewLayout="@layout/shappky_list_widget"
-    android:configure="com.yn.shappky.ui.activities.listWidgetConfig.ListWidgetConfigActivity"
+    android:configure="com.yassernull.shappky.ui.activities.listWidgetConfig.ListWidgetConfigActivity"
     android:widgetFeatures="reconfigurable"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen">

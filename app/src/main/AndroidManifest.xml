@@ -23,35 +23,12 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.activities.main.MainActivity"
-            android:exported="true" />
-
-        <activity-alias
-            android:name=".LauncherEnglish"
-            android:targetActivity=".ui.activities.main.MainActivity"
-            android:label="@string/app_name_en"
-            android:icon="@mipmap/ic_launcher"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity-alias>
-
-        <activity-alias
-            android:name=".LauncherArabic"
-            android:targetActivity=".ui.activities.main.MainActivity"
-            android:label="@string/app_name_ar"
-            android:icon="@mipmap/ic_launcher"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:enabled="false"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity-alias>
+        </activity>
         <activity
             android:name=".ui.activities.settings.SettingsActivity"
             android:exported="false"
@@ -90,7 +67,7 @@
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.yn.shappky.ACTION_WIDGET_CLICK" />
+                <action android:name="com.yassernull.shappky.ACTION_WIDGET_CLICK" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -102,8 +79,8 @@
             android:label="@string/widget_list_title">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.yn.shappky.ACTION_APP_CLICK" />
-                <action android:name="com.yn.shappky.ACTION_REFRESH" />
+                <action android:name="com.yassernull.shappky.ACTION_APP_CLICK" />
+                <action android:name="com.yassernull.shappky.ACTION_REFRESH" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -161,9 +138,9 @@
              android:name=".receivers.ShappkyIntentReceiver"
              android:exported="true">
              <intent-filter>
-                 <action android:name="com.yn.shappky.EXECUTE_TRIGGER" />
-                 <action android:name="com.yn.shappky.ENABLE_SERVICE" />
-                 <action android:name="com.yn.shappky.DISABLE_SERVICE" />
+                 <action android:name="com.yassernull.shappky.EXECUTE_TRIGGER" />
+                 <action android:name="com.yassernull.shappky.ENABLE_SERVICE" />
+                 <action android:name="com.yassernull.shappky.DISABLE_SERVICE" />
              </intent-filter>
          </receiver>
 

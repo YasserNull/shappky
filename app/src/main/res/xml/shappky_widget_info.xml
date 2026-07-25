@@ -11,7 +11,7 @@
     android:updatePeriodMillis="0"
     android:initialLayout="@layout/shappky_widget"
     android:previewLayout="@layout/shappky_widget_preview"
-    android:configure="com.yn.shappky.ui.activities.widgetConfig.WidgetConfigActivity"
+    android:configure="com.yassernull.shappky.ui.activities.widgetConfig.WidgetConfigActivity"
     android:widgetFeatures="reconfigurable"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen">

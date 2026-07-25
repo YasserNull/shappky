@@ -15,7 +15,7 @@ Use the checked-in Gradle wrapper.
 CI in `.github/workflows/android.yml` uses JDK 17 and runs `./gradlew updateLintBaseline` followed by `./gradlew build`.
 
 ## Coding Style & Naming Conventions
-This project uses Java 17, AndroidX, Material Components, view binding, libsu, and Shizuku. Follow existing Java style: 4-space indentation, `PascalCase` classes, `camelCase` fields and methods, and `UPPER_SNAKE_CASE` constants. Keep package paths under `com.yn.shappky`. Name XML resources descriptively by type and role, such as `activity_main.xml`, `item_filter_app.xml`, and `switch_thumb_tint.xml`. Prefer view binding over manual `findViewById` for new UI code.
+This project uses Java 17, AndroidX, Material Components, view binding, libsu, and Shizuku. Follow existing Java style: 4-space indentation, `PascalCase` classes, `camelCase` fields and methods, and `UPPER_SNAKE_CASE` constants. Keep package paths under `com.yassernull.shappky`. Name XML resources descriptively by type and role, such as `activity_main.xml`, `item_filter_app.xml`, and `switch_thumb_tint.xml`. Prefer view binding over manual `findViewById` for new UI code.
 
 ## Testing Guidelines
 No unit or instrumentation test directories are currently present. Add JVM tests under `app/src/test/java` and Android instrumentation tests under `app/src/androidTest/java` when introducing logic with meaningful branching or platform behavior. Name test classes after the target class, for example `ShellManagerTest` or `BackgroundAppManagerTest`. Run `./gradlew test` for local JVM tests and `./gradlew connectedAndroidTest` when device-backed tests are added.

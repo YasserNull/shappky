@@ -1,0 +1,175 @@
+package com.yassernull.shappky.ui.activities.serviceCustomization.sections
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.yassernull.shappky.R
+import com.yassernull.shappky.data.models.RuleType
+import com.yassernull.shappky.data.models.TriggerRule
+import com.yassernull.shappky.ui.activities.serviceCustomization.ServiceCustomizationRulesDialogs
+import com.yassernull.shappky.ui.components.buildRuleSummary
+import java.util.UUID
+
+@Composable
+fun ServiceCustomizationDisableTriggers(
+  disableRules: List<TriggerRule>,
+  onDisableRulesChange: (List<TriggerRule>) -> Unit,
+) {
+  val context = LocalContext.current
+
+  var showRuleSelection by remember { mutableStateOf(false) }
+  var activeConfigType by remember { mutableStateOf<RuleType?>(null) }
+  var showAppOpenedPicker by remember { mutableStateOf(false) }
+  var showAppResumedPicker by remember { mutableStateOf(false) }
+  var showAppClosedPicker by remember { mutableStateOf(false) }
+  var showAppKilledPicker by remember { mutableStateOf(false) }
+  var showAppRamPicker by remember { mutableStateOf(false) }
+  var showInactivityPicker by remember { mutableStateOf(false) }
+
+  fun addRule(rule: TriggerRule) {
+    onDisableRulesChange(disableRules + rule)
+  }
+
+  ServiceCustomizationRulesDialogs(
+    context = context,
+    showRuleSelection = showRuleSelection,
+    onDismissRuleSelection = { showRuleSelection = false },
+    onSelectRuleType = { type ->
+      showRuleSelection = false
+      when (type) {
+        RuleType.PHONE_WAKE -> addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.PHONE_WAKE))
+        RuleType.PHONE_SLEEP -> addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.PHONE_SLEEP))
+        RuleType.SPECIFIC_TIME -> addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.SPECIFIC_TIME))
+        RuleType.RAM_LIMIT_REACHED -> addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.RAM_LIMIT_REACHED))
+        RuleType.APP_OPENED -> showAppOpenedPicker = true
+        RuleType.APP_RESUMED -> showAppResumedPicker = true
+        RuleType.APP_CLOSED -> showAppClosedPicker = true
+        RuleType.APP_KILLED_MANUALLY -> showAppKilledPicker = true
+        RuleType.APP_RAM_EXCEEDED -> showAppRamPicker = true
+        RuleType.APP_INACTIVITY -> showInactivityPicker = true
+        else -> activeConfigType = type
+      }
+    },
+    showAppOpenedPicker = showAppOpenedPicker,
+    onDismissAppOpenedPicker = { showAppOpenedPicker = false },
+    onAppOpenedSaved = { pkgs ->
+      if (pkgs.isNotEmpty()) {
+        addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.APP_OPENED, appPackages = pkgs))
+      }
+      showAppOpenedPicker = false
+    },
+    showAppResumedPicker = showAppResumedPicker,
+    onDismissAppResumedPicker = { showAppResumedPicker = false },
+    onAppResumedSaved = { pkgs ->
+      if (pkgs.isNotEmpty()) {
+        addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.APP_RESUMED, appPackages = pkgs))
+      }
+      showAppResumedPicker = false
+    },
+    showAppClosedPicker = showAppClosedPicker,
+    onDismissAppClosedPicker = { showAppClosedPicker = false },
+    onAppClosedSaved = { pkgs ->
+      if (pkgs.isNotEmpty()) {
+        addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.APP_CLOSED, appPackages = pkgs))
+      }
+      showAppClosedPicker = false
+    },
+    showAppKilledPicker = showAppKilledPicker,
+    onDismissAppKilledPicker = { showAppKilledPicker = false },
+    onAppKilledSaved = { pkgs ->
+      if (pkgs.isNotEmpty()) {
+        addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.APP_KILLED_MANUALLY, appPackages = pkgs))
+      }
+      showAppKilledPicker = false
+    },
+    showAppRamPicker = showAppRamPicker,
+    onDismissAppRamPicker = { showAppRamPicker = false },
+    onAppRamSaved = { pkgs ->
+      if (pkgs.isNotEmpty()) {
+        addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.APP_RAM_EXCEEDED, appPackages = pkgs, ramThresholdMb = 300))
+      }
+      showAppRamPicker = false
+    },
+    showInactivityPicker = showInactivityPicker,
+    onDismissInactivityPicker = { showInactivityPicker = false },
+    onInactivitySaved = { pkgs ->
+      if (pkgs.isNotEmpty()) {
+        addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.APP_INACTIVITY, appPackages = pkgs, inactivityDurationMinutes = 10))
+      }
+      showInactivityPicker = false
+    },
+    activeConfigType = activeConfigType,
+    onDismissConfigureServiceState = { activeConfigType = null },
+    onConfigureServiceStateConfirmed = { rule ->
+      addRule(rule)
+      activeConfigType = null
+    },
+    onDismissConfigureKillOldestApp = { activeConfigType = null },
+    onConfigureKillOldestAppConfirmed = { rule ->
+      addRule(rule)
+      activeConfigType = null
+    },
+  )
+
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(bottom = 8.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(
+      text = stringResource(R.string.disable_rules_title),
+      style = MaterialTheme.typography.titleMedium,
+      color = MaterialTheme.colorScheme.primary,
+      modifier = Modifier.weight(1f),
+    )
+    Button(onClick = { showRuleSelection = true }) {
+      Icon(Icons.Filled.Add, contentDescription = "Add")
+      Spacer(Modifier.width(4.dp))
+      Text(stringResource(R.string.add_disable_rule))
+    }
+  }
+
+  if (disableRules.isEmpty()) {
+    Text(
+      text = stringResource(R.string.no_disable_rules),
+      color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+      modifier = Modifier.padding(bottom = 16.dp),
+    )
+  } else {
+    disableRules.forEach { rule ->
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        val ruleName = buildRuleSummary(rule)
+        Text(
+          text = ruleName,
+          color = MaterialTheme.colorScheme.onSurface,
+          modifier = Modifier.weight(1f),
+        )
+        IconButton(onClick = { onDisableRulesChange(disableRules.filter { it.id != rule.id }) }) {
+          Icon(
+            Icons.Filled.Delete,
+            contentDescription = "Delete rule",
+            tint = MaterialTheme.colorScheme.error,
+          )
+        }
+      }
+    }
+  }
+}
