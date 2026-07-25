@@ -31,7 +31,7 @@ class ShappkyActionRunner : TaskerPluginRunnerActionNoOutput<ShappkyActionInput>
           Log.d(TAG, "Successfully sent start command to ShappkyService.")
         } catch (e: Exception) {
           Log.e(TAG, "Error starting ShappkyService: ${e.message}", e)
-          return TaskerPluginResultError(3, "Failed to start service: ${e.message}")
+          return TaskerPluginResultError(3, context.getString(com.yassernull.shappky.R.string.failed_to_start_service, e.message))
         }
       }
       "STOP_SERVICE" -> {
@@ -41,7 +41,7 @@ class ShappkyActionRunner : TaskerPluginRunnerActionNoOutput<ShappkyActionInput>
           Log.d(TAG, "Successfully sent stop command to ShappkyService.")
         } catch (e: Exception) {
           Log.e(TAG, "Error stopping ShappkyService: ${e.message}", e)
-          return TaskerPluginResultError(4, "Failed to stop service: ${e.message}")
+          return TaskerPluginResultError(4, context.getString(com.yassernull.shappky.R.string.failed_to_stop_service, e.message))
         }
       }
       "EXECUTE_TRIGGER" -> {
@@ -57,7 +57,7 @@ class ShappkyActionRunner : TaskerPluginRunnerActionNoOutput<ShappkyActionInput>
 
             if (!shellManager.hasAnyShellPermission()) {
               Log.e(TAG, "Cannot execute trigger: No shell permissions")
-              return TaskerPluginResultError(6, "No shell (Root/Shizuku) permissions granted")
+              return TaskerPluginResultError(6, context.getString(com.yassernull.shappky.R.string.no_shell_permission_error))
             }
 
             val appManager = com.yassernull.shappky.core.managers.BackgroundAppManager(context, handler, executor, shellManager)
@@ -92,11 +92,11 @@ class ShappkyActionRunner : TaskerPluginRunnerActionNoOutput<ShappkyActionInput>
             }
           } else {
             Log.e(TAG, "Trigger with ID $triggerId not found in SharedPreferences!")
-            return TaskerPluginResultError(1, "Trigger with ID $triggerId not found")
+            return TaskerPluginResultError(1, context.getString(com.yassernull.shappky.R.string.trigger_not_found_error, triggerId))
           }
         } else {
           Log.e(TAG, "No Trigger ID provided in the Tasker configuration!")
-          return TaskerPluginResultError(2, "No Trigger ID provided")
+          return TaskerPluginResultError(2, context.getString(com.yassernull.shappky.R.string.no_trigger_id_error))
         }
       }
       else -> {

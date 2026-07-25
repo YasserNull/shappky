@@ -11,9 +11,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.yassernull.shappky.R
 import com.yassernull.shappky.data.models.ProcessInfo
 
 @Composable
@@ -36,7 +38,7 @@ fun ProcessRow(process: ProcessInfo) {
       horizontalArrangement = Arrangement.SpaceBetween,
     ) {
       Text(
-        text = "PID: ${process.pid}",
+        text = stringResource(R.string.pid_format, process.pid),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )

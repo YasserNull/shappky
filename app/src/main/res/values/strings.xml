@@ -55,8 +55,8 @@
     <string name="language_dialog_title">Choose language</string>
     <string-array name="language_options">
         <item>System Default</item>
-        <item>العربية</item>
         <item>English</item>
+        <item>العربية</item>
     </string-array>
     <string-array name="language_values" translatable="false">
         <item>system</item>
@@ -249,5 +249,37 @@
     <string name="shappky_trigger">Shappky - Trigger</string>
     <string name="please_select_trigger">Please select a trigger from settings</string>
 
+    <!-- Hardcoded strings fixes -->
+    <string name="filter_content_desc">Filter</string>
+    <string name="regex_pattern_label">Regex Pattern</string>
+    <string name="regex_placeholder">com.miui.*|com.xiaomi.*|com.lbe.security.miui</string>
+    <string name="not_found_format">%1$s: Not found</string>
+    <string name="pid_label">PID</string>
+    <string name="user_label">User</string>
+    <string name="is_foreground_label">Is Foreground</string>
+    <string name="is_persistent_label">Is Persistent</string>
+    <string name="cpu_usage_label">CPU Usage</string>
+    <string name="threads_label">Threads</string>
+    <string name="total_ram_usage_label">Total RAM Usage</string>
+    <string name="all_app_processes">All App Processes</string>
+    <string name="close">Close</string>
+    <string name="no">No</string>
+    <string name="pid_format">PID: %1$s</string>
+    <string name="run_content_desc">Run</string>
+    <string name="add_content_desc">Add</string>
+    <string name="delete_rule_content_desc">Delete rule</string>
+    <string name="tasker_configuration">Tasker Configuration</string>
+    <string name="select_action">Select Action:</string>
+    <string name="start_shappky_service_action">Start Shappky Service</string>
+    <string name="stop_shappky_service_action">Stop Shappky Service</string>
+    <string name="execute_specific_trigger_action">Execute Specific Trigger</string>
+    <string name="select_trigger_label">Select Trigger:</string>
+    <string name="no_triggers_available">No triggers available. Please create one in Shappky first.</string>
+    <string name="trigger_name_fallback">Trigger %1$s</string>
+    <string name="failed_to_start_service">Failed to start service: %1$s</string>
+    <string name="failed_to_stop_service">Failed to stop service: %1$s</string>
+    <string name="no_shell_permission_error">No shell (Root/Shizuku) permissions granted</string>
+    <string name="trigger_not_found_error">Trigger with ID %1$s not found</string>
+    <string name="no_trigger_id_error">No Trigger ID provided</string>
 
 </resources>

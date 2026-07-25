@@ -46,24 +46,24 @@ fun ProtectedAppsSearchBar(
     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
     trailingIcon = {
       IconButton(onClick = onToggleMenu) {
-        Icon(Icons.Default.MoreVert, contentDescription = "Filter")
+        Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.filter_content_desc))
       }
       DropdownMenu(
         expanded = isMenuExpanded,
         onDismissRequest = onDismissMenu,
       ) {
         DropdownMenuItem(
-          text = { Text("User Apps") },
+          text = { Text(stringResource(R.string.user_apps)) },
           trailingIcon = { Checkbox(checked = showUserApps, onCheckedChange = onShowUserAppsChange) },
           onClick = { onShowUserAppsChange(!showUserApps) },
         )
         DropdownMenuItem(
-          text = { Text("System Apps") },
+          text = { Text(stringResource(R.string.system_apps)) },
           trailingIcon = { Checkbox(checked = showSystemApps, onCheckedChange = onShowSystemAppsChange) },
           onClick = { onShowSystemAppsChange(!showSystemApps) },
         )
         DropdownMenuItem(
-          text = { Text("Persistent Apps") },
+          text = { Text(stringResource(R.string.persistent_apps)) },
           trailingIcon = { Checkbox(checked = showPersistentApps, onCheckedChange = onShowPersistentAppsChange) },
           onClick = { onShowPersistentAppsChange(!showPersistentApps) },
         )

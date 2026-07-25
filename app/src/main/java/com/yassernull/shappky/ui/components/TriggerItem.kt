@@ -77,7 +77,7 @@ fun TriggerItem(
       IconButton(onClick = onExecute, enabled = trigger.isEnabled) {
         Icon(
           Icons.Filled.PlayArrow,
-          contentDescription = "Run",
+          contentDescription = stringResource(R.string.run_content_desc),
           tint = if (trigger.isEnabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
           modifier = Modifier.size(28.dp),
         )

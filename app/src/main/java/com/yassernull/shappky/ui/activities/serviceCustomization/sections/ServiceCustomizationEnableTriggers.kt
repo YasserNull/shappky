@@ -136,7 +136,7 @@ fun ServiceCustomizationEnableTriggers(
       modifier = Modifier.weight(1f),
     )
     Button(onClick = { showRuleSelection = true }) {
-      Icon(Icons.Filled.Add, contentDescription = "Add")
+      Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_content_desc))
       Spacer(Modifier.width(4.dp))
       Text(stringResource(R.string.add_enable_rule))
     }
@@ -165,7 +165,7 @@ fun ServiceCustomizationEnableTriggers(
         IconButton(onClick = { onEnableRulesChange(enableRules.filter { it.id != rule.id }) }) {
           Icon(
             Icons.Filled.Delete,
-            contentDescription = "Delete rule",
+            contentDescription = stringResource(R.string.delete_rule_content_desc),
             tint = MaterialTheme.colorScheme.error,
           )
         }

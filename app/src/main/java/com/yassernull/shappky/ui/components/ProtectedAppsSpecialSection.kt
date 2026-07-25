@@ -47,7 +47,7 @@ fun ProtectedAppsSpecialSection(
 
   val selfPackage = context.packageName
   SpecialCheckboxRow(
-    text = "Shappky",
+    text = stringResource(R.string.app_name),
     checked = selectedPackages.contains(selfPackage),
     onCheckedChange = onToggleSelf,
   )
@@ -66,7 +66,7 @@ fun ProtectedAppsSpecialSection(
       if (wallpaperPackages.isNotEmpty()) {
         onToggleWallpaper(checked)
       } else {
-        Toast.makeText(context, "$wallpaperText: Not found", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.not_found_format, wallpaperText), Toast.LENGTH_SHORT).show()
       }
     },
   )
@@ -91,7 +91,7 @@ fun ProtectedAppsSpecialSection(
       if (autoBackgroundPackages.isNotEmpty()) {
         onToggleAutoBackground(checked)
       } else {
-        Toast.makeText(context, "$autoBgText: Not found", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.not_found_format, autoBgText), Toast.LENGTH_SHORT).show()
       }
     },
   )
@@ -112,8 +112,8 @@ fun ProtectedAppsSpecialSection(
     value = regexText,
     onValueChange = onRegexChange,
     modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
-    placeholder = { Text("com.miui.*|com.xiaomi.*|com.lbe.security.miui") },
-    label = { Text("Regex Pattern") },
+    placeholder = { Text(stringResource(R.string.regex_placeholder)) },
+    label = { Text(stringResource(R.string.regex_pattern_label)) },
     singleLine = true,
     shape = RoundedCornerShape(12.dp),
   )

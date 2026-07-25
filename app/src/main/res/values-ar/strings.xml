@@ -54,8 +54,8 @@
     <string name="language_dialog_title">اختر اللغة</string>
     <string-array name="language_options">
         <item>افتراضي النظام</item>
-        <item>العربية</item>
         <item>English</item>
+        <item>العربية</item>
     </string-array>
     <string name="dynamic_colors">الألوان الديناميكية</string>
     <string name="dynamic_colors_summary">استخدام ألوان خلفية الجهاز</string>
@@ -241,5 +241,37 @@
     <string name="shappky_trigger">شابكي - مشغل</string>
     <string name="please_select_trigger">الرجاء تحديد مشغل من الإعدادات</string>
 
+    <!-- Hardcoded strings fixes -->
+    <string name="filter_content_desc">تصفية</string>
+    <string name="regex_pattern_label">نمط Regex</string>
+    <string name="regex_placeholder">com.miui.*|com.xiaomi.*|com.lbe.security.miui</string>
+    <string name="not_found_format">%1$s: غير موجود</string>
+    <string name="pid_label">PID</string>
+    <string name="user_label">المستخدم</string>
+    <string name="is_foreground_label">في المقدمة</string>
+    <string name="is_persistent_label">مستمر</string>
+    <string name="cpu_usage_label">استهلاك المعالج</string>
+    <string name="threads_label">الخيوط</string>
+    <string name="total_ram_usage_label">إجمالي استهلاك الذاكرة</string>
+    <string name="all_app_processes">جميع عمليات التطبيق</string>
+    <string name="close">إغلاق</string>
+    <string name="no">لا</string>
+    <string name="pid_format">PID: %1$s</string>
+    <string name="run_content_desc">تشغيل</string>
+    <string name="add_content_desc">إضافة</string>
+    <string name="delete_rule_content_desc">حذف القاعدة</string>
+    <string name="tasker_configuration">إعدادات Tasker</string>
+    <string name="select_action">اختر الإجراء:</string>
+    <string name="start_shappky_service_action">بدء خدمة شابكي</string>
+    <string name="stop_shappky_service_action">إيقاف خدمة شابكي</string>
+    <string name="execute_specific_trigger_action">تشغيل مشغل معين</string>
+    <string name="select_trigger_label">اختر المشغل:</string>
+    <string name="no_triggers_available">لا توجد مشغلات متاحة. الرجاء إنشاء واحد في شابكي أولاً.</string>
+    <string name="trigger_name_fallback">المشغل %1$s</string>
+    <string name="failed_to_start_service">فشل بدء الخدمة: %1$s</string>
+    <string name="failed_to_stop_service">فشل إيقاف الخدمة: %1$s</string>
+    <string name="no_shell_permission_error">لا توجد صلاحية Shell (Root/Shizuku)</string>
+    <string name="trigger_not_found_error">لم يتم العثور على مشغل بالمعرف %1$s</string>
+    <string name="no_trigger_id_error">لم يتم توفير معرف المشغل</string>
 
 </resources>

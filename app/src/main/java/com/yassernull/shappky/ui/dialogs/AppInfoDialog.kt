@@ -11,10 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.yassernull.shappky.R
 import com.yassernull.shappky.data.models.AppDetailedInfo
 import com.yassernull.shappky.ui.components.DrawableIcon
 import com.yassernull.shappky.ui.components.InfoRow
@@ -65,18 +67,18 @@ fun AppInfoDialog(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        InfoRow(label = "PID", value = info.pid)
-        InfoRow(label = "User", value = info.user)
-        InfoRow(label = "Is Foreground", value = if (info.isForeground) "Yes" else "No")
-        InfoRow(label = "Is Persistent", value = if (info.app.isPersistentApp) "Yes" else "No")
-        InfoRow(label = "CPU Usage", value = info.cpuUsage)
-        InfoRow(label = "Threads", value = info.threads)
-        InfoRow(label = "Total RAM Usage", value = Formatter.formatFileSize(context, info.totalRamKb * 1024L))
+        InfoRow(label = stringResource(R.string.pid_label), value = info.pid)
+        InfoRow(label = stringResource(R.string.user_label), value = info.user)
+        InfoRow(label = stringResource(R.string.is_foreground_label), value = if (info.isForeground) stringResource(R.string.yes) else stringResource(R.string.no))
+        InfoRow(label = stringResource(R.string.is_persistent_label), value = if (info.app.isPersistentApp) stringResource(R.string.yes) else stringResource(R.string.no))
+        InfoRow(label = stringResource(R.string.cpu_usage_label), value = info.cpuUsage)
+        InfoRow(label = stringResource(R.string.threads_label), value = info.threads)
+        InfoRow(label = stringResource(R.string.total_ram_usage_label), value = Formatter.formatFileSize(context, info.totalRamKb * 1024L))
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-          text = "All App Processes",
+          text = stringResource(R.string.all_app_processes),
           style = MaterialTheme.typography.titleMedium,
           fontWeight = FontWeight.Bold,
           modifier = Modifier.padding(bottom = 8.dp),
@@ -106,7 +108,7 @@ fun AppInfoDialog(
           horizontalArrangement = Arrangement.End,
         ) {
           TextButton(onClick = onDismiss) {
-            Text("Close")
+            Text(stringResource(R.string.close))
           }
         }
       }
