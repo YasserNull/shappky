@@ -52,7 +52,7 @@ fun ListWidgetConfigActivity.handleOnCreate(savedInstanceState: Bundle?) {
   val appTheme = prefs.getString("appTheme", "dark") ?: "dark"
 
   setContent {
-    AppTheme {
+    AppTheme(withBackground = false) {
       val dialogBg = if (appTheme == "black" || appTheme == "dark") {
         ComposeColor(0xFF121212)
       } else {

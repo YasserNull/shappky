@@ -34,7 +34,7 @@ fun WidgetConfigActivity.handleOnCreate(savedInstanceState: Bundle?) {
   }
 
   setContent {
-    AppTheme {
+    AppTheme(withBackground = false) {
       WidgetConfigScreen(
         appWidgetId = appWidgetId,
         onSave = {

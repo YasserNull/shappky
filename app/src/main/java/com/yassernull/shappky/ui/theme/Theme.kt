@@ -16,7 +16,7 @@ import com.yassernull.shappky.core.preferences.PREFERENCES_NAME
 
 @Suppress("DEPRECATION")
 @Composable
-fun AppTheme(content: @Composable () -> Unit) {
+fun AppTheme(withBackground: Boolean = true, content: @Composable () -> Unit) {
   val context = LocalContext.current
   val sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
   val appTheme = sharedPreferences.getString(KEY_THEME, "dark") ?: "dark"
@@ -66,6 +66,10 @@ fun AppTheme(content: @Composable () -> Unit) {
   }
 
   MaterialTheme(colorScheme = colorScheme) {
-    Surface(color = MaterialTheme.colorScheme.surface, content = content)
+    if (withBackground) {
+      Surface(color = MaterialTheme.colorScheme.surface, content = content)
+    } else {
+      content()
+    }
   }
 }
