@@ -58,7 +58,7 @@ class ShappkyWidgetFactory(
     val showUserApps = prefs.getBoolean(WidgetPreferences.getListShowUserAppsKey(appWidgetId), prefs.getBoolean(AppsListPreferences.KEY_SHOW_USER_APPS, true))
     val showSystemApps = prefs.getBoolean(WidgetPreferences.getListShowSystemAppsKey(appWidgetId), prefs.getBoolean(AppsListPreferences.KEY_SHOW_SYSTEM_APPS, true))
     val showPersistentApps = prefs.getBoolean(WidgetPreferences.getListShowPersistentAppsKey(appWidgetId), prefs.getBoolean(AppsListPreferences.KEY_SHOW_PERSISTENT_APPS, false))
-    val showProtectedApps = prefs.getBoolean(WidgetPreferences.getListShowProtectedAppsKey(appWidgetId), prefs.getBoolean(AppsListPreferences.KEY_SHOW_PROTECTED_APPS, false))
+    val showProtectedApps = prefs.getBoolean(WidgetPreferences.getListShowProtectedAppsKey(appWidgetId), false)
 
     manager.setShowUserApps(showUserApps)
     manager.setShowSystemApps(showSystemApps)
