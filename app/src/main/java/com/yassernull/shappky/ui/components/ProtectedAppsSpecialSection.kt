@@ -31,9 +31,6 @@ fun ProtectedAppsSpecialSection(
   activeWidgetPackages: Set<String>,
   widgetsChecked: Boolean,
   onToggleWidgets: (Boolean) -> Unit,
-  autoBackgroundPackages: Set<String>,
-  autoBackgroundChecked: Boolean,
-  onToggleAutoBackground: (Boolean) -> Unit,
   androidPackages: List<String>,
   androidServicesChecked: Boolean,
   onToggleAndroidServices: (Boolean) -> Unit,
@@ -81,19 +78,6 @@ fun ProtectedAppsSpecialSection(
     text = stringResource(R.string.widgets),
     checked = widgetsChecked,
     onCheckedChange = onToggleWidgets,
-  )
-
-  val autoBgText = stringResource(R.string.auto_background_apps)
-  SpecialCheckboxRow(
-    text = autoBgText,
-    checked = autoBackgroundChecked,
-    onCheckedChange = { checked ->
-      if (autoBackgroundPackages.isNotEmpty()) {
-        onToggleAutoBackground(checked)
-      } else {
-        Toast.makeText(context, context.getString(R.string.not_found_format, autoBgText), Toast.LENGTH_SHORT).show()
-      }
-    },
   )
 
   SpecialCheckboxRow(

@@ -36,7 +36,6 @@ import com.yassernull.shappky.ui.components.ProtectedAppsSearchBar
 import com.yassernull.shappky.ui.components.ProtectedAppsSpecialSection
 import com.yassernull.shappky.utils.applyRegexToSelectedPackages
 import com.yassernull.shappky.utils.collectActiveWidgetPackages
-import com.yassernull.shappky.utils.collectAutoBackgroundPackages
 import com.yassernull.shappky.utils.getAndroidPackages
 import com.yassernull.shappky.utils.getKeyboardPackage
 import com.yassernull.shappky.utils.getLauncherPackage
@@ -62,7 +61,6 @@ fun ProtectedAppsDialog(
   val wallpaperPackages = remember { context.getWallpaperPackages(pm) }
 
   var activeWidgetPackages by remember { mutableStateOf(emptySet<String>()) }
-  var autoBackgroundPackages by remember { mutableStateOf(emptySet<String>()) }
   var regexText by remember { mutableStateOf("") }
   var showUserApps by remember { mutableStateOf(true) }
   var showSystemApps by remember { mutableStateOf(true) }
@@ -92,7 +90,6 @@ fun ProtectedAppsDialog(
     val executor = Executors.newSingleThreadExecutor()
     val shellManager = ShellManager(context, handler, executor)
     activeWidgetPackages = context.collectActiveWidgetPackages(shellManager)
-    autoBackgroundPackages = context.collectAutoBackgroundPackages(shellManager)
   }
 
   LaunchedEffect(regexText) {
@@ -136,8 +133,6 @@ fun ProtectedAppsDialog(
           val widgetsChecked = activeWidgetPackages.isNotEmpty() && activeWidgetPackages.all { selectedPackages.contains(it) }
           val googleAndroidServicesChecked = googleAndroidPackages.isNotEmpty() && googleAndroidPackages.all { selectedPackages.contains(it) }
           val androidServicesChecked = androidPackages.isNotEmpty() && androidPackages.all { selectedPackages.contains(it) }
-          val autoBackgroundChecked = autoBackgroundPackages.isNotEmpty() && autoBackgroundPackages.all { selectedPackages.contains(it) }
-
           val filtered = allApps.filter { app ->
             val matchesQuery = app.appName.contains(query, ignoreCase = true) || app.packageName.contains(query, ignoreCase = true)
             var matchesFilter = false
@@ -181,11 +176,6 @@ fun ProtectedAppsDialog(
                 widgetsChecked = widgetsChecked,
                 onToggleWidgets = { checked ->
                   selectedPackages = if (checked) selectedPackages + activeWidgetPackages else selectedPackages - activeWidgetPackages
-                },
-                autoBackgroundPackages = autoBackgroundPackages,
-                autoBackgroundChecked = autoBackgroundChecked,
-                onToggleAutoBackground = { checked ->
-                  selectedPackages = if (checked) selectedPackages + autoBackgroundPackages else selectedPackages - autoBackgroundPackages
                 },
                 androidPackages = androidPackages,
                 androidServicesChecked = androidServicesChecked,
