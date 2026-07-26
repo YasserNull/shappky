@@ -126,7 +126,7 @@ object ProtectionManager {
       val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
       for (appInfo in packages) {
         val pkg = appInfo.packageName
-        if (pkg.startsWith("com.android.") || pkg.startsWith("android.")) {
+        if (pkg == "android" || pkg.startsWith("com.android.") || pkg.startsWith("android.")) {
           defaultSet.add(pkg)
         }
       }
