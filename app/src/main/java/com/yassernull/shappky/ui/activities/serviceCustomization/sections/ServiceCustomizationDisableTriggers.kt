@@ -104,10 +104,8 @@ fun ServiceCustomizationDisableTriggers(
     },
     showInactivityPicker = showInactivityPicker,
     onDismissInactivityPicker = { showInactivityPicker = false },
-    onInactivitySaved = { pkgs ->
-      if (pkgs.isNotEmpty()) {
-        addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.APP_INACTIVITY, appPackages = pkgs, inactivityDurationMinutes = 10))
-      }
+    onInactivitySaved = { rule ->
+      addRule(rule)
       showInactivityPicker = false
     },
     activeConfigType = activeConfigType,

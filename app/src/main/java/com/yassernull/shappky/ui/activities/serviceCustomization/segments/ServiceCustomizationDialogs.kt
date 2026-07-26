@@ -72,7 +72,7 @@ fun ServiceCustomizationRulesDialogs(
   onAppRamSaved: (Set<String>) -> Unit,
   showInactivityPicker: Boolean,
   onDismissInactivityPicker: () -> Unit,
-  onInactivitySaved: (Set<String>) -> Unit,
+  onInactivitySaved: (TriggerRule) -> Unit,
   activeConfigType: RuleType?,
   onDismissConfigureServiceState: () -> Unit,
   onConfigureServiceStateConfirmed: (TriggerRule) -> Unit,
@@ -138,12 +138,10 @@ fun ServiceCustomizationRulesDialogs(
   }
 
   if (showInactivityPicker) {
-    AppSelectionDialog(
-      title = stringResource(R.string.rule_app_inactivity),
-      initialSelectedPackages = emptySet(),
+    ConfigureAppInactivityDialog(
       loadAllApps = { callback -> context.loadAllApps(callback) },
       onDismiss = onDismissInactivityPicker,
-      onSave = onInactivitySaved,
+      onConfirm = onInactivitySaved,
     )
   }
 
