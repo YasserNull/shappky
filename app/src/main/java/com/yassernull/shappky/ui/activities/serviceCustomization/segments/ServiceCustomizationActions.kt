@@ -6,6 +6,7 @@ import android.widget.Toast
 import com.yassernull.shappky.R
 import com.yassernull.shappky.core.managers.DisableTriggerManager
 import com.yassernull.shappky.core.managers.EnableTriggerManager
+import com.yassernull.shappky.core.managers.TriggerServiceManager
 
 object ServiceCustomizationActions {
 
@@ -55,6 +56,7 @@ object ServiceCustomizationActions {
     EnableTriggerManager.saveEnableRules(activity, settings.enableRules)
     DisableTriggerManager.saveDisableRules(activity, settings.disableRules)
 
+    TriggerServiceManager.updateTriggerServiceState(activity)
     Toast.makeText(activity, activity.getString(R.string.save), Toast.LENGTH_SHORT).show()
     activity.finish()
   }
