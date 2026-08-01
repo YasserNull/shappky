@@ -216,6 +216,17 @@
     <string name="settings_about">حول</string>
     <string name="triggers_summary">إدارة مشغلات الخلفية التلقائية</string>
 
+    <!-- Settings Backup -->
+    <string name="settings_backup">النسخ الاحتياطي والاستعادة</string>
+    <string name="export_settings">تصدير الإعدادات</string>
+    <string name="export_settings_summary">حفظ كل إعدادات التطبيق في ملف</string>
+    <string name="import_settings">استيراد الإعدادات</string>
+    <string name="import_settings_summary">استعادة الإعدادات من ملف</string>
+    <string name="export_settings_success">تم تصدير الإعدادات بنجاح</string>
+    <string name="export_settings_failed">فشل تصدير الإعدادات</string>
+    <string name="import_settings_success">تم استيراد الإعدادات بنجاح</string>
+    <string name="import_settings_failed">فشل استيراد الإعدادات</string>
+
     <!-- Widget Config -->
     <string name="widget_settings">إعدادات الويدجت</string>
     <string name="widget_bg_size">حجم الخلفية: %1$d dp</string>

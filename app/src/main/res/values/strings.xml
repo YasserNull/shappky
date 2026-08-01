@@ -224,6 +224,17 @@
     <string name="settings_about">About</string>
     <string name="triggers_summary">Manage automated background triggers</string>
 
+    <!-- Settings Backup -->
+    <string name="settings_backup">Backup &amp; Restore</string>
+    <string name="export_settings">Export Settings</string>
+    <string name="export_settings_summary">Save all app settings to a file</string>
+    <string name="import_settings">Import Settings</string>
+    <string name="import_settings_summary">Restore settings from a file</string>
+    <string name="export_settings_success">Settings exported successfully</string>
+    <string name="export_settings_failed">Failed to export settings</string>
+    <string name="import_settings_success">Settings imported successfully</string>
+    <string name="import_settings_failed">Failed to import settings</string>
+
     <!-- Widget Config -->
     <string name="widget_settings">Widget Settings</string>
     <string name="widget_bg_size">Background Size: %1$d dp</string>

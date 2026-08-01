@@ -31,6 +31,7 @@ fun SettingsContent(
       ServiceSection()
       RamUsageSection()
       AppsListSection()
+      BackupSection()
       AboutSection()
     }
   }
