@@ -1,8 +1,10 @@
 package com.yassernull.shappky.core.managers
 
+import android.os.Process
 import java.io.BufferedReader
 import java.io.StringReader
 import java.util.Locale
+import java.util.regex.Pattern
 
 data class PsEntry(
   val packageName: String,
@@ -20,8 +22,9 @@ fun parsePsOutputToEntries(output: String): List<PsEntry> {
         val rawName = parts[1].trim()
         val rssKb = parts[0].trim().toLongOrNull() ?: 0L
         val uid = if (parts.size >= 3) parts[2].trim() else ""
+        val isAppUser = uid.toLongOrNull()?.let { it >= Process.FIRST_APPLICATION_UID } ?: false
         val packageName = if (rawName.contains(".")) rawName.substringBefore(":") else ""
-        if (rawName.isNotEmpty()) {
+        if (isAppUser && rawName.isNotEmpty()) {
           entries.add(PsEntry(packageName, rssKb, uid))
         }
       }
@@ -62,7 +65,11 @@ fun parsePsOutputToProcessInfos(
         val pid = parts[0]
         val rss = parts[2].toLongOrNull() ?: 0L
         val name = parts[3]
-        val matchesByUid = uid != null && parts.size >= 5 && parts[4] == uid
+        val user = if (parts.size >= 2) parts[1] else ""
+        val matchesByUid = uid != null &&
+          parts.size >= 5 &&
+          parts[4] == uid &&
+          APP_USER_NAME_PATTERN.matcher(user).matches()
         val matchesByName = name.startsWith(packageName)
         if (matchesByUid || matchesByName) {
           processes.add(com.yassernull.shappky.data.models.ProcessInfo(name, pid, rss))
@@ -73,6 +80,8 @@ fun parsePsOutputToProcessInfos(
   }
   return processes
 }
+
+private val APP_USER_NAME_PATTERN = Pattern.compile("^u\\d+_")
 
 fun parseCpuInfoOutput(cpuOutput: String): Double {
   var totalCpu = 0.0
