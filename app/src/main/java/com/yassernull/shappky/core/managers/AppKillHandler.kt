@@ -91,7 +91,8 @@ class AppKillHandler(
       val killCommands = packageNames.joinToString("; ") { "am kill " + it }
       val forceStopCommands = packageNames.joinToString("; ") { "if pidof " + it + " > /dev/null; then am force-stop " + it + "; fi" }
       val kill9Commands = packageNames.joinToString("; ") {
-        "pids=${'$'}(${ShellManager.TOYBOX_PATH} ps -A -o pid,name | grep '" + it + "' | grep -v '[-@]' | awk '{print ${'$'}1}'); if [ ! -z \"${'$'}pids\" ]; then kill -9 ${'$'}pids 2>/dev/null; fi"
+        val escapedPkg = it.replace(".", "\\.")
+        "pids=${'$'}(${ShellManager.TOYBOX_PATH} ps -A -o pid,name | grep -E '" + escapedPkg + "([^A-Za-z]|\$)' | grep -v '[-@]' | awk '{print ${'$'}1}'); if [ ! -z \"${'$'}pids\" ]; then kill -9 ${'$'}pids 2>/dev/null; fi"
       }
       val baseCommand = killCommands + "; sleep 0.2; " + forceStopCommands + "; sleep 0.2; " + kill9Commands
       return if (appendKillAll) baseCommand + "; am kill-all" else baseCommand

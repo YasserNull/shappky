@@ -70,7 +70,7 @@ fun parsePsOutputToProcessInfos(
           parts.size >= 5 &&
           parts[4] == uid &&
           APP_USER_NAME_PATTERN.matcher(user).matches()
-        val matchesByName = name.startsWith(packageName)
+        val matchesByName = isProcessOfPackage(name, packageName)
         if (matchesByUid || matchesByName) {
           processes.add(com.yassernull.shappky.data.models.ProcessInfo(name, pid, rss))
         }
@@ -82,6 +82,8 @@ fun parsePsOutputToProcessInfos(
 }
 
 private val APP_USER_NAME_PATTERN = Pattern.compile("^u\\d+_")
+
+fun isProcessOfPackage(processName: String, packageName: String): Boolean = Regex("^" + Pattern.quote(packageName) + "(?![A-Za-z]).*$").matches(processName)
 
 fun parseCpuInfoOutput(cpuOutput: String): Double {
   var totalCpu = 0.0

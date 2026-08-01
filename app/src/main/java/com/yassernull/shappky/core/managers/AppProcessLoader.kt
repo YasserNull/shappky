@@ -242,8 +242,9 @@ class AppProcessLoader(
               }
             }
             if (!uidFiltered) {
+              val escapedPkg = app.packageName.replace(".", "\\.")
               fullOutput = shellManager.runShellCommandAndGetFullOutput(
-                "${ShellManager.TOYBOX_PATH} ps -A -o pid,user,rss,name | grep '\\.' | grep -v '[-@]' | grep '" + app.packageName + "'",
+                "${ShellManager.TOYBOX_PATH} ps -A -o pid,user,rss,name | grep '\\.' | grep -v '[-@]' | grep -E '" + escapedPkg + "([^A-Za-z]|\$)'",
               )
             }
             var processes = mutableListOf<com.yassernull.shappky.data.models.ProcessInfo>()
