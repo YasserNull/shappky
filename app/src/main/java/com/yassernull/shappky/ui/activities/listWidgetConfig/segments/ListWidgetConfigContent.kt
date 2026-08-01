@@ -67,6 +67,7 @@ fun ListWidgetConfigContent(appWidgetId: Int, onSave: () -> Unit, onDismiss: () 
           ShappkyListWidgetProvider.updateAppWidget(context, appWidgetManager, appWidgetId)
           @Suppress("DEPRECATION")
           appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list_view)
+          ShappkyListWidgetProvider.startAutoRefresh(context)
           onSave()
         },
         colors = ButtonDefaults.buttonColors(

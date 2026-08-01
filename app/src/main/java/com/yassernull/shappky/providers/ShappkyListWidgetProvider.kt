@@ -166,10 +166,16 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
             val isAppInForeground = App.isAppInForeground
 
             if (isInteractive && !isAppInForeground) {
-              @Suppress("DEPRECATION")
-              appWidgetManager.notifyAppWidgetViewDataChanged(innerWidgetIds, R.id.widget_list_view)
               for (id in innerWidgetIds) {
-                updateAppWidget(context, appWidgetManager, id)
+                val autoRefresh = innerPrefs.getBoolean("widget_list_auto_refresh_apps_$id", innerPrefs.getBoolean("appsAutoRefresh", true))
+                val ramUsageRefresh = innerPrefs.getBoolean("widget_list_auto_refresh_ram_$id", innerPrefs.getBoolean("appsRamUsageAutoRefresh", true))
+                if (autoRefresh || ramUsageRefresh) {
+                  if (autoRefresh) {
+                    @Suppress("DEPRECATION")
+                    appWidgetManager.notifyAppWidgetViewDataChanged(id, R.id.widget_list_view)
+                  }
+                  updateAppWidget(context, appWidgetManager, id)
+                }
               }
             }
             handler.postDelayed(this, innerMinInterval.coerceAtLeast(1000L))
