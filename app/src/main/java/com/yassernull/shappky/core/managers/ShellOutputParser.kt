@@ -7,6 +7,7 @@ import java.util.Locale
 data class PsEntry(
   val packageName: String,
   val rssKb: Long,
+  val uid: String,
 )
 
 fun parsePsOutputToEntries(output: String): List<PsEntry> {
@@ -15,12 +16,13 @@ fun parsePsOutputToEntries(output: String): List<PsEntry> {
     var line = reader.readLine()
     while (line != null) {
       val parts = line.trim().split(Regex("\\s+"))
-      if (parts.size >= 2) {
-        val rawPackageName = parts[1].trim()
-        val packageName = if (rawPackageName.contains(":")) rawPackageName.substringBefore(":") else rawPackageName
+      if (parts.size >= 2 && !line.startsWith("ERROR:")) {
+        val rawName = parts[1].trim()
         val rssKb = parts[0].trim().toLongOrNull() ?: 0L
-        if (packageName.isNotEmpty() && packageName.contains(".") && !packageName.startsWith("ERROR:")) {
-          entries.add(PsEntry(packageName, rssKb))
+        val uid = if (parts.size >= 3) parts[2].trim() else ""
+        val packageName = if (rawName.contains(".")) rawName.substringBefore(":") else ""
+        if (rawName.isNotEmpty()) {
+          entries.add(PsEntry(packageName, rssKb, uid))
         }
       }
       line = reader.readLine()
@@ -30,9 +32,18 @@ fun parsePsOutputToEntries(output: String): List<PsEntry> {
 }
 
 fun aggregateByPackage(entries: List<PsEntry>): Map<String, Long> {
+  val uidToPackage = mutableMapOf<String, String>()
+  for (entry in entries) {
+    if (entry.packageName.isNotEmpty() && entry.uid.isNotEmpty()) {
+      uidToPackage.putIfAbsent(entry.uid, entry.packageName)
+    }
+  }
   val map = mutableMapOf<String, Long>()
   for (entry in entries) {
-    map[entry.packageName] = (map[entry.packageName] ?: 0L) + entry.rssKb
+    val packageName = entry.packageName.ifEmpty { uidToPackage[entry.uid] ?: "" }
+    if (packageName.isNotEmpty()) {
+      map[packageName] = (map[packageName] ?: 0L) + entry.rssKb
+    }
   }
   return map
 }
@@ -40,6 +51,7 @@ fun aggregateByPackage(entries: List<PsEntry>): Map<String, Long> {
 fun parsePsOutputToProcessInfos(
   output: String,
   packageName: String,
+  uid: String? = null,
 ): List<com.yassernull.shappky.data.models.ProcessInfo> {
   val processes = mutableListOf<com.yassernull.shappky.data.models.ProcessInfo>()
   BufferedReader(StringReader(output)).use { reader ->
@@ -50,7 +62,9 @@ fun parsePsOutputToProcessInfos(
         val pid = parts[0]
         val rss = parts[2].toLongOrNull() ?: 0L
         val name = parts[3]
-        if (name.startsWith(packageName)) {
+        val matchesByUid = uid != null && parts.size >= 5 && parts[4] == uid
+        val matchesByName = name.startsWith(packageName)
+        if (matchesByUid || matchesByName) {
           processes.add(com.yassernull.shappky.data.models.ProcessInfo(name, pid, rss))
         }
       }

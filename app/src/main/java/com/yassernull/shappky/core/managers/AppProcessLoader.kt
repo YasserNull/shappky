@@ -95,22 +95,22 @@ class AppProcessLoader(
           val protectedApps = ProtectionManager.getProtectedApps(context)
 
           if (shellManager.isShellCommandReady()) {
-            val command = "${ShellManager.TOYBOX_PATH} ps -A -o rss,name | grep '\\.' | grep -v '[-@]'"
+            val command = "${ShellManager.TOYBOX_PATH} ps -A -o rss,name,uid"
             try {
               val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
               if (fullOutput != null) {
                 val entries = parsePsOutputToEntries(fullOutput)
                 val pm = context.packageManager
-                val validatedEntries = entries.filter { entry ->
+                val packageRamMap = aggregateByPackage(entries)
+                val validatedEntries = packageRamMap.filterKeys { pkg ->
                   try {
-                    pm.getApplicationInfo(entry.packageName, 0)
+                    pm.getApplicationInfo(pkg, 0)
                     true
                   } catch (_: PackageManager.NameNotFoundException) {
                     false
                   }
                 }
-                val packageRamMap = aggregateByPackage(validatedEntries)
-                val runningEntries = packageRamMap.map { "${it.key}:${it.value}" }.toSet()
+                val runningEntries = validatedEntries.map { "${it.key}:${it.value}" }.toSet()
 
                 result = AppModelFilter.buildRunningAppModels(
                   runningEntries = runningEntries,
@@ -195,14 +195,17 @@ class AppProcessLoader(
         val ramUsageByPackage = mutableMapOf<String, Long>()
         try {
           if (requestedPackages.isNotEmpty() && shellManager.isShellCommandReady()) {
-            val command = "${ShellManager.TOYBOX_PATH} ps -A -o rss,name | grep '\\.' | grep -v '[-@]'"
+            val command = "${ShellManager.TOYBOX_PATH} ps -A -o rss,name,uid"
             try {
               val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
               if (fullOutput != null) {
                 val entries = parsePsOutputToEntries(fullOutput)
-                val filtered = entries.filter { it.packageName in requestedPackages }
-                val aggregated = aggregateByPackage(filtered)
-                ramUsageByPackage.putAll(aggregated)
+                val aggregated = aggregateByPackage(entries)
+                for ((pkg, rss) in aggregated) {
+                  if (pkg in requestedPackages) {
+                    ramUsageByPackage[pkg] = rss
+                  }
+                }
               }
             } catch (e: Exception) {
               Log.e(TAG, "Error updating app RAM usage", e)
@@ -223,8 +226,26 @@ class AppProcessLoader(
       executor.execute {
         try {
           if (shellManager.isShellCommandReady()) {
-            val command = "${ShellManager.TOYBOX_PATH} ps -A -o pid,user,rss,name | grep '\\.' | grep -v '[-@]' | grep '" + app.packageName + "'"
-            val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
+            var fullOutput: String? = null
+            var uidFiltered = false
+            val appUid = resolveAppUid(app.packageName)
+            Log.d(TAG, "loadAppDetailedInfo package=${app.packageName}, resolvedUid=$appUid")
+            if (appUid != null) {
+              val uidCommand = "${ShellManager.TOYBOX_PATH} ps -A -o pid,user,rss,name,uid"
+              val uidOutput = shellManager.runShellCommandAndGetFullOutput(uidCommand)
+              if (!uidOutput.isNullOrBlank()) {
+                fullOutput = uidOutput
+                uidFiltered = true
+                Log.d(TAG, "loadAppDetailedInfo full ps output lines=${uidOutput.lines().size}")
+              } else {
+                Log.w(TAG, "loadAppDetailedInfo ps returned no output, falling back to package name grep")
+              }
+            }
+            if (!uidFiltered) {
+              fullOutput = shellManager.runShellCommandAndGetFullOutput(
+                "${ShellManager.TOYBOX_PATH} ps -A -o pid,user,rss,name | grep '\\.' | grep -v '[-@]' | grep '" + app.packageName + "'",
+              )
+            }
             var processes = mutableListOf<com.yassernull.shappky.data.models.ProcessInfo>()
             var mainPid = "-"
             var mainUser = "-"
@@ -234,7 +255,8 @@ class AppProcessLoader(
             var isForeground = false
 
             if (fullOutput != null) {
-              processes = parsePsOutputToProcessInfos(fullOutput, app.packageName).toMutableList()
+              processes = parsePsOutputToProcessInfos(fullOutput, app.packageName, if (uidFiltered) appUid else null).toMutableList()
+              Log.d(TAG, "loadAppDetailedInfo package=${app.packageName}, uidFiltered=$uidFiltered, parsedProcesses=${processes.size}, output=${fullOutput.trim().replace('\n', '|')}")
 
               var mainFound = false
               for (p in processes) {
@@ -256,14 +278,11 @@ class AppProcessLoader(
                 mainUser = "N/A"
               }
 
-              val entries = parsePsOutputToEntries(fullOutput)
-              val byUser = mutableMapOf<String, String>()
               BufferedReader(java.io.StringReader(fullOutput)).use { reader ->
                 var line = reader.readLine()
                 while (line != null) {
                   val parts = line.trim().split(Regex("\\s+"))
                   if (parts.size >= 4 && !line.startsWith("ERROR:")) {
-                    val pid = parts[0]
                     val user = parts[1]
                     val name = parts[3]
                     if (name == app.packageName || name.startsWith(app.packageName + ":")) {
@@ -308,6 +327,12 @@ class AppProcessLoader(
         }
       }
     }
+  }
+
+  private fun resolveAppUid(packageName: String): String? = try {
+    context.packageManager.getApplicationInfo(packageName, 0).uid.toString()
+  } catch (_: PackageManager.NameNotFoundException) {
+    null
   }
 
   fun getHiddenApps(): Set<String> = sharedPreferences.getStringSet(KEY_HIDDEN_APPS, HashSet()) ?: HashSet()
