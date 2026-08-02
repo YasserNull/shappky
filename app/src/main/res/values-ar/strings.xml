@@ -227,6 +227,10 @@
     <string name="import_settings_success">تم استيراد الإعدادات بنجاح</string>
     <string name="import_settings_failed">فشل استيراد الإعدادات</string>
 
+    <!-- App Info Dialog -->
+    <string name="hide_app">إخفاء التطبيق</string>
+    <string name="protect_app">حماية التطبيق</string>
+
     <!-- Widget Config -->
     <string name="widget_settings">إعدادات الويدجت</string>
     <string name="widget_bg_size">حجم الخلفية: %1$d dp</string>

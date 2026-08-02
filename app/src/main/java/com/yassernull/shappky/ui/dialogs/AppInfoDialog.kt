@@ -1,15 +1,24 @@
 package com.yassernull.shappky.ui.dialogs
 
+import android.content.Context
 import android.text.format.Formatter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -17,6 +26,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.yassernull.shappky.R
+import com.yassernull.shappky.core.managers.AppProcessLoader
+import com.yassernull.shappky.core.managers.ProtectionManager
 import com.yassernull.shappky.data.models.AppDetailedInfo
 import com.yassernull.shappky.ui.components.DrawableIcon
 import com.yassernull.shappky.ui.components.InfoRow
@@ -28,6 +39,13 @@ fun AppInfoDialog(
   onDismiss: () -> Unit,
 ) {
   val context = LocalContext.current
+  val prefs = remember { context.getSharedPreferences(AppProcessLoader.PREFERENCES_NAME, Context.MODE_PRIVATE) }
+  var isHidden by remember {
+    mutableStateOf(prefs.getStringSet(AppProcessLoader.KEY_HIDDEN_APPS, emptySet()).orEmpty().contains(info.app.packageName))
+  }
+  var isProtected by remember {
+    mutableStateOf(ProtectionManager.getProtectedApps(context).contains(info.app.packageName))
+  }
   Dialog(onDismissRequest = onDismiss) {
     Surface(
       shape = RoundedCornerShape(16.dp),
@@ -106,12 +124,55 @@ fun AppInfoDialog(
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.End,
+          verticalAlignment = Alignment.CenterVertically,
         ) {
-          TextButton(onClick = onDismiss) {
+          ToggleIconButton(
+            icon = Icons.Filled.VisibilityOff,
+            contentDescription = stringResource(R.string.hide_app),
+            active = isHidden,
+            onClick = {
+              isHidden = !isHidden
+              val hiddenApps = prefs.getStringSet(AppProcessLoader.KEY_HIDDEN_APPS, emptySet())
+                ?.toMutableSet() ?: mutableSetOf()
+              if (isHidden) hiddenApps.add(info.app.packageName) else hiddenApps.remove(info.app.packageName)
+              prefs.edit().putStringSet(AppProcessLoader.KEY_HIDDEN_APPS, hiddenApps).apply()
+            },
+          )
+          ToggleIconButton(
+            icon = Icons.Filled.Shield,
+            contentDescription = stringResource(R.string.protect_app),
+            active = isProtected,
+            onClick = {
+              isProtected = !isProtected
+              val protectedApps = ProtectionManager.getProtectedApps(context).toMutableSet()
+              if (isProtected) protectedApps.add(info.app.packageName) else protectedApps.remove(info.app.packageName)
+              ProtectionManager.saveProtectedApps(context, protectedApps)
+            },
+          )
+          TextButton(
+            onClick = onDismiss,
+            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+          ) {
             Text(stringResource(R.string.close))
           }
         }
       }
     }
+  }
+}
+
+@Composable
+private fun ToggleIconButton(
+  icon: ImageVector,
+  contentDescription: String?,
+  active: Boolean,
+  onClick: () -> Unit,
+) {
+  IconButton(onClick = onClick) {
+    Icon(
+      imageVector = icon,
+      contentDescription = contentDescription,
+      tint = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+    )
   }
 }

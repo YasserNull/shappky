@@ -235,6 +235,10 @@
     <string name="import_settings_success">Settings imported successfully</string>
     <string name="import_settings_failed">Failed to import settings</string>
 
+    <!-- App Info Dialog -->
+    <string name="hide_app">Hide App</string>
+    <string name="protect_app">Protect App</string>
+
     <!-- Widget Config -->
     <string name="widget_settings">Widget Settings</string>
     <string name="widget_bg_size">Background Size: %1$d dp</string>
