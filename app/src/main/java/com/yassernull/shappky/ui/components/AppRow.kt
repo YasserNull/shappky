@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
+import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Settings
@@ -91,14 +92,6 @@ fun AppRow(
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
       )
-      Text(
-        text = app.packageName,
-        color = secondaryTextColor,
-        fontSize = 12.sp,
-        lineHeight = 13.sp,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-      )
       Row(verticalAlignment = Alignment.CenterVertically) {
         if (showAppTypeIcons) {
           val icon = when {
@@ -114,6 +107,38 @@ fun AppRow(
           )
           Spacer(Modifier.width(4.dp))
         }
+        Text(
+          text = app.packageName,
+          color = secondaryTextColor,
+          fontSize = 12.sp,
+          lineHeight = 13.sp,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+          modifier = Modifier.weight(1f, fill = false),
+        )
+      }
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+          imageVector = Icons.Outlined.Memory,
+          contentDescription = null,
+          modifier = Modifier.size(12.dp),
+          tint = secondaryTextColor,
+        )
+        Spacer(Modifier.width(4.dp))
+        Text(
+          text = app.appCpu,
+          color = secondaryTextColor,
+          fontSize = 12.sp,
+          lineHeight = 13.sp,
+        )
+        Spacer(Modifier.width(8.dp))
+        Icon(
+          imageVector = memoryAltIcon,
+          contentDescription = null,
+          modifier = Modifier.size(12.dp),
+          tint = secondaryTextColor,
+        )
+        Spacer(Modifier.width(4.dp))
         Text(
           text = app.appRam,
           color = secondaryTextColor,

@@ -24,6 +24,7 @@ object AppModelFilter {
       val parts = packageEntry.split(":")
       val packageName = parts[0]
       val ramUsage = parts.getOrNull(1)?.toLongOrNull() ?: 0L
+      val cpuUsage = parts.getOrNull(2)?.toDoubleOrNull() ?: 0.0
 
       try {
         if (hiddenApps.contains(packageName)) continue
@@ -47,6 +48,7 @@ object AppModelFilter {
             packageName = packageName,
             appRam = formatMemorySize(ramUsage),
             ramKb = ramUsage,
+            appCpu = String.format(java.util.Locale.US, "%.1f%%", cpuUsage),
             appIcon = pm.getApplicationIcon(appInfo),
             isSystemApp = isSystemApp,
             isPersistentApp = isPersistentApp,

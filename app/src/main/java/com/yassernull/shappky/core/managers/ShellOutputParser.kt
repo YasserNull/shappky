@@ -10,6 +10,12 @@ data class PsEntry(
   val packageName: String,
   val rssKb: Long,
   val uid: String,
+  val cpuPercent: Double,
+)
+
+data class PackageUsage(
+  val ramKb: Long,
+  val cpuPercent: Double,
 )
 
 fun parsePsOutputToEntries(output: String): List<PsEntry> {
@@ -17,15 +23,20 @@ fun parsePsOutputToEntries(output: String): List<PsEntry> {
   BufferedReader(StringReader(output)).use { reader ->
     var line = reader.readLine()
     while (line != null) {
-      val parts = line.trim().split(Regex("\\s+"))
-      if (parts.size >= 2 && !line.startsWith("ERROR:")) {
-        val rawName = parts[1].trim()
-        val rssKb = parts[0].trim().toLongOrNull() ?: 0L
-        val uid = if (parts.size >= 3) parts[2].trim() else ""
-        val isAppUser = uid.toLongOrNull()?.let { it >= Process.FIRST_APPLICATION_UID } ?: false
-        val packageName = if (rawName.contains(".")) rawName.substringBefore(":") else ""
-        if (isAppUser && rawName.isNotEmpty()) {
-          entries.add(PsEntry(packageName, rssKb, uid))
+      if (!line.startsWith("ERROR:")) {
+        val fields = line.trim().split(Regex("\\s+"))
+        var index = 0
+        while (index + 3 < fields.size) {
+          val cpuPercent = fields[index].toDoubleOrNull() ?: 0.0
+          val rssKb = fields[index + 1].toLongOrNull() ?: 0L
+          val rawName = fields[index + 2].trim()
+          val uid = fields[index + 3].trim()
+          val isAppUser = uid.toLongOrNull()?.let { it >= Process.FIRST_APPLICATION_UID } ?: false
+          val packageName = if (rawName.contains(".")) rawName.substringBefore(":") else ""
+          if (isAppUser && rawName.isNotEmpty()) {
+            entries.add(PsEntry(packageName, rssKb, uid, cpuPercent))
+          }
+          index += 4
         }
       }
       line = reader.readLine()
@@ -34,18 +45,22 @@ fun parsePsOutputToEntries(output: String): List<PsEntry> {
   return entries
 }
 
-fun aggregateByPackage(entries: List<PsEntry>): Map<String, Long> {
+fun aggregateByPackage(entries: List<PsEntry>): Map<String, PackageUsage> {
   val uidToPackage = mutableMapOf<String, String>()
   for (entry in entries) {
     if (entry.packageName.isNotEmpty() && entry.uid.isNotEmpty()) {
       uidToPackage.putIfAbsent(entry.uid, entry.packageName)
     }
   }
-  val map = mutableMapOf<String, Long>()
+  val map = mutableMapOf<String, PackageUsage>()
   for (entry in entries) {
     val packageName = entry.packageName.ifEmpty { uidToPackage[entry.uid] ?: "" }
     if (packageName.isNotEmpty()) {
-      map[packageName] = (map[packageName] ?: 0L) + entry.rssKb
+      val current = map[packageName] ?: PackageUsage(0L, 0.0)
+      map[packageName] = PackageUsage(
+        ramKb = current.ramKb + entry.rssKb,
+        cpuPercent = current.cpuPercent + entry.cpuPercent,
+      )
     }
   }
   return map

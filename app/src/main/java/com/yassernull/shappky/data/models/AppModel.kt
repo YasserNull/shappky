@@ -7,6 +7,7 @@ data class AppModel(
   var packageName: String,
   var appRam: String,
   var ramKb: Long,
+  var appCpu: String = "",
   var appIcon: Drawable,
   var isSystemApp: Boolean,
   var isPersistentApp: Boolean,

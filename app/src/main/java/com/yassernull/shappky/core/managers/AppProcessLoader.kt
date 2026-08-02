@@ -93,14 +93,14 @@ class AppProcessLoader(
           val protectedApps = ProtectionManager.getProtectedApps(context)
 
           if (shellManager.isShellCommandReady()) {
-            val command = "${ShellManager.TOYBOX_PATH} ps -A -o rss,name,uid"
+            val command = "${ShellManager.TOYBOX_PATH} ps -A -o %cpu,rss,name,uid"
             try {
               val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
               if (fullOutput != null) {
                 val entries = parsePsOutputToEntries(fullOutput)
                 val pm = context.packageManager
-                val packageRamMap = aggregateByPackage(entries)
-                val validatedEntries = packageRamMap.filterKeys { pkg ->
+                val packageUsageMap = aggregateByPackage(entries)
+                val validatedEntries = packageUsageMap.filterKeys { pkg ->
                   try {
                     pm.getApplicationInfo(pkg, 0)
                     true
@@ -108,7 +108,7 @@ class AppProcessLoader(
                     false
                   }
                 }
-                val runningEntries = validatedEntries.map { "${it.key}:${it.value}" }.toSet()
+                val runningEntries = validatedEntries.map { (pkg, usage) -> "$pkg:${usage.ramKb}:${usage.cpuPercent}" }.toSet()
 
                 result = AppModelFilter.buildRunningAppModels(
                   runningEntries = runningEntries,
@@ -193,15 +193,15 @@ class AppProcessLoader(
         val ramUsageByPackage = mutableMapOf<String, Long>()
         try {
           if (requestedPackages.isNotEmpty() && shellManager.isShellCommandReady()) {
-            val command = "${ShellManager.TOYBOX_PATH} ps -A -o rss,name,uid"
+            val command = "${ShellManager.TOYBOX_PATH} ps -A -o %cpu,rss,name,uid"
             try {
               val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
               if (fullOutput != null) {
                 val entries = parsePsOutputToEntries(fullOutput)
                 val aggregated = aggregateByPackage(entries)
-                for ((pkg, rss) in aggregated) {
+                for ((pkg, usage) in aggregated) {
                   if (pkg in requestedPackages) {
-                    ramUsageByPackage[pkg] = rss
+                    ramUsageByPackage[pkg] = usage.ramKb
                   }
                 }
               }
