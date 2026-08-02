@@ -88,14 +88,15 @@ class AppKillHandler(
   companion object {
     fun buildSmartKillCommand(packageNames: List<String>, appendKillAll: Boolean = false): String {
       if (packageNames.isEmpty()) return ""
-      val killCommands = packageNames.joinToString("; ") { "am kill " + it }
-      val forceStopCommands = packageNames.joinToString("; ") { "if pidof " + it + " > /dev/null; then am force-stop " + it + "; fi" }
-      val kill9Commands = packageNames.joinToString("; ") {
-        val escapedPkg = it.replace(".", "\\.")
-        "pids=${'$'}(${ShellManager.TOYBOX_PATH} ps -A -o pid,name | grep -E '" + escapedPkg + "([^A-Za-z]|\$)' | grep -v '[-@]' | awk '{print ${'$'}1}'); if [ ! -z \"${'$'}pids\" ]; then kill -9 ${'$'}pids 2>/dev/null; fi"
+      val perPackage = packageNames.joinToString("; ") { pkg ->
+        val escapedPkg = pkg.replace(".", "\\.")
+        val truncatedPkg = pkg.take(15)
+        val escapedTruncatedPkg = truncatedPkg.replace(".", "\\.")
+        "am kill " + pkg +
+          "; sleep 0.2; if " + ShellManager.TOYBOX_PATH + " pidof " + pkg + " > /dev/null 2>&1 || " + ShellManager.TOYBOX_PATH + " pidof " + truncatedPkg + " > /dev/null 2>&1; then am force-stop " + pkg + "; sleep 0.2; fi" +
+          "; pids=${'$'}(" + ShellManager.TOYBOX_PATH + " ps -A -o pid,name | grep -oE '[0-9]+ (" + escapedPkg + "|" + escapedTruncatedPkg + ")([^A-Za-z0-9]|\$)' | awk '{print ${'$'}1}'); if [ ! -z \"${'$'}pids\" ]; then kill -9 ${'$'}pids 2>/dev/null; fi"
       }
-      val baseCommand = killCommands + "; sleep 0.2; " + forceStopCommands + "; sleep 0.2; " + kill9Commands
-      return if (appendKillAll) baseCommand + "; am kill-all" else baseCommand
+      return if (appendKillAll) perPackage + "; am kill-all" else perPackage
     }
   }
 }
