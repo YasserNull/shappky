@@ -9,8 +9,8 @@ import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfigHelperNoOutput
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
 import com.yassernull.shappky.data.models.TriggerModel
-import com.yassernull.shappky.tasker.ShappkyActionInput
-import com.yassernull.shappky.tasker.ShappkyActionRunner
+import com.yassernull.shappky.services.ShappkyActionInput
+import com.yassernull.shappky.services.ShappkyActionRunner
 import com.yassernull.shappky.ui.activities.tasker.events.handleOnCreate
 
 class TaskerConfigActivity :

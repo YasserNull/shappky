@@ -37,4 +37,4 @@ Shappky is licensed under the [GNU General Public License v3.0](LICENSE).
 
 If you want to support me, I would be very grateful. 
 
-[**PayPal**](https://www.paypal.com/ncp/payment/7X44EWSM9KAVW)
+[**Ko-fi**](https://ko-fi.com/yassernull)

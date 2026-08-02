@@ -1,4 +1,4 @@
-package com.yassernull.shappky.tasker
+package com.yassernull.shappky.services
 
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInputField
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInputRoot

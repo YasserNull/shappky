@@ -89,7 +89,7 @@
     <string name="filter_dialog_title">Select the apps you want to hide</string>
     <string name="donate">Donate</string>
     <string name="donate_summary">Support development</string>
-    <string name="donate_url" translatable="false">https://www.paypal.com/ncp/payment/7X44EWSM9KAVW</string>
+    <string name="donate_url" translatable="false">https://ko-fi.com/yassernull</string>
     <string name="source_code">Source Code</string>
     <string name="source_code_summary">Open project repository</string>
     <string name="source_code_url" translatable="false">https://github.com/YasserNull/shappky</string>
