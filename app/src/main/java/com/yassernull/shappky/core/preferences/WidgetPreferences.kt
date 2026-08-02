@@ -21,6 +21,5 @@ object WidgetPreferences {
   fun getListSortDescendingKey(appWidgetId: Int) = "widget_list_sort_descending_$appWidgetId"
 
   fun getListAutoRefreshAppsKey(appWidgetId: Int) = "widget_list_auto_refresh_apps_$appWidgetId"
-  fun getListAutoRefreshRamKey(appWidgetId: Int) = "widget_list_auto_refresh_ram_$appWidgetId"
   fun getListRamBarRefreshKey(appWidgetId: Int) = "widget_list_ram_bar_refresh_$appWidgetId"
 }

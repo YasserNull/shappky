@@ -4,7 +4,6 @@ import android.os.Handler
 
 class AutoRefreshManager(private val handler: Handler) {
   private var appsAutoRefreshRunnable: Runnable? = null
-  private var appsRamUsageRunnable: Runnable? = null
 
   fun updateAppsAutoRefresh(
     enabled: Boolean,
@@ -34,36 +33,7 @@ class AutoRefreshManager(private val handler: Handler) {
     appsAutoRefreshRunnable = null
   }
 
-  fun updateAppsRamUsageAutoRefresh(
-    enabled: Boolean,
-    intervalMs: Long,
-    onRefresh: () -> Unit,
-  ) {
-    if (enabled) {
-      startAppsRamUsageAutoRefresh(intervalMs, onRefresh)
-    } else {
-      stopAppsRamUsageAutoRefresh()
-    }
-  }
-
-  private fun startAppsRamUsageAutoRefresh(intervalMs: Long, onRefresh: () -> Unit) {
-    if (appsRamUsageRunnable != null) return
-    appsRamUsageRunnable = object : Runnable {
-      override fun run() {
-        onRefresh()
-        handler.postDelayed(this, intervalMs)
-      }
-    }
-    handler.postDelayed(requireNotNull(appsRamUsageRunnable), intervalMs)
-  }
-
-  fun stopAppsRamUsageAutoRefresh() {
-    appsRamUsageRunnable?.let { handler.removeCallbacks(it) }
-    appsRamUsageRunnable = null
-  }
-
   fun stopAll() {
     stopAppsAutoRefresh()
-    stopAppsRamUsageAutoRefresh()
   }
 }

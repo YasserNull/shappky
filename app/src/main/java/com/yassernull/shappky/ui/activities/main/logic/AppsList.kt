@@ -344,15 +344,5 @@ object AppsListLogic {
         onMenuVisibilityUpdated = { },
       )
     }
-
-    val appsRamUsageAutoRefresh = prefs.getBoolean(AppsListPreferences.KEY_APPS_RAM_USAGE_AUTO_REFRESH, true)
-    val appsRamUsageRefreshIntervalMs = prefs.getLong(
-      AppsListPreferences.KEY_APPS_RAM_USAGE_REFRESH_INTERVAL_MS,
-      AppsListPreferences.DEFAULT_APPS_RAM_USAGE_REFRESH_INTERVAL_MS,
-    ).coerceAtLeast(1000L)
-
-    autoRefreshManager.updateAppsRamUsageAutoRefresh(appsRamUsageAutoRefresh, appsRamUsageRefreshIntervalMs) {
-      AppsRamUsageLogic.refreshAppsRamUsage(activity)
-    }
   }
 }

@@ -15,10 +15,7 @@ object AppsListPreferences {
   const val SORT_BY_TYPE = "type"
 
   const val KEY_APPS_AUTO_REFRESH = "appsAutoRefresh"
-  const val KEY_APPS_RAM_USAGE_AUTO_REFRESH = "appsRamUsageAutoRefresh"
   const val KEY_APPS_AUTO_REFRESH_INTERVAL_MS = "appsAutoRefreshIntervalMs"
-  const val KEY_APPS_RAM_USAGE_REFRESH_INTERVAL_MS = "appsRamUsageRefreshIntervalMs"
 
   const val DEFAULT_APPS_AUTO_REFRESH_INTERVAL_MS = 1000L
-  const val DEFAULT_APPS_RAM_USAGE_REFRESH_INTERVAL_MS = 1000L
 }

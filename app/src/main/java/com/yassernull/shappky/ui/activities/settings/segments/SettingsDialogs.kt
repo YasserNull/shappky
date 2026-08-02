@@ -97,22 +97,18 @@ fun AppsListSettingsDialogs(
   sortDescending: Boolean,
   hiddenApps: Set<String>,
   appsAutoRefreshIntervalMs: Long,
-  appsRamUsageRefreshIntervalMs: Long,
   showSortDialog: Boolean,
   showFilterDialog: Boolean,
   showProtectedAppsListDialog: Boolean,
   showAppsAutoRefreshIntervalDialog: Boolean,
-  showAppsRamUsageRefreshIntervalDialog: Boolean,
   onSortApply: (String, Boolean) -> Unit,
   onSaveHiddenApps: (Set<String>) -> Unit,
   onSaveProtectedApps: (Set<String>) -> Unit,
   onAutoRefreshApply: (Long) -> Unit,
-  onRamUsageRefreshApply: (Long) -> Unit,
   onDismissSort: () -> Unit,
   onDismissFilter: () -> Unit,
   onDismissProtectedApps: () -> Unit,
   onDismissAutoRefresh: () -> Unit,
-  onDismissRamUsageRefresh: () -> Unit,
   loadAllApps: ((List<com.yassernull.shappky.data.models.AppModel>) -> Unit) -> Unit,
   saveProtectedApps: (Set<String>) -> Unit,
 ) {
@@ -149,15 +145,6 @@ fun AppsListSettingsDialogs(
       choices = listOf(1000L, 2000L, 5000L, 10000L, 30000L, 60000L, 120000L, 300000L),
       onApply = { newInterval -> onAutoRefreshApply(newInterval.coerceAtLeast(1000L)) },
       onDismiss = onDismissAutoRefresh,
-    )
-  }
-  if (showAppsRamUsageRefreshIntervalDialog) {
-    RefreshIntervalDialog(
-      title = stringResource(R.string.apps_ram_usage_auto_refresh_interval_title),
-      currentIntervalMs = appsRamUsageRefreshIntervalMs,
-      choices = listOf(1000L, 2000L, 3000L, 5000L, 10000L, 30000L, 60000L),
-      onApply = { newInterval -> onRamUsageRefreshApply(newInterval.coerceAtLeast(1000L)) },
-      onDismiss = onDismissRamUsageRefresh,
     )
   }
 }

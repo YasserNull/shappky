@@ -37,12 +37,8 @@ fun AppsListSection() {
   var showAppTypeIcons by remember { mutableStateOf(sharedPreferences.getBoolean("showAppTypeIcons", true)) }
 
   var appsAutoRefresh by remember { mutableStateOf(sharedPreferences.getBoolean("appsAutoRefresh", true)) }
-  var appsRamUsageAutoRefresh by remember { mutableStateOf(sharedPreferences.getBoolean("appsRamUsageAutoRefresh", true)) }
   var appsAutoRefreshIntervalMs by remember {
     mutableStateOf(sharedPreferences.getLong("appsAutoRefreshIntervalMs", 1000L).coerceAtLeast(1000L))
-  }
-  var appsRamUsageRefreshIntervalMs by remember {
-    mutableStateOf(sharedPreferences.getLong("appsRamUsageRefreshIntervalMs", 1000L).coerceAtLeast(1000L))
   }
 
   var sortMode by remember { mutableStateOf(sharedPreferences.getString("sortMode", "name") ?: "name") }
@@ -53,7 +49,6 @@ fun AppsListSection() {
   var showFilterDialog by remember { mutableStateOf(false) }
   var showProtectedAppsListDialog by remember { mutableStateOf(false) }
   var showAppsAutoRefreshIntervalDialog by remember { mutableStateOf(false) }
-  var showAppsRamUsageRefreshIntervalDialog by remember { mutableStateOf(false) }
 
   SettingsHeader(text = stringResource(R.string.settings_apps_list))
   SwitchSettingRow(
@@ -137,17 +132,6 @@ fun AppsListSection() {
     },
     onClick = { showAppsAutoRefreshIntervalDialog = true },
   )
-  SwitchSettingRow(
-    icon = Icons.Filled.Refresh,
-    title = stringResource(R.string.apps_ram_usage_auto_refresh),
-    summary = formatInterval(appsRamUsageRefreshIntervalMs),
-    checked = appsRamUsageAutoRefresh,
-    onCheckedChange = {
-      appsRamUsageAutoRefresh = it
-      sharedPreferences.edit().putBoolean("appsRamUsageAutoRefresh", it).apply()
-    },
-    onClick = { showAppsRamUsageRefreshIntervalDialog = true },
-  )
   ActionSettingRow(
     icon = Icons.Filled.Security,
     title = stringResource(R.string.protected_apps_list_title),
@@ -160,12 +144,10 @@ fun AppsListSection() {
     sortDescending = sortDescending,
     hiddenApps = hiddenApps,
     appsAutoRefreshIntervalMs = appsAutoRefreshIntervalMs,
-    appsRamUsageRefreshIntervalMs = appsRamUsageRefreshIntervalMs,
     showSortDialog = showSortDialog,
     showFilterDialog = showFilterDialog,
     showProtectedAppsListDialog = showProtectedAppsListDialog,
     showAppsAutoRefreshIntervalDialog = showAppsAutoRefreshIntervalDialog,
-    showAppsRamUsageRefreshIntervalDialog = showAppsRamUsageRefreshIntervalDialog,
     onSortApply = { newMode, descending ->
       sortMode = newMode
       sortDescending = descending
@@ -193,20 +175,10 @@ fun AppsListSection() {
       }
       showAppsAutoRefreshIntervalDialog = false
     },
-    onRamUsageRefreshApply = { newInterval ->
-      appsRamUsageRefreshIntervalMs = newInterval
-      sharedPreferences.edit().putLong("appsRamUsageRefreshIntervalMs", newInterval).apply()
-      if (!appsRamUsageAutoRefresh) {
-        appsRamUsageAutoRefresh = true
-        sharedPreferences.edit().putBoolean("appsRamUsageAutoRefresh", true).apply()
-      }
-      showAppsRamUsageRefreshIntervalDialog = false
-    },
     onDismissSort = { showSortDialog = false },
     onDismissFilter = { showFilterDialog = false },
     onDismissProtectedApps = { showProtectedAppsListDialog = false },
     onDismissAutoRefresh = { showAppsAutoRefreshIntervalDialog = false },
-    onDismissRamUsageRefresh = { showAppsRamUsageRefreshIntervalDialog = false },
     loadAllApps = { onLoaded -> context.loadAllApps(onLoaded) },
     saveProtectedApps = { apps -> ProtectionManager.saveProtectedApps(context, apps) },
   )

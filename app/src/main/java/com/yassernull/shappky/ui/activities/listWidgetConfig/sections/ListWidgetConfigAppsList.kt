@@ -45,19 +45,12 @@ fun ListWidgetConfigAppsList(appWidgetId: Int) {
   var autoRefreshApps by remember {
     mutableStateOf(prefs.getBoolean(WidgetPreferences.getListAutoRefreshAppsKey(appWidgetId), true))
   }
-  var autoRefreshRam by remember {
-    mutableStateOf(prefs.getBoolean(WidgetPreferences.getListAutoRefreshRamKey(appWidgetId), true))
-  }
   var appsAutoRefreshIntervalMs by remember {
     mutableStateOf(prefs.getLong("appsAutoRefreshIntervalMs", 1000L))
-  }
-  var appsRamUsageRefreshIntervalMs by remember {
-    mutableStateOf(prefs.getLong("appsRamUsageRefreshIntervalMs", 1000L))
   }
 
   var showSortDialog by remember { mutableStateOf(false) }
   var showAppsAutoRefreshIntervalDialog by remember { mutableStateOf(false) }
-  var showAppsRamUsageRefreshIntervalDialog by remember { mutableStateOf(false) }
 
   SectionHeader(stringResource(R.string.widget_list_apps_title))
   RowSetting(stringResource(R.string.show_user_apps), showUserApps) {
@@ -109,17 +102,6 @@ fun ListWidgetConfigAppsList(appWidgetId: Int) {
     onClick = { showAppsAutoRefreshIntervalDialog = true },
   )
 
-  RowSetting(stringResource(R.string.apps_ram_usage_auto_refresh), autoRefreshRam) {
-    autoRefreshRam = it
-    prefs.edit().putBoolean(WidgetPreferences.getListAutoRefreshRamKey(appWidgetId), it).apply()
-  }
-
-  ActionSettingRow(
-    label = stringResource(R.string.apps_ram_usage_auto_refresh_interval_title),
-    summary = com.yassernull.shappky.utils.formatInterval(appsRamUsageRefreshIntervalMs),
-    onClick = { showAppsRamUsageRefreshIntervalDialog = true },
-  )
-
   ListWidgetConfigAppsListDialogs(
     showSortDialog = showSortDialog,
     onDismissSortDialog = { showSortDialog = false },
@@ -142,13 +124,5 @@ fun ListWidgetConfigAppsList(appWidgetId: Int) {
       showAppsAutoRefreshIntervalDialog = false
     },
     appsAutoRefreshIntervalMs = appsAutoRefreshIntervalMs,
-    showAppsRamUsageRefreshIntervalDialog = showAppsRamUsageRefreshIntervalDialog,
-    onDismissAppsRamUsageRefreshIntervalDialog = { showAppsRamUsageRefreshIntervalDialog = false },
-    onApplyAppsRamUsageRefreshInterval = {
-      appsRamUsageRefreshIntervalMs = it
-      prefs.edit().putLong("appsRamUsageRefreshIntervalMs", it).apply()
-      showAppsRamUsageRefreshIntervalDialog = false
-    },
-    appsRamUsageRefreshIntervalMs = appsRamUsageRefreshIntervalMs,
   )
 }

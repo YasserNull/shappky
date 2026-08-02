@@ -101,19 +101,10 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
 
       for (id in appWidgetIds) {
         val autoRefresh = prefs.getBoolean("widget_list_auto_refresh_apps_$id", prefs.getBoolean("appsAutoRefresh", true))
-        val ramUsageRefresh = prefs.getBoolean("widget_list_auto_refresh_ram_$id", prefs.getBoolean("appsRamUsageAutoRefresh", true))
 
-        if (autoRefresh || ramUsageRefresh) {
+        if (autoRefresh) {
           isRefreshEnabled = true
-          val interval = when {
-            autoRefresh && ramUsageRefresh -> {
-              val autoInt = prefs.getLong("appsAutoRefreshIntervalMs", 1000L)
-              val ramInt = prefs.getLong("appsRamUsageRefreshIntervalMs", 1000L)
-              kotlin.math.min(autoInt, ramInt)
-            }
-            autoRefresh -> prefs.getLong("appsAutoRefreshIntervalMs", 1000L)
-            else -> prefs.getLong("appsRamUsageRefreshIntervalMs", 1000L)
-          }
+          val interval = prefs.getLong("appsAutoRefreshIntervalMs", 1000L)
           if (interval < minIntervalMs) {
             minIntervalMs = interval
           }
@@ -144,19 +135,10 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
 
           for (id in innerWidgetIds) {
             val autoRefresh = innerPrefs.getBoolean("widget_list_auto_refresh_apps_$id", innerPrefs.getBoolean("appsAutoRefresh", true))
-            val ramUsageRefresh = innerPrefs.getBoolean("widget_list_auto_refresh_ram_$id", innerPrefs.getBoolean("appsRamUsageAutoRefresh", true))
 
-            if (autoRefresh || ramUsageRefresh) {
+            if (autoRefresh) {
               innerRefreshEnabled = true
-              val interval = when {
-                autoRefresh && ramUsageRefresh -> {
-                  val autoInt = innerPrefs.getLong("appsAutoRefreshIntervalMs", 1000L)
-                  val ramInt = innerPrefs.getLong("appsRamUsageRefreshIntervalMs", 1000L)
-                  kotlin.math.min(autoInt, ramInt)
-                }
-                autoRefresh -> innerPrefs.getLong("appsAutoRefreshIntervalMs", 1000L)
-                else -> innerPrefs.getLong("appsRamUsageRefreshIntervalMs", 1000L)
-              }
+              val interval = innerPrefs.getLong("appsAutoRefreshIntervalMs", 1000L)
               if (interval < innerMinInterval) {
                 innerMinInterval = interval
               }
@@ -171,12 +153,9 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
             if (isInteractive && !isAppInForeground) {
               for (id in innerWidgetIds) {
                 val autoRefresh = innerPrefs.getBoolean("widget_list_auto_refresh_apps_$id", innerPrefs.getBoolean("appsAutoRefresh", true))
-                val ramUsageRefresh = innerPrefs.getBoolean("widget_list_auto_refresh_ram_$id", innerPrefs.getBoolean("appsRamUsageAutoRefresh", true))
-                if (autoRefresh || ramUsageRefresh) {
-                  if (autoRefresh) {
-                    @Suppress("DEPRECATION")
-                    appWidgetManager.notifyAppWidgetViewDataChanged(id, R.id.widget_list_view)
-                  }
+                if (autoRefresh) {
+                  @Suppress("DEPRECATION")
+                  appWidgetManager.notifyAppWidgetViewDataChanged(id, R.id.widget_list_view)
                   updateAppWidget(context, appWidgetManager, id)
                 }
               }

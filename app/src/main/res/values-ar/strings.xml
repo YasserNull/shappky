@@ -22,8 +22,6 @@
     <string name="show_app_type_icons_summary">إظهار أيقونات صغيرة بجانب استهلاك ذاكرة الوصول العشوائي لتوضيح نوع التطبيق</string>
     <string name="apps_auto_refresh">التحديث التلقائي للتطبيقات</string>
     <string name="apps_auto_refresh_interval_title">فترة التحديث التلقائي للتطبيقات</string>
-    <string name="apps_ram_usage_auto_refresh">التحديث التلقائي لاستهلاك ذاكرة الوصول العشوائي للتطبيقات</string>
-    <string name="apps_ram_usage_auto_refresh_interval_title">فترة تحديث استهلاك ذاكرة الوصول العشوائي للتطبيقات</string>
     <string name="protected_apps_list_title">قائمة التطبيقات المحمية</string>
     <string name="protected_apps_list_summary">تحديد التطبيقات المحمية التي يتم تخطيها على مستوى التطبيق</string>
     <string name="launcher">المشغل (لانشر)</string>

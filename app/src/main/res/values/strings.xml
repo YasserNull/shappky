@@ -23,8 +23,6 @@
     <string name="show_app_type_icons_summary">Show small icons next to RAM usage indicating app type</string>
     <string name="apps_auto_refresh">Apps auto refresh</string>
     <string name="apps_auto_refresh_interval_title">Apps auto refresh interval</string>
-    <string name="apps_ram_usage_auto_refresh">Apps RAM usage auto refresh</string>
-    <string name="apps_ram_usage_auto_refresh_interval_title">Apps RAM usage refresh interval</string>
     <string name="protected_apps_list_title">Protected apps list</string>
     <string name="protected_apps_list_summary">Select protected apps to be bypassed at the application level</string>
     <string name="launcher">Launcher</string>

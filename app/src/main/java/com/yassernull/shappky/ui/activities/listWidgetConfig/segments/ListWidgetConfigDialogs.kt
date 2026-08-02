@@ -18,10 +18,6 @@ fun ListWidgetConfigAppsListDialogs(
   onDismissAppsAutoRefreshIntervalDialog: () -> Unit,
   onApplyAppsAutoRefreshInterval: (Long) -> Unit,
   appsAutoRefreshIntervalMs: Long,
-  showAppsRamUsageRefreshIntervalDialog: Boolean,
-  onDismissAppsRamUsageRefreshIntervalDialog: () -> Unit,
-  onApplyAppsRamUsageRefreshInterval: (Long) -> Unit,
-  appsRamUsageRefreshIntervalMs: Long,
 ) {
   if (showSortDialog) {
     SortDialog(
@@ -41,16 +37,6 @@ fun ListWidgetConfigAppsListDialogs(
       choices = listOf(1000L, 2000L, 5000L, 10000L, 30000L, 60000L, 120000L, 300000L),
       onApply = onApplyAppsAutoRefreshInterval,
       onDismiss = onDismissAppsAutoRefreshIntervalDialog,
-    )
-  }
-
-  if (showAppsRamUsageRefreshIntervalDialog) {
-    RefreshIntervalDialog(
-      title = stringResource(R.string.apps_ram_usage_auto_refresh_interval_title),
-      currentIntervalMs = appsRamUsageRefreshIntervalMs,
-      choices = listOf(1000L, 2000L, 3000L, 5000L, 10000L, 30000L, 60000L),
-      onApply = onApplyAppsRamUsageRefreshInterval,
-      onDismiss = onDismissAppsRamUsageRefreshIntervalDialog,
     )
   }
 }
