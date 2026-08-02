@@ -230,7 +230,9 @@ class ShappkyService : Service() {
   private fun isProtected(
     packageName: String,
     protectedApps: Set<String>,
-  ): Boolean = packageName == "com.yassernull.shappky" || protectedApps.contains(packageName)
+  ): Boolean = packageName == "com.yassernull.shappky" ||
+    protectedApps.contains(packageName) ||
+    com.yassernull.shappky.core.managers.ProtectionManager.isAppProtectedByRegex(this, packageName)
 
   override fun onDestroy() {
     setRunningState(false)

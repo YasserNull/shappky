@@ -103,10 +103,22 @@ fun ListWidgetConfigAppsList(appWidgetId: Int) {
     prefs.edit().putBoolean(WidgetPreferences.getListAutoRefreshAppsKey(appWidgetId), it).apply()
   }
 
+  ActionSettingRow(
+    label = stringResource(R.string.apps_auto_refresh_interval_title),
+    summary = com.yassernull.shappky.utils.formatInterval(appsAutoRefreshIntervalMs),
+    onClick = { showAppsAutoRefreshIntervalDialog = true },
+  )
+
   RowSetting(stringResource(R.string.apps_ram_usage_auto_refresh), autoRefreshRam) {
     autoRefreshRam = it
     prefs.edit().putBoolean(WidgetPreferences.getListAutoRefreshRamKey(appWidgetId), it).apply()
   }
+
+  ActionSettingRow(
+    label = stringResource(R.string.apps_ram_usage_auto_refresh_interval_title),
+    summary = com.yassernull.shappky.utils.formatInterval(appsRamUsageRefreshIntervalMs),
+    onClick = { showAppsRamUsageRefreshIntervalDialog = true },
+  )
 
   ListWidgetConfigAppsListDialogs(
     showSortDialog = showSortDialog,

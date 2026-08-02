@@ -10,6 +10,7 @@ import com.yassernull.shappky.R
 import com.yassernull.shappky.core.managers.BackgroundAppManager
 import com.yassernull.shappky.core.managers.ShellManager
 import com.yassernull.shappky.core.managers.TriggerManager
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class ShappkyIntentReceiver : BroadcastReceiver() {
@@ -24,10 +25,25 @@ class ShappkyIntentReceiver : BroadcastReceiver() {
 
   override fun onReceive(context: Context, intent: Intent?) {
     Log.d(TAG, "onReceive triggered with action: ${intent?.action}")
-    when (intent?.action) {
-      ACTION_EXECUTE_TRIGGER -> handleExecuteTrigger(context, intent)
-      ACTION_ENABLE_SERVICE -> handleEnableService(context)
-      ACTION_DISABLE_SERVICE -> handleDisableService(context)
+    val pendingResult = goAsync()
+    try {
+      when (intent?.action) {
+        ACTION_EXECUTE_TRIGGER -> handleExecuteTrigger(context, intent) {
+          pendingResult.finish()
+        }
+        ACTION_ENABLE_SERVICE -> {
+          handleEnableService(context)
+          pendingResult.finish()
+        }
+        ACTION_DISABLE_SERVICE -> {
+          handleDisableService(context)
+          pendingResult.finish()
+        }
+        else -> pendingResult.finish()
+      }
+    } catch (e: Exception) {
+      Log.e(TAG, "Error handling intent", e)
+      pendingResult.finish()
     }
   }
 
@@ -43,34 +59,38 @@ class ShappkyIntentReceiver : BroadcastReceiver() {
     Log.d(TAG, "Shappky Service disabled via Intent")
   }
 
-  private fun handleExecuteTrigger(context: Context, intent: Intent) {
+  private fun handleExecuteTrigger(context: Context, intent: Intent, onDone: () -> Unit) {
     val triggerId = intent.getStringExtra(EXTRA_TRIGGER_ID)
     val triggerName = intent.getStringExtra(EXTRA_TRIGGER_NAME)
 
     if (triggerId == null && triggerName == null) {
       Log.e(TAG, "No TRIGGER_ID or TRIGGER_NAME provided in intent extras")
+      onDone()
       return
     }
 
-    val triggers = com.yassernull.shappky.core.managers.TriggerManager.getTriggers(context)
+    val triggers = TriggerManager.getTriggers(context)
     val trigger = triggers.find { it.id == triggerId || (triggerName != null && it.name.equals(triggerName, ignoreCase = true)) }
 
     if (trigger == null) {
       Log.e(TAG, "Trigger not found! ID: $triggerId, Name: $triggerName")
+      onDone()
       return
     }
 
     Log.d(TAG, "Trigger found: ${trigger.name}. Executing from Intent...")
     val handler = Handler(Looper.getMainLooper())
-    val executor = Executors.newSingleThreadExecutor()
-    val shellManager = com.yassernull.shappky.core.managers.ShellManager(context, handler, executor)
+    val executor: ExecutorService = Executors.newSingleThreadExecutor()
+    val shellManager = ShellManager(context, handler, executor)
 
     if (!shellManager.hasAnyShellPermission()) {
       Log.e(TAG, "Cannot execute trigger: No shell permissions")
+      handler.post { executor.shutdown() }
+      onDone()
       return
     }
 
-    val appManager = com.yassernull.shappky.core.managers.BackgroundAppManager(context, handler, executor, shellManager)
+    val appManager = BackgroundAppManager(context, handler, executor, shellManager)
 
     val selectUserApps = trigger.selectUserApps
     val selectSystemApps = trigger.selectSystemApps
@@ -95,9 +115,13 @@ class ShappkyIntentReceiver : BroadcastReceiver() {
           val totalKb = toKill.sumOf { it.ramKb }
           val freedText = context.getString(R.string.free_up_memory, appManager.formatMemorySize(totalKb))
           Log.d(TAG, "Intent Trigger '${trigger.name}' executed successfully. Freed: $freedText")
+          handler.post { executor.shutdown() }
+          onDone()
         }, false)
       } else {
         Log.d(TAG, "No apps matching trigger rules were running.")
+        handler.post { executor.shutdown() }
+        onDone()
       }
     }
   }

@@ -30,6 +30,8 @@ fun SelectAppsSection(
   onSelectUserAppsChange: (Boolean) -> Unit,
   selectSystemApps: Boolean,
   onSelectSystemAppsChange: (Boolean) -> Unit,
+  selectPersistentApps: Boolean,
+  onSelectPersistentAppsChange: (Boolean) -> Unit,
   excludedApps: Set<String>,
   onExcludedAppsChange: (Set<String>) -> Unit,
   manuallySelectedApps: Set<String>,
@@ -101,6 +103,26 @@ fun SelectAppsSection(
     Checkbox(
       checked = selectSystemApps,
       onCheckedChange = onSelectSystemAppsChange,
+    )
+  }
+
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .clickable { onSelectPersistentAppsChange(!selectPersistentApps) }
+      .padding(vertical = 12.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Column(modifier = Modifier.weight(1f)) {
+      Text(
+        text = stringResource(R.string.persistent_apps),
+        fontSize = 16.sp,
+        color = MaterialTheme.colorScheme.onSurface,
+      )
+    }
+    Checkbox(
+      checked = selectPersistentApps,
+      onCheckedChange = onSelectPersistentAppsChange,
     )
   }
 

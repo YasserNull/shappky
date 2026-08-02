@@ -28,6 +28,7 @@ class TriggerRuleEvaluator(
 ) {
   companion object {
     private const val TAG = "TriggerRuleEvaluator"
+    private const val APP_FOREGROUND_RULE_COOLDOWN_MS = 60000L
   }
 
   private val lastExecutedTime = mutableMapOf<String, Long>()
@@ -138,18 +139,29 @@ class TriggerRuleEvaluator(
     previouslyForeground: String?,
   ) {
     val isShappkyServiceRunning = ShappkyService.isRunning()
+    val now = System.currentTimeMillis()
 
     for (trigger in triggers) {
       val appOpenedRules = trigger.rules.filter { it.type == RuleType.APP_OPENED }
       if (currentForeground != null && appOpenedRules.any { rule -> rule.appPackages.contains(currentForeground) }) {
-        Log.d(TAG, "APP_OPENED MATCH FOUND! Triggering '${trigger.name}' for $currentForeground")
-        actionExecutor.executeServiceTrigger(trigger)
+        val matchedRule = appOpenedRules.first { rule -> rule.appPackages.contains(currentForeground) }
+        val lastRun = lastExecutedTime[matchedRule.id] ?: 0L
+        if (now - lastRun >= APP_FOREGROUND_RULE_COOLDOWN_MS) {
+          lastExecutedTime[matchedRule.id] = now
+          Log.d(TAG, "APP_OPENED MATCH FOUND! Triggering '${trigger.name}' for $currentForeground")
+          actionExecutor.executeServiceTrigger(trigger)
+        }
       }
 
       val appResumedRules = trigger.rules.filter { it.type == RuleType.APP_RESUMED }
       if (currentForeground != null && appResumedRules.any { rule -> rule.appPackages.contains(currentForeground) }) {
-        Log.d(TAG, "APP_RESUMED MATCH FOUND! Triggering '${trigger.name}' for $currentForeground")
-        actionExecutor.executeServiceTrigger(trigger)
+        val matchedRule = appResumedRules.first { rule -> rule.appPackages.contains(currentForeground) }
+        val lastRun = lastExecutedTime[matchedRule.id] ?: 0L
+        if (now - lastRun >= APP_FOREGROUND_RULE_COOLDOWN_MS) {
+          lastExecutedTime[matchedRule.id] = now
+          Log.d(TAG, "APP_RESUMED MATCH FOUND! Triggering '${trigger.name}' for $currentForeground")
+          actionExecutor.executeServiceTrigger(trigger)
+        }
       }
 
       if (previouslyForeground != null) {
@@ -164,12 +176,22 @@ class TriggerRuleEvaluator(
     if (!isShappkyServiceRunning && enableRules.isNotEmpty()) {
       val appOpenedRules = enableRules.filter { it.type == RuleType.APP_OPENED }
       if (currentForeground != null && appOpenedRules.any { rule -> rule.appPackages.contains(currentForeground) }) {
-        actionExecutor.enableShappkyService(appOpenedRules.first())
+        val matchedRule = appOpenedRules.first { rule -> rule.appPackages.contains(currentForeground) }
+        val lastRun = lastExecutedTime[matchedRule.id] ?: 0L
+        if (now - lastRun >= APP_FOREGROUND_RULE_COOLDOWN_MS) {
+          lastExecutedTime[matchedRule.id] = now
+          actionExecutor.enableShappkyService(matchedRule)
+        }
       }
 
       val appResumedRules = enableRules.filter { it.type == RuleType.APP_RESUMED }
       if (currentForeground != null && appResumedRules.any { rule -> rule.appPackages.contains(currentForeground) }) {
-        actionExecutor.enableShappkyService(appResumedRules.first())
+        val matchedRule = appResumedRules.first { rule -> rule.appPackages.contains(currentForeground) }
+        val lastRun = lastExecutedTime[matchedRule.id] ?: 0L
+        if (now - lastRun >= APP_FOREGROUND_RULE_COOLDOWN_MS) {
+          lastExecutedTime[matchedRule.id] = now
+          actionExecutor.enableShappkyService(matchedRule)
+        }
       }
 
       if (previouslyForeground != null) {
@@ -183,12 +205,22 @@ class TriggerRuleEvaluator(
     if (isShappkyServiceRunning && disableRules.isNotEmpty()) {
       val appOpenedRules = disableRules.filter { it.type == RuleType.APP_OPENED }
       if (currentForeground != null && appOpenedRules.any { rule -> rule.appPackages.contains(currentForeground) }) {
-        actionExecutor.disableShappkyService(appOpenedRules.first())
+        val matchedRule = appOpenedRules.first { rule -> rule.appPackages.contains(currentForeground) }
+        val lastRun = lastExecutedTime[matchedRule.id] ?: 0L
+        if (now - lastRun >= APP_FOREGROUND_RULE_COOLDOWN_MS) {
+          lastExecutedTime[matchedRule.id] = now
+          actionExecutor.disableShappkyService(matchedRule)
+        }
       }
 
       val appResumedRules = disableRules.filter { it.type == RuleType.APP_RESUMED }
       if (currentForeground != null && appResumedRules.any { rule -> rule.appPackages.contains(currentForeground) }) {
-        actionExecutor.disableShappkyService(appResumedRules.first())
+        val matchedRule = appResumedRules.first { rule -> rule.appPackages.contains(currentForeground) }
+        val lastRun = lastExecutedTime[matchedRule.id] ?: 0L
+        if (now - lastRun >= APP_FOREGROUND_RULE_COOLDOWN_MS) {
+          lastExecutedTime[matchedRule.id] = now
+          actionExecutor.disableShappkyService(matchedRule)
+        }
       }
 
       if (previouslyForeground != null) {
@@ -340,7 +372,7 @@ class TriggerRuleEvaluator(
       val manuallySelectedApps = trigger.manuallySelectedApps
 
       val candidatePackages = runningPackages.filter { pkg ->
-        if (pkg == "com.yassernull.shappky" || protectedApps.contains(pkg) || excludedApps.contains(pkg)) return@filter false
+        if (pkg == "com.yassernull.shappky" || protectedApps.contains(pkg) || ProtectionManager.isAppProtectedByRegex(context, pkg) || excludedApps.contains(pkg)) return@filter false
         val matchesManual = manuallySelectedApps.contains(pkg)
         if (matchesManual) return@filter true
         if (manuallySelectedApps.isNotEmpty()) return@filter false
@@ -463,7 +495,7 @@ class TriggerRuleEvaluator(
       val bgRules = trigger.rules.filter { it.type == RuleType.APP_BACKGROUND_STARTED }
       if (bgRules.isEmpty()) continue
       val matchingPackages = autoStartedPackages.filter { pkg ->
-        if (pkg == context.packageName || protectedApps.contains(pkg) || trigger.excludedApps.contains(pkg)) return@filter false
+        if (pkg == context.packageName || protectedApps.contains(pkg) || ProtectionManager.isAppProtectedByRegex(context, pkg) || trigger.excludedApps.contains(pkg)) return@filter false
         if (trigger.manuallySelectedApps.contains(pkg)) return@filter true
         if (trigger.manuallySelectedApps.isNotEmpty()) return@filter false
         try {

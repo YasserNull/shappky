@@ -40,7 +40,7 @@ fun ListWidgetConfigActivity.handleOnCreate(savedInstanceState: Bundle?) {
     AppWidgetManager.INVALID_APPWIDGET_ID,
   ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
 
-  Log.d("WidgetConfig", "ListWidgetConfigActivity Received appWidgetId: \$appWidgetId")
+  Log.d("WidgetConfig", "ListWidgetConfigActivity Received appWidgetId: $appWidgetId")
 
   if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
     Log.d("WidgetConfig", "Invalid appWidgetId, finishing!")

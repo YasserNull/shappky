@@ -20,20 +20,61 @@ class AlarmReceiver : BroadcastReceiver() {
   }
 
   override fun onReceive(context: Context, intent: Intent) {
-    val triggerId = intent.getStringExtra("trigger_id") ?: return
-    Log.d(TAG, "Alarm fired for trigger ID: $triggerId")
+    val pendingResult = goAsync()
+    try {
+      if (intent.action == TriggerAlarmManager.ACTION_RULE_ALARM) {
+        handleRuleAlarm(context, intent)
+        pendingResult.finish()
+        return
+      }
+      val triggerId = intent.getStringExtra("trigger_id") ?: run {
+        pendingResult.finish()
+        return
+      }
+      Log.d(TAG, "Alarm fired for trigger ID: $triggerId")
 
-    val triggers = TriggerManager.getTriggers(context)
-    val trigger = triggers.firstOrNull { it.id == triggerId }
+      val triggers = TriggerManager.getTriggers(context)
+      val trigger = triggers.firstOrNull { it.id == triggerId }
 
-    if (trigger != null && trigger.isEnabled) {
-      executeAlarmTrigger(context, trigger)
-      // Reschedule for tomorrow
-      TriggerAlarmManager.scheduleAlarmForTrigger(context, trigger)
+      if (trigger != null && trigger.isEnabled) {
+        executeAlarmTrigger(context, trigger) {
+          // Reschedule for tomorrow
+          TriggerAlarmManager.scheduleAlarmForTrigger(context, trigger)
+          pendingResult.finish()
+        }
+      } else {
+        pendingResult.finish()
+      }
+    } catch (e: Exception) {
+      Log.e(TAG, "Error handling alarm", e)
+      pendingResult.finish()
     }
   }
 
-  private fun executeAlarmTrigger(context: Context, trigger: TriggerModel) {
+  private fun handleRuleAlarm(context: Context, intent: Intent) {
+    val ruleId = intent.getStringExtra(TriggerAlarmManager.EXTRA_RULE_ID) ?: return
+    val isEnableRule = intent.getBooleanExtra(TriggerAlarmManager.EXTRA_IS_ENABLE_RULE, true)
+    Log.d(TAG, "Rule alarm fired ruleId=$ruleId, isEnableRule=$isEnableRule")
+
+    val rules = if (isEnableRule) {
+      com.yassernull.shappky.core.managers.EnableTriggerManager.getEnableRules(context)
+    } else {
+      com.yassernull.shappky.core.managers.DisableTriggerManager.getDisableRules(context)
+    }
+    val rule = rules.firstOrNull { it.id == ruleId } ?: return
+
+    if (isEnableRule) {
+      androidx.core.content.ContextCompat.startForegroundService(context, Intent(context, com.yassernull.shappky.services.ShappkyService::class.java))
+      Log.d(TAG, "Enable rule executed via alarm: $ruleId")
+    } else {
+      context.stopService(Intent(context, com.yassernull.shappky.services.ShappkyService::class.java))
+      Log.d(TAG, "Disable rule executed via alarm: $ruleId")
+    }
+    // Reschedule for tomorrow
+    TriggerAlarmManager.scheduleAlarmForRule(context, rule, isEnableRule)
+  }
+
+  private fun executeAlarmTrigger(context: Context, trigger: TriggerModel, onDone: () -> Unit) {
     Log.d(TAG, "executeAlarmTrigger: Executing trigger '${trigger.name}'")
 
     val handler = Handler(Looper.getMainLooper())
@@ -44,6 +85,7 @@ class AlarmReceiver : BroadcastReceiver() {
     if (!shellManager.hasAnyShellPermission()) {
       Log.w(TAG, "executeAlarmTrigger: Skipped due to lack of shell permissions")
       executor.shutdown()
+      onDone()
       return
     }
 
@@ -74,10 +116,12 @@ class AlarmReceiver : BroadcastReceiver() {
           Log.d(TAG, "executeAlarmTrigger: Kill completed successfully. Freed memory: $freedText")
           com.yassernull.shappky.utils.NotificationUtils.showTriggerFreedMemoryNotification(context, trigger.name, freedText)
           executor.shutdown()
+          onDone()
         }, showToast = false)
       } else {
         Log.d(TAG, "executeAlarmTrigger: No packages matched search filters to kill")
         executor.shutdown()
+        onDone()
       }
     }
   }

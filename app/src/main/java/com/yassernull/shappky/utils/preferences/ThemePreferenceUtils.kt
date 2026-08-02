@@ -24,10 +24,8 @@ fun Activity.applyPendingFullScreenPreference() {
   val prefs = getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
   if (prefs.contains("fullScreenPending")) {
     val pending = prefs.getBoolean("fullScreenPending", false)
-    if (pending) {
-      prefs.edit().putBoolean(KEY_FULL_SCREEN, pending).remove("fullScreenPending").apply()
-      recreate()
-    }
+    prefs.edit().putBoolean(KEY_FULL_SCREEN, pending).remove("fullScreenPending").apply()
+    recreate()
   }
 }
 

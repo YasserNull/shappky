@@ -92,7 +92,7 @@ class ShappkyTriggerService : Service() {
             (isShappkyServiceRunning && disableRules.isNotEmpty())
 
           if (!hasWorkToDo) {
-            Thread.sleep(2000L)
+            Thread.sleep(10000L)
             continue
           }
 
@@ -233,7 +233,7 @@ class ShappkyTriggerService : Service() {
             }
           }
 
-          Thread.sleep(2000L)
+          Thread.sleep(10000L)
         } catch (_: InterruptedException) {
           Log.d(TAG, "startTriggerMonitoring: Monitoring loop interrupted")
           Thread.currentThread().interrupt()

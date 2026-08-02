@@ -237,7 +237,7 @@ object AppsListLogic {
     appsAutoRefresh: Boolean = false,
     onMenuVisibilityUpdated: () -> Unit,
   ) {
-    Log.d(TAG, "loadBackgroundApps requested showRefreshIndicator=\$showRefreshIndicator, isLoading=\${isLoadingBackgroundApps}, currentListSize=\${appsDataList.size}, hasPermission=\${hasPermission}")
+    Log.d(TAG, "loadBackgroundApps requested showRefreshIndicator=$showRefreshIndicator, isLoading=$isLoadingBackgroundApps, currentListSize=${appsDataList.size}, hasPermission=$hasPermission")
 
     if (showRefreshIndicator && isLoadingBackgroundApps) {
       Log.d(TAG, "loadBackgroundApps skipped because visible refresh is already loading")
@@ -255,7 +255,7 @@ object AppsListLogic {
     }
 
     appManager.loadBackgroundApps { result ->
-      Log.d(TAG, "loadBackgroundApps callback resultSize=\${result.size}, oldListSize=\${appsDataList.size}, showRefreshIndicator=\$showRefreshIndicator")
+      Log.d(TAG, "loadBackgroundApps callback resultSize=${result.size}, oldListSize=${appsDataList.size}, showRefreshIndicator=$showRefreshIndicator")
 
       if (showRefreshIndicator) {
         isLoadingBackgroundApps = false
@@ -310,7 +310,7 @@ object AppsListLogic {
   fun updatePermissionUi(activity: MainActivity, forceRefresh: Boolean = false, appsAutoRefresh: Boolean = false) {
     val previous = hasPermission
     hasPermission = shellManager.hasAnyShellPermission()
-    Log.d(TAG, "updatePermissionUi previous=\$previous, current=\${hasPermission}")
+    Log.d(TAG, "updatePermissionUi previous=$previous, current=$hasPermission")
 
     if (hasPermission) {
       val permissionJustGranted = !previous && hasPermission

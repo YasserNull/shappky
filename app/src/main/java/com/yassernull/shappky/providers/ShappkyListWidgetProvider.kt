@@ -47,9 +47,7 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
       val appName = intent.getStringExtra("app_name") ?: ""
       val appRam = intent.getStringExtra("app_ram") ?: ""
       if (!packageName.isNullOrEmpty()) {
-        val handler = android.os.Handler(android.os.Looper.getMainLooper())
-        val shellExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
-        val shellManager = ShellManager(context, handler, shellExecutor)
+        val shellManager = getShellManager(context)
         if (shellManager.hasAnyShellPermission()) {
           shellManager.runShellCommand("am force-stop $packageName") {
             val localCtx = getLocalizedContext(context)
@@ -82,6 +80,11 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
 
     private val handler = android.os.Handler(android.os.Looper.getMainLooper())
     private var refreshRunnable: Runnable? = null
+
+    private val shellExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
+    private var shellManager: ShellManager? = null
+
+    private fun getShellManager(context: Context): ShellManager = shellManager ?: ShellManager(context.applicationContext, handler, shellExecutor).also { shellManager = it }
 
     fun startAutoRefresh(context: Context) {
       val appWidgetManager = AppWidgetManager.getInstance(context)
@@ -252,9 +255,7 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
       views.setRemoteAdapter(R.id.widget_list_view, serviceIntent)
       views.setEmptyView(R.id.widget_list_view, R.id.widget_empty_view)
 
-      val handler = android.os.Handler(android.os.Looper.getMainLooper())
-      val shellExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
-      val shellManager = ShellManager(context, handler, shellExecutor)
+      val shellManager = getShellManager(context)
       if (shellManager.hasAnyShellPermission()) {
         views.setTextViewText(R.id.widget_empty_view, localCtx.getString(R.string.no_apps_to_kill))
       } else {

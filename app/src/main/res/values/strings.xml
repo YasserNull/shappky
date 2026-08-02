@@ -88,7 +88,7 @@
     <string name="apps_filter">Hide apps from list</string>
     <string name="filter_dialog_title">Select the apps you want to hide</string>
     <string name="donate">Donate</string>
-    <string name="donate_summary">Support development</string>
+    <string name="donate_summary">Support developer</string>
     <string name="donate_url" translatable="false">https://ko-fi.com/yassernull</string>
     <string name="source_code">Source Code</string>
     <string name="source_code_summary">Open project repository</string>

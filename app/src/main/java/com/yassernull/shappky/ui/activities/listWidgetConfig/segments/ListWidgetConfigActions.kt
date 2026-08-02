@@ -7,7 +7,7 @@ import android.util.Log
 
 object ListWidgetConfigActions {
   fun onSave(activity: Activity, appWidgetId: Int) {
-    Log.d("WidgetConfig", "ListWidgetConfigActivity onSave called for appWidgetId \$appWidgetId")
+    Log.d("WidgetConfig", "ListWidgetConfigActivity onSave called for appWidgetId $appWidgetId")
     val resultValue = Intent().apply {
       putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
     }

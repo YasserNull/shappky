@@ -1,6 +1,7 @@
 package com.yassernull.shappky.core.managers
 
 import android.content.Context
+import android.util.Log
 import com.yassernull.shappky.core.preferences.PREFERENCES_NAME
 import com.yassernull.shappky.core.preferences.TriggerPreferences
 import com.yassernull.shappky.data.models.RuleType
@@ -18,71 +19,75 @@ object TriggerManager {
     try {
       val jsonArray = JSONArray(jsonStr)
       for (i in 0 until jsonArray.length()) {
-        val obj = jsonArray.getJSONObject(i)
-        val excluded = mutableSetOf<String>()
-        val excludedArray = obj.optJSONArray("excludedApps")
-        if (excludedArray != null) {
-          for (j in 0 until excludedArray.length()) {
-            excluded.add(excludedArray.getString(j))
-          }
-        }
-
-        val manual = mutableSetOf<String>()
-        val manualArray = obj.optJSONArray("manuallySelectedApps")
-        if (manualArray != null) {
-          for (j in 0 until manualArray.length()) {
-            manual.add(manualArray.getString(j))
-          }
-        }
-
-        val rules = mutableListOf<TriggerRule>()
-        val rulesArray = obj.optJSONArray("rules")
-        if (rulesArray != null) {
-          for (j in 0 until rulesArray.length()) {
-            val ruleObj = rulesArray.getJSONObject(j)
-            val appPackages = mutableSetOf<String>()
-            val packagesArray = ruleObj.optJSONArray("appPackages")
-            if (packagesArray != null) {
-              for (k in 0 until packagesArray.length()) {
-                appPackages.add(packagesArray.getString(k))
-              }
+        try {
+          val obj = jsonArray.getJSONObject(i)
+          val excluded = mutableSetOf<String>()
+          val excludedArray = obj.optJSONArray("excludedApps")
+          if (excludedArray != null) {
+            for (j in 0 until excludedArray.length()) {
+              excluded.add(excludedArray.getString(j))
             }
-            val selectedServices = mutableSetOf<String>()
-            val servicesArray = ruleObj.optJSONArray("selectedServices")
-            if (servicesArray != null) {
-              for (k in 0 until servicesArray.length()) {
-                selectedServices.add(servicesArray.getString(k))
-              }
-            }
-            rules.add(
-              TriggerRule(
-                id = ruleObj.getString("id"),
-                type = RuleType.valueOf(ruleObj.getString("type")),
-                appPackages = appPackages,
-                ramThresholdMb = ruleObj.optInt("ramThresholdMb", 0),
-                sleepDurationMinutes = ruleObj.optInt("sleepDurationMinutes", 0),
-                timeHour = ruleObj.optInt("timeHour", 0),
-                timeMinute = ruleObj.optInt("timeMinute", 0),
-                inactivityDurationMinutes = ruleObj.optInt("inactivityDurationMinutes", 0),
-                selectedServices = selectedServices,
-              ),
-            )
           }
-        }
 
-        list.add(
-          TriggerModel(
-            id = obj.getString("id"),
-            name = obj.getString("name"),
-            selectUserApps = obj.optBoolean("selectUserApps", false),
-            selectSystemApps = obj.optBoolean("selectSystemApps", false),
-            selectPersistentApps = obj.optBoolean("selectPersistentApps", false),
-            excludedApps = excluded,
-            manuallySelectedApps = manual,
-            rules = rules,
-            isEnabled = obj.optBoolean("isEnabled", true),
-          ),
-        )
+          val manual = mutableSetOf<String>()
+          val manualArray = obj.optJSONArray("manuallySelectedApps")
+          if (manualArray != null) {
+            for (j in 0 until manualArray.length()) {
+              manual.add(manualArray.getString(j))
+            }
+          }
+
+          val rules = mutableListOf<TriggerRule>()
+          val rulesArray = obj.optJSONArray("rules")
+          if (rulesArray != null) {
+            for (j in 0 until rulesArray.length()) {
+              val ruleObj = rulesArray.getJSONObject(j)
+              val appPackages = mutableSetOf<String>()
+              val packagesArray = ruleObj.optJSONArray("appPackages")
+              if (packagesArray != null) {
+                for (k in 0 until packagesArray.length()) {
+                  appPackages.add(packagesArray.getString(k))
+                }
+              }
+              val selectedServices = mutableSetOf<String>()
+              val servicesArray = ruleObj.optJSONArray("selectedServices")
+              if (servicesArray != null) {
+                for (k in 0 until servicesArray.length()) {
+                  selectedServices.add(servicesArray.getString(k))
+                }
+              }
+              rules.add(
+                TriggerRule(
+                  id = ruleObj.getString("id"),
+                  type = RuleType.valueOf(ruleObj.getString("type")),
+                  appPackages = appPackages,
+                  ramThresholdMb = ruleObj.optInt("ramThresholdMb", 0),
+                  sleepDurationMinutes = ruleObj.optInt("sleepDurationMinutes", 0),
+                  timeHour = ruleObj.optInt("timeHour", 0),
+                  timeMinute = ruleObj.optInt("timeMinute", 0),
+                  inactivityDurationMinutes = ruleObj.optInt("inactivityDurationMinutes", 0),
+                  selectedServices = selectedServices,
+                ),
+              )
+            }
+          }
+
+          list.add(
+            TriggerModel(
+              id = obj.getString("id"),
+              name = obj.getString("name"),
+              selectUserApps = obj.optBoolean("selectUserApps", false),
+              selectSystemApps = obj.optBoolean("selectSystemApps", false),
+              selectPersistentApps = obj.optBoolean("selectPersistentApps", false),
+              excludedApps = excluded,
+              manuallySelectedApps = manual,
+              rules = rules,
+              isEnabled = obj.optBoolean("isEnabled", true),
+            ),
+          )
+        } catch (e: Exception) {
+          Log.w("TriggerManager", "Skipping corrupted trigger entry at index $i", e)
+        }
       }
     } catch (e: Exception) {
       e.printStackTrace()

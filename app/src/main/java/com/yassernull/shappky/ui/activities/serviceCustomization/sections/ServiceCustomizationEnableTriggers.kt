@@ -50,9 +50,9 @@ fun ServiceCustomizationEnableTriggers(
       showRuleSelection = false
       when (type) {
         RuleType.PHONE_WAKE -> addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.PHONE_WAKE))
-        RuleType.PHONE_SLEEP -> addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.PHONE_SLEEP))
-        RuleType.SPECIFIC_TIME -> addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.SPECIFIC_TIME))
-        RuleType.RAM_LIMIT_REACHED -> addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.RAM_LIMIT_REACHED))
+        RuleType.PHONE_SLEEP -> activeConfigType = type
+        RuleType.SPECIFIC_TIME -> activeConfigType = type
+        RuleType.RAM_LIMIT_REACHED -> activeConfigType = type
         RuleType.APP_OPENED -> showAppOpenedPicker = true
         RuleType.APP_RESUMED -> showAppResumedPicker = true
         RuleType.APP_CLOSED -> showAppClosedPicker = true
@@ -96,10 +96,8 @@ fun ServiceCustomizationEnableTriggers(
     },
     showAppRamPicker = showAppRamPicker,
     onDismissAppRamPicker = { showAppRamPicker = false },
-    onAppRamSaved = { pkgs ->
-      if (pkgs.isNotEmpty()) {
-        addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.APP_RAM_EXCEEDED, appPackages = pkgs, ramThresholdMb = 300))
-      }
+    onAppRamSaved = { rule ->
+      addRule(rule)
       showAppRamPicker = false
     },
     showInactivityPicker = showInactivityPicker,
@@ -117,6 +115,10 @@ fun ServiceCustomizationEnableTriggers(
     onDismissConfigureKillOldestApp = { activeConfigType = null },
     onConfigureKillOldestAppConfirmed = { rule ->
       addRule(rule)
+      activeConfigType = null
+    },
+    onSaveTimeConfig = { hour, minute ->
+      addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.SPECIFIC_TIME, timeHour = hour, timeMinute = minute))
       activeConfigType = null
     },
   )

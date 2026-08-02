@@ -1,6 +1,7 @@
 package com.yassernull.shappky.core.managers
 
 import android.content.Context
+import android.util.Log
 import com.yassernull.shappky.data.models.RuleType
 import com.yassernull.shappky.data.models.TriggerRule
 import org.json.JSONArray
@@ -8,41 +9,45 @@ import org.json.JSONObject
 
 object EnableTriggerManager {
   private const val PREFS_NAME = "AppPreferences"
-  private const val KEY_ENABLE_RULES = "enable_rules_list"
+  private const val KEY_RULES = "enable_rules_list"
 
   fun getEnableRules(context: Context): List<TriggerRule> {
     val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    val jsonStr = prefs.getString(KEY_ENABLE_RULES, null) ?: return emptyList()
+    val jsonStr = prefs.getString(KEY_RULES, null) ?: return emptyList()
     val rules = mutableListOf<TriggerRule>()
     try {
       val rulesArray = JSONArray(jsonStr)
       for (j in 0 until rulesArray.length()) {
-        val ruleObj = rulesArray.getJSONObject(j)
-        val appPackages = mutableSetOf<String>()
-        val packagesArray = ruleObj.optJSONArray("appPackages")
-        if (packagesArray != null) {
-          for (k in 0 until packagesArray.length()) {
-            appPackages.add(packagesArray.getString(k))
+        try {
+          val ruleObj = rulesArray.getJSONObject(j)
+          val appPackages = mutableSetOf<String>()
+          val packagesArray = ruleObj.optJSONArray("appPackages")
+          if (packagesArray != null) {
+            for (k in 0 until packagesArray.length()) {
+              appPackages.add(packagesArray.getString(k))
+            }
           }
-        }
-        val selectedServices = mutableSetOf<String>()
-        val servicesArray = ruleObj.optJSONArray("selectedServices")
-        if (servicesArray != null) {
-          for (k in 0 until servicesArray.length()) {
-            selectedServices.add(servicesArray.getString(k))
+          val selectedServices = mutableSetOf<String>()
+          val servicesArray = ruleObj.optJSONArray("selectedServices")
+          if (servicesArray != null) {
+            for (k in 0 until servicesArray.length()) {
+              selectedServices.add(servicesArray.getString(k))
+            }
           }
+          val rule = TriggerRule(
+            id = ruleObj.getString("id"),
+            type = RuleType.valueOf(ruleObj.getString("type")),
+            appPackages = appPackages,
+            ramThresholdMb = ruleObj.optInt("ramThresholdMb", 0),
+            timeHour = ruleObj.optInt("timeHour", 0),
+            timeMinute = ruleObj.optInt("timeMinute", 0),
+            inactivityDurationMinutes = ruleObj.optInt("inactivityDurationMinutes", 0),
+            selectedServices = selectedServices,
+          )
+          rules.add(rule)
+        } catch (e: Exception) {
+          Log.w("EnableTriggerManager", "Skipping corrupted rule entry at index $j", e)
         }
-        val rule = TriggerRule(
-          id = ruleObj.getString("id"),
-          type = RuleType.valueOf(ruleObj.getString("type")),
-          appPackages = appPackages,
-          ramThresholdMb = ruleObj.optInt("ramThresholdMb", 0),
-          timeHour = ruleObj.optInt("timeHour", 0),
-          timeMinute = ruleObj.optInt("timeMinute", 0),
-          inactivityDurationMinutes = ruleObj.optInt("inactivityDurationMinutes", 0),
-          selectedServices = selectedServices,
-        )
-        rules.add(rule)
       }
     } catch (e: Exception) {
       e.printStackTrace()
@@ -69,6 +74,6 @@ object EnableTriggerManager {
       ruleObj.put("selectedServices", servicesArray)
       rulesArray.put(ruleObj)
     }
-    prefs.edit().putString(KEY_ENABLE_RULES, rulesArray.toString()).apply()
+    prefs.edit().putString(KEY_RULES, rulesArray.toString()).apply()
   }
 }

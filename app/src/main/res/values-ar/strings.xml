@@ -82,7 +82,7 @@
     <string name="apps_filter">إخفاء تطبيقات من القائمة</string>
     <string name="filter_dialog_title">اختر التطبيقات التي تريد إخفاءها</string>
     <string name="donate">تبرع</string>
-    <string name="donate_summary">دعم التطوير</string>
+    <string name="donate_summary">دعم المطور</string>
     <string name="source_code">الكود المصدري</string>
     <string name="source_code_summary">فتح مستودع المشروع</string>
     <string name="refresh">تحديث</string>

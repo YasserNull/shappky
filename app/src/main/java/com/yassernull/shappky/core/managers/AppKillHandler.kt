@@ -30,7 +30,7 @@ class AppKillHandler(
     }
 
     val protectedApps = ProtectionManager.getProtectedApps(context)
-    val safePackageNames = packageNames.filter { !protectedApps.contains(it) }
+    val safePackageNames = packageNames.filter { !protectedApps.contains(it) && !ProtectionManager.isAppProtectedByRegex(context, it) }
 
     if (safePackageNames.isEmpty()) {
       onComplete?.let { handler.post(it) }

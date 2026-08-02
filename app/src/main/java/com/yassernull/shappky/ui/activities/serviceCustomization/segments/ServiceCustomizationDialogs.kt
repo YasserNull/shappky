@@ -69,7 +69,7 @@ fun ServiceCustomizationRulesDialogs(
   onAppKilledSaved: (Set<String>) -> Unit,
   showAppRamPicker: Boolean,
   onDismissAppRamPicker: () -> Unit,
-  onAppRamSaved: (Set<String>) -> Unit,
+  onAppRamSaved: (TriggerRule) -> Unit,
   showInactivityPicker: Boolean,
   onDismissInactivityPicker: () -> Unit,
   onInactivitySaved: (TriggerRule) -> Unit,
@@ -78,6 +78,7 @@ fun ServiceCustomizationRulesDialogs(
   onConfigureServiceStateConfirmed: (TriggerRule) -> Unit,
   onDismissConfigureKillOldestApp: () -> Unit,
   onConfigureKillOldestAppConfirmed: (TriggerRule) -> Unit,
+  onSaveTimeConfig: (Int, Int) -> Unit,
 ) {
   if (showRuleSelection) {
     RuleSelectionDialog(
@@ -128,12 +129,10 @@ fun ServiceCustomizationRulesDialogs(
   }
 
   if (showAppRamPicker) {
-    AppSelectionDialog(
-      title = stringResource(R.string.rule_app_ram_exceeded),
-      initialSelectedPackages = emptySet(),
+    ConfigureAppRamExceededDialog(
       loadAllApps = { callback -> context.loadAllApps(callback) },
       onDismiss = onDismissAppRamPicker,
-      onSave = onAppRamSaved,
+      onConfirm = onAppRamSaved,
     )
   }
 
@@ -142,6 +141,27 @@ fun ServiceCustomizationRulesDialogs(
       loadAllApps = { callback -> context.loadAllApps(callback) },
       onDismiss = onDismissInactivityPicker,
       onConfirm = onInactivitySaved,
+    )
+  }
+
+  if (activeConfigType == RuleType.RAM_LIMIT_REACHED) {
+    ConfigureRamLimitDialog(
+      onDismiss = onDismissConfigureServiceState,
+      onConfirm = onConfigureServiceStateConfirmed,
+    )
+  }
+
+  if (activeConfigType == RuleType.PHONE_SLEEP) {
+    ConfigurePhoneSleepDialog(
+      onDismiss = onDismissConfigureServiceState,
+      onConfirm = onConfigureServiceStateConfirmed,
+    )
+  }
+
+  if (activeConfigType == RuleType.SPECIFIC_TIME) {
+    ShowTimePickerDialog(
+      onDismiss = onDismissConfigureServiceState,
+      onConfirm = onSaveTimeConfig,
     )
   }
 

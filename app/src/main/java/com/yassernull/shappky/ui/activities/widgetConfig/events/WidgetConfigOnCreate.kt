@@ -25,7 +25,7 @@ fun WidgetConfigActivity.handleOnCreate(savedInstanceState: Bundle?) {
     AppWidgetManager.INVALID_APPWIDGET_ID,
   ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
 
-  Log.d("WidgetConfig", "WidgetConfigActivity Received appWidgetId: \$appWidgetId")
+  Log.d("WidgetConfig", "WidgetConfigActivity Received appWidgetId: $appWidgetId")
 
   if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
     Log.d("WidgetConfig", "Invalid appWidgetId, finishing!")
@@ -38,7 +38,7 @@ fun WidgetConfigActivity.handleOnCreate(savedInstanceState: Bundle?) {
       WidgetConfigScreen(
         appWidgetId = appWidgetId,
         onSave = {
-          Log.d("WidgetConfig", "WidgetConfigActivity onSave called for appWidgetId \$appWidgetId")
+          Log.d("WidgetConfig", "WidgetConfigActivity onSave called for appWidgetId $appWidgetId")
           val resultValue = Intent().apply {
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
           }
