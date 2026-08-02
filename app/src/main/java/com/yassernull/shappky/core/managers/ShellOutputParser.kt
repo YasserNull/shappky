@@ -57,22 +57,30 @@ fun parsePsOutputToProcessInfos(
   uid: String? = null,
 ): List<com.yassernull.shappky.data.models.ProcessInfo> {
   val processes = mutableListOf<com.yassernull.shappky.data.models.ProcessInfo>()
+  val targetUid = uid?.toLongOrNull()
   BufferedReader(StringReader(output)).use { reader ->
     var line = reader.readLine()
     while (line != null) {
-      val parts = line.trim().split(Regex("\\s+"))
-      if (parts.size >= 4 && !line.startsWith("ERROR:")) {
-        val pid = parts[0]
-        val rss = parts[2].toLongOrNull() ?: 0L
-        val name = parts[3]
-        val user = if (parts.size >= 2) parts[1] else ""
-        val matchesByUid = uid != null &&
-          parts.size >= 5 &&
-          parts[4] == uid &&
-          APP_USER_NAME_PATTERN.matcher(user).matches()
-        val matchesByName = isProcessOfPackage(name, packageName)
-        if (matchesByUid || matchesByName) {
-          processes.add(com.yassernull.shappky.data.models.ProcessInfo(name, pid, rss))
+      if (!line.startsWith("ERROR:")) {
+        val fields = line.trim().split(Regex("\\s+"))
+        var index = 0
+        while (index + 5 < fields.size) {
+          val cpuPercent = fields[index].toDoubleOrNull() ?: 0.0
+          val pid = fields[index + 1]
+          val user = fields[index + 2]
+          val rss = fields[index + 3].toLongOrNull() ?: 0L
+          val name = fields[index + 4]
+          val rawUid = fields[index + 5].toLongOrNull()
+          val matchesByUid = targetUid != null &&
+            (
+              rawUid == targetUid ||
+                androidUserNameToUid(user) == targetUid
+              )
+          val matchesByName = isProcessOfPackage(name, packageName)
+          if (matchesByUid || matchesByName) {
+            processes.add(com.yassernull.shappky.data.models.ProcessInfo(name, pid, rss, user, cpuPercent))
+          }
+          index += 6
         }
       }
       line = reader.readLine()
@@ -81,25 +89,20 @@ fun parsePsOutputToProcessInfos(
   return processes
 }
 
-private val APP_USER_NAME_PATTERN = Pattern.compile("^u\\d+_")
+private val ANDROID_USER_NAME_PATTERN = Pattern.compile("^u(\\d+)_a(\\d+)$")
 
-fun isProcessOfPackage(processName: String, packageName: String): Boolean = Regex("^" + Pattern.quote(packageName) + "(?![A-Za-z]).*$").matches(processName)
-
-fun parseCpuInfoOutput(cpuOutput: String): Double {
-  var totalCpu = 0.0
-  BufferedReader(StringReader(cpuOutput)).use { reader ->
-    var line = reader.readLine()
-    while (line != null) {
-      val parts = line.trim().split(Regex("\\s+"))
-      if (parts.isNotEmpty() && parts[0].endsWith("%")) {
-        val percentStr = parts[0].removeSuffix("%")
-        totalCpu += percentStr.toDoubleOrNull() ?: 0.0
-      }
-      line = reader.readLine()
-    }
+fun androidUserNameToUid(user: String): Long? {
+  val numeric = user.toLongOrNull()
+  if (numeric != null) return numeric
+  val match = ANDROID_USER_NAME_PATTERN.matcher(user)
+  return if (match.matches()) {
+    match.group(1).toLong() * 100000L + 10000L + match.group(2).toLong()
+  } else {
+    null
   }
-  return totalCpu
 }
+
+fun isProcessOfPackage(processName: String, packageName: String): Boolean = Regex("^" + Pattern.quote(packageName) + "(?![A-Za-z0-9]).*$").matches(processName)
 
 fun parseStatForThreads(statOutput: String): Int {
   if (statOutput.startsWith("ERROR")) return 0

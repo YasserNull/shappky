@@ -31,7 +31,9 @@ fun WidgetConfigScreen(appWidgetId: Int, onSave: () -> Unit, onDismiss: () -> Un
 
   var selectedTriggerId by remember {
     val saved = prefs.getString(WidgetPreferences.getTriggerIdKey(appWidgetId), "") ?: ""
-    mutableStateOf(saved.ifEmpty { triggers.firstOrNull()?.id ?: "" })
+    val defaultTriggerId = triggers.firstOrNull { it.rules.isNotEmpty() }?.id ?: ""
+    val validSaved = if (triggers.any { it.id == saved && it.rules.isNotEmpty() }) saved else defaultTriggerId
+    mutableStateOf(validSaved)
   }
 
   var selectedBgSize by remember {

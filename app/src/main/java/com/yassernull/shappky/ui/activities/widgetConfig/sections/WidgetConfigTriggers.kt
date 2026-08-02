@@ -19,6 +19,7 @@ fun WidgetConfigTriggers(
   onTriggerSelected: (String) -> Unit,
 ) {
   var expanded by remember { mutableStateOf(false) }
+  val selectableTriggers = triggers.filter { it.rules.isNotEmpty() }
 
   Text(
     text = stringResource(R.string.widget_select_trigger),
@@ -28,7 +29,7 @@ fun WidgetConfigTriggers(
   )
   Spacer(Modifier.height(4.dp))
 
-  if (triggers.isEmpty()) {
+  if (selectableTriggers.isEmpty()) {
     Text(
       text = stringResource(R.string.widget_no_triggers_warning),
       color = MaterialTheme.colorScheme.error,
@@ -41,7 +42,7 @@ fun WidgetConfigTriggers(
       onExpandedChange = { expanded = !expanded },
       modifier = Modifier.fillMaxWidth(),
     ) {
-      val selectedTriggerName = triggers.firstOrNull { it.id == selectedTriggerId }?.name ?: stringResource(R.string.widget_select_trigger)
+      val selectedTriggerName = selectableTriggers.firstOrNull { it.id == selectedTriggerId }?.name ?: stringResource(R.string.widget_select_trigger)
       OutlinedTextField(
         value = selectedTriggerName,
         onValueChange = {},
@@ -62,7 +63,7 @@ fun WidgetConfigTriggers(
         onDismissRequest = { expanded = false },
         modifier = Modifier.background(MaterialTheme.colorScheme.surface),
       ) {
-        triggers.forEach { trigger ->
+        selectableTriggers.forEach { trigger ->
           DropdownMenuItem(
             text = { Text(trigger.name, color = MaterialTheme.colorScheme.onSurface) },
             onClick = {

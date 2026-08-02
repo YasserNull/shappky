@@ -7,8 +7,6 @@ import android.util.Log
 import android.widget.Toast
 import com.yassernull.shappky.R
 import com.yassernull.shappky.data.models.AppModel
-import java.io.BufferedReader
-import java.io.StringReader
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.function.Consumer
@@ -227,24 +225,22 @@ class AppProcessLoader(
         try {
           if (shellManager.isShellCommandReady()) {
             var fullOutput: String? = null
-            var uidFiltered = false
             val appUid = resolveAppUid(app.packageName)
             Log.d(TAG, "loadAppDetailedInfo package=${app.packageName}, resolvedUid=$appUid")
             if (appUid != null) {
-              val uidCommand = "${ShellManager.TOYBOX_PATH} ps -A -o pid,user,rss,name,uid"
+              val uidCommand = "${ShellManager.TOYBOX_PATH} ps -A -o %cpu,pid,user,rss,name,uid"
               val uidOutput = shellManager.runShellCommandAndGetFullOutput(uidCommand)
               if (!uidOutput.isNullOrBlank()) {
                 fullOutput = uidOutput
-                uidFiltered = true
                 Log.d(TAG, "loadAppDetailedInfo full ps output lines=${uidOutput.lines().size}")
               } else {
                 Log.w(TAG, "loadAppDetailedInfo ps returned no output, falling back to package name grep")
               }
             }
-            if (!uidFiltered) {
+            if (fullOutput == null) {
               val escapedPkg = app.packageName.replace(".", "\\.")
               fullOutput = shellManager.runShellCommandAndGetFullOutput(
-                "${ShellManager.TOYBOX_PATH} ps -A -o pid,user,rss,name | grep '\\.' | grep -v '[-@]' | grep -E '" + escapedPkg + "([^A-Za-z]|\$)'",
+                "${ShellManager.TOYBOX_PATH} ps -A -o %cpu,pid,user,rss,name,uid | grep '\\.' | grep -v '[-@]' | grep -E '" + escapedPkg + "([^A-Za-z0-9]|\$)'",
               )
             }
             var processes = mutableListOf<com.yassernull.shappky.data.models.ProcessInfo>()
@@ -256,17 +252,18 @@ class AppProcessLoader(
             var isForeground = false
 
             if (fullOutput != null) {
-              processes = parsePsOutputToProcessInfos(fullOutput, app.packageName, if (uidFiltered) appUid else null).toMutableList()
-              Log.d(TAG, "loadAppDetailedInfo package=${app.packageName}, uidFiltered=$uidFiltered, parsedProcesses=${processes.size}, output=${fullOutput.trim().replace('\n', '|')}")
+              processes = parsePsOutputToProcessInfos(fullOutput, app.packageName, appUid).toMutableList()
+              Log.d(TAG, "loadAppDetailedInfo package=${app.packageName}, uidFiltered=${appUid != null}, parsedProcesses=${processes.size}, output=${fullOutput.trim().replace('\n', '|')}")
 
               var mainFound = false
               for (p in processes) {
                 if (p.name == app.packageName) {
                   mainPid = p.pid
-                  mainUser = "-"
+                  mainUser = p.user
                   mainFound = true
                 }
                 totalRam += p.ramKb
+                totalCpu += p.cpuPercent
                 try {
                   val statOutput = shellManager.runShellCommandAndGetFullOutput("cat /proc/${p.pid}/stat")
                   if (statOutput != null) {
@@ -278,28 +275,6 @@ class AppProcessLoader(
                 mainPid = processes[0].pid
                 mainUser = "N/A"
               }
-
-              BufferedReader(java.io.StringReader(fullOutput)).use { reader ->
-                var line = reader.readLine()
-                while (line != null) {
-                  val parts = line.trim().split(Regex("\\s+"))
-                  if (parts.size >= 4 && !line.startsWith("ERROR:")) {
-                    val user = parts[1]
-                    val name = parts[3]
-                    if (name == app.packageName || name.startsWith(app.packageName + ":")) {
-                      if (name == app.packageName) mainUser = user
-                    }
-                  }
-                  line = reader.readLine()
-                }
-              }
-
-              try {
-                val cpuOutput = shellManager.runShellCommandAndGetFullOutput("dumpsys cpuinfo | grep " + app.packageName)
-                if (cpuOutput != null && !cpuOutput.startsWith("ERROR")) {
-                  totalCpu = parseCpuInfoOutput(cpuOutput)
-                }
-              } catch (_: Exception) {}
             }
 
             val dumpCommand = "dumpsys activity services " + app.packageName + " | grep isForeground=true"

@@ -15,4 +15,6 @@ data class ProcessInfo(
   val name: String,
   val pid: String,
   val ramKb: Long,
+  val user: String = "-",
+  val cpuPercent: Double = 0.0,
 )
