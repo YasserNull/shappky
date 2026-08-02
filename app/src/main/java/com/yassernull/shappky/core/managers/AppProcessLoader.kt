@@ -33,6 +33,14 @@ class AppProcessLoader(
   @Volatile
   private var isCurrentlyLoadingRam = false
 
+  private val installedPackages: Set<String> by lazy {
+    try {
+      context.packageManager.getInstalledApplications(0).mapTo(mutableSetOf()) { it.packageName }
+    } catch (_: Exception) {
+      emptySet()
+    }
+  }
+
   fun formatMemorySize(kb: Long): String = when {
     kb < 1024 -> context.getString(R.string.kb_format, kb)
     kb < 1024 * 1024 -> context.getString(R.string.mb_format, kb / 1024f)
@@ -93,13 +101,13 @@ class AppProcessLoader(
           val protectedApps = ProtectionManager.getProtectedApps(context)
 
           if (shellManager.isShellCommandReady()) {
-            val command = "${ShellManager.TOYBOX_PATH} ps -A -o %cpu,rss,name,uid"
+            val command = "${ShellManager.TOYBOX_PATH} ps -A -o %cpu,pid,user,rss,name,uid"
             try {
               val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
               if (fullOutput != null) {
-                val entries = parsePsOutputToEntries(fullOutput)
+                val entries = parsePsOutputToProcessEntries(fullOutput)
                 val pm = context.packageManager
-                val packageUsageMap = aggregateByPackage(entries)
+                val packageUsageMap = aggregateByPackage(entries, pm)
                 val validatedEntries = packageUsageMap.filterKeys { pkg ->
                   try {
                     pm.getApplicationInfo(pkg, 0)
@@ -109,6 +117,8 @@ class AppProcessLoader(
                   }
                 }
                 val runningEntries = validatedEntries.map { (pkg, usage) -> "$pkg:${usage.ramKb}:${usage.cpuPercent}" }.toSet()
+                Log.d(TAG, "loadBackgroundApps psLines=${fullOutput.lines().size}, parsedEntries=${entries.size}, packages=${packageUsageMap.size}, validated=${validatedEntries.size}")
+                Log.d(TAG, "loadBackgroundApps aggregated=${packageUsageMap.entries.joinToString { "${it.key}=${it.value.ramKb}KB" }}")
 
                 result = AppModelFilter.buildRunningAppModels(
                   runningEntries = runningEntries,
@@ -193,12 +203,13 @@ class AppProcessLoader(
         val ramUsageByPackage = mutableMapOf<String, Long>()
         try {
           if (requestedPackages.isNotEmpty() && shellManager.isShellCommandReady()) {
-            val command = "${ShellManager.TOYBOX_PATH} ps -A -o %cpu,rss,name,uid"
+            val command = "${ShellManager.TOYBOX_PATH} ps -A -o %cpu,pid,user,rss,name,uid"
             try {
               val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
               if (fullOutput != null) {
-                val entries = parsePsOutputToEntries(fullOutput)
-                val aggregated = aggregateByPackage(entries)
+                val entries = parsePsOutputToProcessEntries(fullOutput)
+                val aggregated = aggregateByPackage(entries, context.packageManager)
+                Log.d(TAG, "loadAppsRamUsage aggregated=${aggregated.entries.joinToString { "${it.key}=${it.value.ramKb}KB" }}")
                 for ((pkg, usage) in aggregated) {
                   if (pkg in requestedPackages) {
                     ramUsageByPackage[pkg] = usage.ramKb
@@ -309,6 +320,45 @@ class AppProcessLoader(
     context.packageManager.getApplicationInfo(packageName, 0).uid.toString()
   } catch (_: PackageManager.NameNotFoundException) {
     null
+  }
+
+  private fun aggregateByPackage(entries: List<PsProcessEntry>, pm: PackageManager): Map<String, PackageUsage> {
+    val map = mutableMapOf<String, PackageUsage>()
+    for (entry in entries) {
+      val packageName = resolvePackageForEntry(entry, pm) ?: continue
+      val current = map[packageName] ?: PackageUsage(0L, 0.0)
+      map[packageName] = PackageUsage(
+        ramKb = current.ramKb + entry.rssKb,
+        cpuPercent = current.cpuPercent + entry.cpuPercent,
+      )
+    }
+    return map
+  }
+
+  private fun resolvePackageForEntry(entry: PsProcessEntry, pm: PackageManager): String? {
+    val uid = entry.uid ?: androidUserNameToUid(entry.user)
+    val packagesForUid = uid?.let {
+      try {
+        pm.getPackagesForUid(it.toInt())
+      } catch (_: Exception) {
+        null
+      }
+    }
+    val byUidPrefix = packagesForUid?.firstOrNull { pkg -> entry.name.startsWith(pkg) }
+    val byName = resolvePackageForName(entry.name)
+    return when {
+      byUidPrefix != null -> byUidPrefix
+      byName != null -> byName
+      else -> packagesForUid?.firstOrNull()
+    }
+  }
+
+  private fun resolvePackageForName(name: String): String? {
+    val base = name.substringBefore(":")
+    if (base in installedPackages) return base
+    return installedPackages.firstOrNull { pkg ->
+      name.length >= pkg.length + 1 && name.startsWith(pkg) && !name[pkg.length].isLetterOrDigit()
+    }
   }
 
   fun getHiddenApps(): Set<String> = sharedPreferences.getStringSet(KEY_HIDDEN_APPS, HashSet()) ?: HashSet()

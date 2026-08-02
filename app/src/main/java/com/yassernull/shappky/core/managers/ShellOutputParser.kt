@@ -1,15 +1,16 @@
 package com.yassernull.shappky.core.managers
 
-import android.os.Process
 import java.io.BufferedReader
 import java.io.StringReader
 import java.util.Locale
 import java.util.regex.Pattern
 
-data class PsEntry(
-  val packageName: String,
+data class PsProcessEntry(
+  val name: String,
+  val pid: String,
+  val user: String,
   val rssKb: Long,
-  val uid: String,
+  val uid: Long?,
   val cpuPercent: Double,
 )
 
@@ -18,61 +19,8 @@ data class PackageUsage(
   val cpuPercent: Double,
 )
 
-fun parsePsOutputToEntries(output: String): List<PsEntry> {
-  val entries = mutableListOf<PsEntry>()
-  BufferedReader(StringReader(output)).use { reader ->
-    var line = reader.readLine()
-    while (line != null) {
-      if (!line.startsWith("ERROR:")) {
-        val fields = line.trim().split(Regex("\\s+"))
-        var index = 0
-        while (index + 3 < fields.size) {
-          val cpuPercent = fields[index].toDoubleOrNull() ?: 0.0
-          val rssKb = fields[index + 1].toLongOrNull() ?: 0L
-          val rawName = fields[index + 2].trim()
-          val uid = fields[index + 3].trim()
-          val isAppUser = uid.toLongOrNull()?.let { it >= Process.FIRST_APPLICATION_UID } ?: false
-          val packageName = if (rawName.contains(".")) rawName.substringBefore(":") else ""
-          if (isAppUser && rawName.isNotEmpty()) {
-            entries.add(PsEntry(packageName, rssKb, uid, cpuPercent))
-          }
-          index += 4
-        }
-      }
-      line = reader.readLine()
-    }
-  }
-  return entries
-}
-
-fun aggregateByPackage(entries: List<PsEntry>): Map<String, PackageUsage> {
-  val uidToPackage = mutableMapOf<String, String>()
-  for (entry in entries) {
-    if (entry.packageName.isNotEmpty() && entry.uid.isNotEmpty()) {
-      uidToPackage.putIfAbsent(entry.uid, entry.packageName)
-    }
-  }
-  val map = mutableMapOf<String, PackageUsage>()
-  for (entry in entries) {
-    val packageName = entry.packageName.ifEmpty { uidToPackage[entry.uid] ?: "" }
-    if (packageName.isNotEmpty()) {
-      val current = map[packageName] ?: PackageUsage(0L, 0.0)
-      map[packageName] = PackageUsage(
-        ramKb = current.ramKb + entry.rssKb,
-        cpuPercent = current.cpuPercent + entry.cpuPercent,
-      )
-    }
-  }
-  return map
-}
-
-fun parsePsOutputToProcessInfos(
-  output: String,
-  packageName: String,
-  uid: String? = null,
-): List<com.yassernull.shappky.data.models.ProcessInfo> {
-  val processes = mutableListOf<com.yassernull.shappky.data.models.ProcessInfo>()
-  val targetUid = uid?.toLongOrNull()
+fun parsePsOutputToProcessEntries(output: String): List<PsProcessEntry> {
+  val entries = mutableListOf<PsProcessEntry>()
   BufferedReader(StringReader(output)).use { reader ->
     var line = reader.readLine()
     while (line != null) {
@@ -83,25 +31,36 @@ fun parsePsOutputToProcessInfos(
           val cpuPercent = fields[index].toDoubleOrNull() ?: 0.0
           val pid = fields[index + 1]
           val user = fields[index + 2]
-          val rss = fields[index + 3].toLongOrNull() ?: 0L
+          val rssKb = fields[index + 3].toLongOrNull() ?: 0L
           val name = fields[index + 4]
-          val rawUid = fields[index + 5].toLongOrNull()
-          val matchesByUid = targetUid != null &&
-            (
-              rawUid == targetUid ||
-                androidUserNameToUid(user) == targetUid
-              )
-          val matchesByName = isProcessOfPackage(name, packageName)
-          if (matchesByUid || matchesByName) {
-            processes.add(com.yassernull.shappky.data.models.ProcessInfo(name, pid, rss, user, cpuPercent))
-          }
+          val uid = fields[index + 5].toLongOrNull()
+          entries.add(PsProcessEntry(name, pid, user, rssKb, uid, cpuPercent))
           index += 6
         }
       }
       line = reader.readLine()
     }
   }
-  return processes
+  return entries
+}
+
+fun parsePsOutputToProcessInfos(
+  output: String,
+  packageName: String,
+  uid: String? = null,
+): List<com.yassernull.shappky.data.models.ProcessInfo> {
+  val targetUid = uid?.toLongOrNull()
+  return parsePsOutputToProcessEntries(output)
+    .filter { entry ->
+      val matchesByUid = targetUid != null &&
+        (
+          entry.uid == targetUid ||
+            androidUserNameToUid(entry.user) == targetUid
+          )
+      val matchesByName = isProcessOfPackage(entry.name, packageName)
+      matchesByUid || matchesByName
+    }
+    .map { entry -> com.yassernull.shappky.data.models.ProcessInfo(entry.name, entry.pid, entry.rssKb, entry.user, entry.cpuPercent) }
 }
 
 private val ANDROID_USER_NAME_PATTERN = Pattern.compile("^u(\\d+)_a(\\d+)$")
