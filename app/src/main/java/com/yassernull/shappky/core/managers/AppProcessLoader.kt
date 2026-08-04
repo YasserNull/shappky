@@ -338,10 +338,14 @@ class AppProcessLoader(
   private fun resolvePackageForEntry(entry: PsProcessEntry, pm: PackageManager): String? {
     val uid = entry.uid ?: androidUserNameToUid(entry.user)
     val packagesForUid = uid?.let {
-      try {
-        pm.getPackagesForUid(it.toInt())
-      } catch (_: Exception) {
+      if (it < android.os.Process.FIRST_APPLICATION_UID) {
         null
+      } else {
+        try {
+          pm.getPackagesForUid(it.toInt())
+        } catch (_: Exception) {
+          null
+        }
       }
     }
     val byUidPrefix = packagesForUid?.firstOrNull { pkg -> entry.name.startsWith(pkg) }

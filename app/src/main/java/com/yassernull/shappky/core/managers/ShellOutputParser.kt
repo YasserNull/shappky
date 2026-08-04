@@ -1,5 +1,6 @@
 package com.yassernull.shappky.core.managers
 
+import android.os.Process
 import java.io.BufferedReader
 import java.io.StringReader
 import java.util.Locale
@@ -50,9 +51,10 @@ fun parsePsOutputToProcessInfos(
   uid: String? = null,
 ): List<com.yassernull.shappky.data.models.ProcessInfo> {
   val targetUid = uid?.toLongOrNull()
+  val canMatchByUid = targetUid != null && targetUid >= Process.FIRST_APPLICATION_UID
   return parsePsOutputToProcessEntries(output)
     .filter { entry ->
-      val matchesByUid = targetUid != null &&
+      val matchesByUid = canMatchByUid &&
         (
           entry.uid == targetUid ||
             androidUserNameToUid(entry.user) == targetUid
