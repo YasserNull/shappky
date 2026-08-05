@@ -65,7 +65,20 @@ fun MainContent(
 ) {
   var showSortDialog by remember { mutableStateOf(false) }
   var showFilterDialog by remember { mutableStateOf(false) }
+  var isSearching by remember { mutableStateOf(false) }
+  var searchQuery by remember { mutableStateOf("") }
   val hasSelection = apps.any { it.isSelected }
+
+  val trimmedQuery = searchQuery.trim()
+  val filteredApps =
+    if (isSearching && trimmedQuery.isNotEmpty()) {
+      apps.filter { app ->
+        app.appName.contains(trimmedQuery, ignoreCase = true) ||
+          app.packageName.contains(trimmedQuery, ignoreCase = true)
+      }
+    } else {
+      apps
+    }
 
   Scaffold(
     topBar = {
@@ -77,6 +90,14 @@ fun MainContent(
         showSystemApps = showSystemApps,
         showPersistentApps = showPersistentApps,
         showProtectedApps = showProtectedApps,
+        isSearching = isSearching,
+        searchQuery = searchQuery,
+        onSearchQueryChange = { searchQuery = it },
+        onOpenSearch = { isSearching = true },
+        onCloseSearch = {
+          isSearching = false
+          searchQuery = ""
+        },
         onOpenTriggers = onOpenTriggers,
         onSelectAll = onSelectAll,
         onToggleService = onToggleService,
@@ -115,7 +136,7 @@ fun MainContent(
       }
       AppsRamUsage(ramState)
       AppsList(
-        apps = apps,
+        apps = filteredApps,
         isLoadingBackgroundApps = isLoadingBackgroundApps,
         onRefresh = onRefresh,
         onToggleApp = onToggleApp,
