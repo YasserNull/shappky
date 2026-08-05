@@ -33,7 +33,6 @@ import java.util.concurrent.Executors
 fun AppsList(
   apps: List<AppModel>,
   isLoadingBackgroundApps: Boolean,
-  showAppTypeIcons: Boolean,
   onRefresh: () -> Unit,
   onToggleApp: (AppModel) -> Unit,
   onKillApp: (AppModel, Boolean) -> Unit,
@@ -48,7 +47,6 @@ fun AppsList(
       items(apps, key = { it.packageName }) { app ->
         AppRow(
           app = app,
-          showAppTypeIcons = showAppTypeIcons,
           onToggle = { onToggleApp(app) },
           onKill = { force -> onKillApp(app, force) },
           onLongClick = { onAppLongClick(app) },
@@ -80,7 +78,6 @@ object AppsListLogic {
   internal var showSystemApps by mutableStateOf(true)
   internal var showPersistentApps by mutableStateOf(false)
   internal var showProtectedApps by mutableStateOf(false)
-  internal var showAppTypeIcons by mutableStateOf(true)
   internal var appsAutoRefresh = true
   internal lateinit var autoRefreshManager: AutoRefreshManager
   private const val TAG = "AppsListLogic"

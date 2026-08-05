@@ -36,7 +36,6 @@ fun MainContent(
   showSystemApps: Boolean,
   showPersistentApps: Boolean,
   showProtectedApps: Boolean,
-  showAppTypeIcons: Boolean,
   initialSortMode: String,
   initialSortDescending: Boolean,
   sortByName: String,
@@ -118,7 +117,6 @@ fun MainContent(
       AppsList(
         apps = apps,
         isLoadingBackgroundApps = isLoadingBackgroundApps,
-        showAppTypeIcons = showAppTypeIcons,
         onRefresh = onRefresh,
         onToggleApp = onToggleApp,
         onKillApp = onKillApp,

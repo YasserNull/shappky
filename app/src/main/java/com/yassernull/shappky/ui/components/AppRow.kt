@@ -46,7 +46,6 @@ import com.yassernull.shappky.data.models.AppModel
 @Composable
 fun AppRow(
   app: AppModel,
-  showAppTypeIcons: Boolean,
   onToggle: () -> Unit,
   onKill: (Boolean) -> Unit,
   onLongClick: () -> Unit = {},
@@ -93,20 +92,18 @@ fun AppRow(
         overflow = TextOverflow.Ellipsis,
       )
       Row(verticalAlignment = Alignment.CenterVertically) {
-        if (showAppTypeIcons) {
-          val icon = when {
-            app.isPersistentApp -> Icons.Outlined.PushPin
-            app.isSystemApp -> Icons.Outlined.Settings
-            else -> Icons.Outlined.Person
-          }
-          Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(12.dp),
-            tint = secondaryTextColor,
-          )
-          Spacer(Modifier.width(4.dp))
+        val icon = when {
+          app.isPersistentApp -> Icons.Outlined.PushPin
+          app.isSystemApp -> Icons.Outlined.Settings
+          else -> Icons.Outlined.Person
         }
+        Icon(
+          imageVector = icon,
+          contentDescription = null,
+          modifier = Modifier.size(12.dp),
+          tint = secondaryTextColor,
+        )
+        Spacer(Modifier.width(4.dp))
         Text(
           text = app.packageName,
           color = secondaryTextColor,

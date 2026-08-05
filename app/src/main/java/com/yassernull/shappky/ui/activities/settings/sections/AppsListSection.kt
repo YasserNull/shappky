@@ -6,7 +6,6 @@ import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.DoNotDisturb
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
@@ -34,7 +33,6 @@ fun AppsListSection() {
   var showSystemApps by remember { mutableStateOf(sharedPreferences.getBoolean("showSystemApps", true)) }
   var showPersistentApps by remember { mutableStateOf(sharedPreferences.getBoolean("showPersistentApps", false)) }
   var showProtectedApps by remember { mutableStateOf(sharedPreferences.getBoolean("showProtectedApps", false)) }
-  var showAppTypeIcons by remember { mutableStateOf(sharedPreferences.getBoolean("showAppTypeIcons", true)) }
 
   var appsAutoRefresh by remember { mutableStateOf(sharedPreferences.getBoolean("appsAutoRefresh", true)) }
   var appsAutoRefreshIntervalMs by remember {
@@ -97,16 +95,6 @@ fun AppsListSection() {
         showProtectedApps = it
         sharedPreferences.edit().putBoolean("showProtectedApps", it).apply()
       }
-    },
-  )
-  SwitchSettingRow(
-    icon = Icons.Filled.Palette,
-    title = stringResource(R.string.show_app_type_icons),
-    summary = stringResource(R.string.show_app_type_icons_summary),
-    checked = showAppTypeIcons,
-    onCheckedChange = {
-      showAppTypeIcons = it
-      sharedPreferences.edit().putBoolean("showAppTypeIcons", it).apply()
     },
   )
   ActionSettingRow(

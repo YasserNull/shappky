@@ -18,8 +18,6 @@
     <string name="show_persistent_apps_summary">عرض التطبيقات المستمرة التي ترفض التوقف في القائمة</string>
     <string name="show_protected_apps">عرض التطبيقات المحمية</string>
     <string name="show_protected_apps_summary">عرض التطبيقات المحمية في القائمة</string>
-    <string name="show_app_type_icons">إظهار أيقونات نوع التطبيق</string>
-    <string name="show_app_type_icons_summary">إظهار أيقونات صغيرة بجانب استهلاك ذاكرة الوصول العشوائي لتوضيح نوع التطبيق</string>
     <string name="apps_auto_refresh">التحديث التلقائي للتطبيقات</string>
     <string name="apps_auto_refresh_interval_title">فترة التحديث التلقائي للتطبيقات</string>
     <string name="protected_apps_list_title">قائمة التطبيقات المحمية</string>

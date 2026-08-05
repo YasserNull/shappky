@@ -33,9 +33,6 @@ fun ListWidgetConfigAppsList(appWidgetId: Int) {
   var showProtectedApps by remember {
     mutableStateOf(prefs.getBoolean(WidgetPreferences.getListShowProtectedAppsKey(appWidgetId), false))
   }
-  var showAppTypeIcons by remember {
-    mutableStateOf(prefs.getBoolean(WidgetPreferences.getListShowAppTypeIconsKey(appWidgetId), true))
-  }
   var sortMode by remember {
     mutableStateOf(prefs.getString(WidgetPreferences.getListSortModeKey(appWidgetId), AppsListPreferences.SORT_BY_NAME) ?: AppsListPreferences.SORT_BY_NAME)
   }
@@ -68,10 +65,6 @@ fun ListWidgetConfigAppsList(appWidgetId: Int) {
   RowSetting(stringResource(R.string.show_protected_apps), showProtectedApps) {
     showProtectedApps = it
     prefs.edit().putBoolean(WidgetPreferences.getListShowProtectedAppsKey(appWidgetId), it).apply()
-  }
-  RowSetting(stringResource(R.string.show_app_type_icons), showAppTypeIcons) {
-    showAppTypeIcons = it
-    prefs.edit().putBoolean(WidgetPreferences.getListShowAppTypeIconsKey(appWidgetId), it).apply()
   }
 
   val sortModeText = when (sortMode) {

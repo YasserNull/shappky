@@ -139,7 +139,6 @@ class ShappkyWidgetFactory(
     views.setTextViewText(R.id.app_ram, formattedRam)
 
     val prefs = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
-    val showAppTypeIcons = prefs.getBoolean(WidgetPreferences.getListShowAppTypeIconsKey(appWidgetId), true)
     val appTheme = prefs.getString(KEY_THEME, "dark") ?: "dark"
     val isWhiteTheme = appTheme == "white"
 
@@ -171,18 +170,14 @@ class ShappkyWidgetFactory(
 
     views.setInt(R.id.btn_close_app, "setColorFilter", iconColor)
 
-    if (showAppTypeIcons) {
-      views.setViewVisibility(R.id.app_type_icon, android.view.View.VISIBLE)
-      val iconRes = when {
-        app.isPersistentApp -> R.drawable.ic_pushpin_outlined
-        app.isSystemApp -> R.drawable.ic_settings_outlined
-        else -> R.drawable.ic_person_outlined
-      }
-      views.setImageViewResource(R.id.app_type_icon, iconRes)
-      views.setInt(R.id.app_type_icon, "setColorFilter", secondaryTextColor)
-    } else {
-      views.setViewVisibility(R.id.app_type_icon, android.view.View.GONE)
+    views.setViewVisibility(R.id.app_type_icon, android.view.View.VISIBLE)
+    val iconRes = when {
+      app.isPersistentApp -> R.drawable.ic_pushpin_outlined
+      app.isSystemApp -> R.drawable.ic_settings_outlined
+      else -> R.drawable.ic_person_outlined
     }
+    views.setImageViewResource(R.id.app_type_icon, iconRes)
+    views.setInt(R.id.app_type_icon, "setColorFilter", secondaryTextColor)
 
     try {
       val bitmap = drawableToBitmap(app.appIcon)

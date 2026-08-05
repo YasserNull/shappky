@@ -5,7 +5,6 @@ object AppsListPreferences {
   const val KEY_SHOW_SYSTEM_APPS = "showSystemApps"
   const val KEY_SHOW_PERSISTENT_APPS = "showPersistentApps"
   const val KEY_SHOW_PROTECTED_APPS = "showProtectedApps"
-  const val KEY_SHOW_APP_TYPE_ICONS = "showAppTypeIcons"
 
   const val KEY_SORT_MODE = "sortMode"
   const val KEY_SORT_DESCENDING = "sortDescending"

@@ -28,7 +28,6 @@ fun MainActivity.handleOnResume() {
   val showSystemAppsNow = prefs.getBoolean(AppsListPreferences.KEY_SHOW_SYSTEM_APPS, true)
   val showPersistentAppsNow = prefs.getBoolean(AppsListPreferences.KEY_SHOW_PERSISTENT_APPS, false)
   val showProtectedAppsNow = prefs.getBoolean(AppsListPreferences.KEY_SHOW_PROTECTED_APPS, false)
-  val showAppTypeIconsNow = prefs.getBoolean(AppsListPreferences.KEY_SHOW_APP_TYPE_ICONS, true)
 
   var settingsChanged = false
   if (showUserAppsNow != AppsListLogic.showUserApps || showSystemAppsNow != AppsListLogic.showSystemApps || showPersistentAppsNow != AppsListLogic.showPersistentApps || showProtectedAppsNow != AppsListLogic.showProtectedApps) {
@@ -40,11 +39,6 @@ fun MainActivity.handleOnResume() {
     AppsListLogic.appManager.setShowSystemApps(AppsListLogic.showSystemApps)
     AppsListLogic.appManager.setShowPersistentApps(AppsListLogic.showPersistentApps)
     AppsListLogic.appManager.setShowProtectedApps(AppsListLogic.showProtectedApps)
-    settingsChanged = true
-  }
-
-  if (showAppTypeIconsNow != AppsListLogic.showAppTypeIcons) {
-    AppsListLogic.showAppTypeIcons = showAppTypeIconsNow
     settingsChanged = true
   }
 

@@ -15,7 +15,6 @@ object WidgetPreferences {
   fun getListShowSystemAppsKey(appWidgetId: Int) = "widget_list_show_system_apps_$appWidgetId"
   fun getListShowPersistentAppsKey(appWidgetId: Int) = "widget_list_show_persistent_apps_$appWidgetId"
   fun getListShowProtectedAppsKey(appWidgetId: Int) = "widget_list_show_protected_apps_$appWidgetId"
-  fun getListShowAppTypeIconsKey(appWidgetId: Int) = "widget_list_show_app_type_icons_$appWidgetId"
 
   fun getListSortModeKey(appWidgetId: Int) = "widget_list_sort_mode_$appWidgetId"
   fun getListSortDescendingKey(appWidgetId: Int) = "widget_list_sort_descending_$appWidgetId"
