@@ -25,6 +25,9 @@ fun ProtectedAppsSpecialSection(
   keyboardPackage: String?,
   keyboardChecked: Boolean,
   onToggleKeyboard: (Boolean) -> Unit,
+  persistentPackages: List<String>,
+  persistentChecked: Boolean,
+  onTogglePersistent: (Boolean) -> Unit,
   wallpaperPackages: Set<String>,
   wallpaperChecked: Boolean,
   onToggleWallpaper: (Boolean) -> Unit,
@@ -72,6 +75,19 @@ fun ProtectedAppsSpecialSection(
     text = stringResource(R.string.keyboard),
     checked = keyboardChecked,
     onCheckedChange = onToggleKeyboard,
+  )
+
+  val persistentText = stringResource(R.string.persistent_apps)
+  SpecialCheckboxRow(
+    text = persistentText,
+    checked = persistentChecked,
+    onCheckedChange = { checked ->
+      if (persistentPackages.isNotEmpty()) {
+        onTogglePersistent(checked)
+      } else {
+        Toast.makeText(context, context.getString(R.string.not_found_format, persistentText), Toast.LENGTH_SHORT).show()
+      }
+    },
   )
 
   SpecialCheckboxRow(

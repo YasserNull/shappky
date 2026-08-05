@@ -126,9 +126,11 @@ fun ProtectedAppsDialog(
           }
         } else {
           val googleAndroidPackages = allApps.map { it.packageName }.filter { it.startsWith("com.google.android") }
+          val persistentPackages = allApps.filter { it.isPersistentApp }.map { it.packageName }
 
           val launcherChecked = launcherPackage != null && selectedPackages.contains(launcherPackage)
           val keyboardChecked = keyboardPackage != null && selectedPackages.contains(keyboardPackage)
+          val persistentChecked = persistentPackages.isNotEmpty() && persistentPackages.all { selectedPackages.contains(it) }
           val wallpaperChecked = wallpaperPackages.isNotEmpty() && wallpaperPackages.all { selectedPackages.contains(it) }
           val widgetsChecked = activeWidgetPackages.isNotEmpty() && activeWidgetPackages.all { selectedPackages.contains(it) }
           val googleAndroidServicesChecked = googleAndroidPackages.isNotEmpty() && googleAndroidPackages.all { selectedPackages.contains(it) }
@@ -165,6 +167,15 @@ fun ProtectedAppsDialog(
                 onToggleKeyboard = { checked ->
                   keyboardPackage?.let { pkg ->
                     selectedPackages = if (checked) selectedPackages + pkg else selectedPackages - pkg
+                  }
+                },
+                persistentPackages = persistentPackages,
+                persistentChecked = persistentChecked,
+                onTogglePersistent = { checked ->
+                  selectedPackages = if (checked) {
+                    selectedPackages + persistentPackages
+                  } else {
+                    selectedPackages - persistentPackages.toSet()
                   }
                 },
                 wallpaperPackages = wallpaperPackages,
