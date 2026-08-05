@@ -59,27 +59,32 @@ fun parsePsOutputToProcessInfos(
   val canMatchByUid = targetUid != null && targetUid >= Process.FIRST_APPLICATION_UID
   return parsePsOutputToProcessEntries(output)
     .filter { entry ->
-      val matchesByUid = canMatchByUid &&
-        (
-          entry.uid == targetUid ||
-            androidUserNameToUid(entry.user) == targetUid
-          )
+      val matchesByUid = canMatchByUid && entry.uid == targetUid
       val matchesByName = isProcessOfPackage(entry.name, packageName)
       matchesByUid || matchesByName
     }
     .map { entry -> com.yassernull.shappky.data.models.ProcessInfo(entry.name, entry.pid, entry.rssKb, entry.user, entry.cpuPercent) }
 }
 
-private val ANDROID_USER_NAME_PATTERN = Pattern.compile("^u(\\d+)_a(\\d+)$")
-
-fun androidUserNameToUid(user: String): Long? {
-  val numeric = user.toLongOrNull()
-  if (numeric != null) return numeric
-  val match = ANDROID_USER_NAME_PATTERN.matcher(user)
-  return if (match.matches()) {
-    match.group(1).toLong() * 100000L + 10000L + match.group(2).toLong()
-  } else {
-    null
+fun uidToAndroidUserName(uid: Long): String = when (uid) {
+  0L -> "root"
+  1000L -> "system"
+  2000L -> "shell"
+  1001L -> "phone"
+  1002L -> "bluetooth"
+  1003L -> "log"
+  1004L -> "wifi"
+  1005L -> "rild"
+  1006L -> "nfc"
+  1007L -> "media"
+  else -> {
+    val appId = uid % 100000
+    if (appId >= 10000) {
+      val userId = uid / 100000
+      "u${userId}_a${appId - 10000}"
+    } else {
+      uid.toString()
+    }
   }
 }
 
@@ -130,7 +135,7 @@ private fun resolvePackageForEntry(
   pm: PackageManager,
   installedPackages: Set<String>,
 ): String? {
-  val uid = entry.uid ?: androidUserNameToUid(entry.user)
+  val uid = entry.uid
   val packagesForUid = uid?.let {
     if (it < Process.FIRST_APPLICATION_UID) {
       null

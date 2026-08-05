@@ -242,7 +242,7 @@ class AppProcessLoader(
             }
             var processes = mutableListOf<com.yassernull.shappky.data.models.ProcessInfo>()
             var mainPid = "-"
-            var mainUser = "-"
+            val mainUser = appUid?.toLongOrNull()?.let { uidToAndroidUserName(it) } ?: "-"
             var totalCpu = 0.0
             var totalThreads = 0
             var totalRam = 0L
@@ -256,7 +256,6 @@ class AppProcessLoader(
               for (p in processes) {
                 if (p.name == app.packageName) {
                   mainPid = p.pid
-                  mainUser = p.user
                   mainFound = true
                 }
                 totalRam += p.ramKb
@@ -270,7 +269,6 @@ class AppProcessLoader(
               }
               if (!mainFound && processes.isNotEmpty()) {
                 mainPid = processes[0].pid
-                mainUser = "N/A"
               }
             }
 
@@ -280,7 +278,6 @@ class AppProcessLoader(
 
             if (mainPid == "-" && processes.isNotEmpty()) {
               mainPid = processes[0].pid
-              mainUser = "N/A"
             }
 
             val result = com.yassernull.shappky.data.models.AppDetailedInfo(
