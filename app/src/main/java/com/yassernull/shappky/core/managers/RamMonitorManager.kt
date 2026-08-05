@@ -1,9 +1,7 @@
 package com.yassernull.shappky.core.managers
 
 import android.os.Handler
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
+import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -58,33 +56,19 @@ class RamMonitorManager(
     }
   }
 
-  private fun readRamState(): RamState? {
-    return try {
-      val process = Runtime.getRuntime().exec("cat /proc/meminfo")
-      BufferedReader(InputStreamReader(process.inputStream)).use { reader ->
-        var memMax = 0
-        var memFree = 0
-        repeat(3) {
-          val line = reader.readLine() ?: return@repeat
-          when {
-            line.startsWith("MemTotal") -> memMax = line.split(Regex("\\s+"))[1].toInt()
-            line.startsWith("MemAvailable") -> memFree = line.split(Regex("\\s+"))[1].toInt()
-          }
-        }
-        process.waitFor()
-        if (memMax > 0 && memFree >= 0) RamState(memMax - memFree, memMax) else null
+  private fun readRamState(): RamState? = try {
+    var memMax = 0L
+    var memFree = 0L
+    for (line in File("/proc/meminfo").readLines()) {
+      when {
+        line.startsWith("MemTotal") -> memMax = line.split(Regex("\\s+"))[1].toLong()
+        line.startsWith("MemAvailable") -> memFree = line.split(Regex("\\s+"))[1].toLong()
       }
-    } catch (e: IOException) {
-      e.printStackTrace()
-      null
-    } catch (e: NumberFormatException) {
-      e.printStackTrace()
-      null
-    } catch (e: InterruptedException) {
-      Thread.currentThread().interrupt()
-      e.printStackTrace()
-      null
+      if (memMax > 0 && memFree > 0) break
     }
+    if (memMax > 0 && memFree >= 0) RamState((memMax - memFree).toInt(), memMax.toInt()) else null
+  } catch (_: Exception) {
+    null
   }
 
   private companion object {

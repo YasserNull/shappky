@@ -18,7 +18,6 @@ import android.service.quicksettings.TileService
 import androidx.core.app.NotificationCompat
 import com.yassernull.shappky.R
 import com.yassernull.shappky.core.managers.ShellManager
-import java.io.BufferedReader
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -70,22 +69,16 @@ class ShappkyService : Service() {
   }
 
   private fun getUsedRamMb(): Int = try {
-    val process = Runtime.getRuntime().exec("cat /proc/meminfo")
-    BufferedReader(java.io.InputStreamReader(process.inputStream)).use { reader ->
-      var memTotal = 0
-      var memFree = 0
-      var line = reader.readLine()
-      while (line != null) {
-        if (line.startsWith("MemTotal")) {
-          memTotal = line.split(Regex("\\s+"))[1].toInt()
-        } else if (line.startsWith("MemAvailable")) {
-          memFree = line.split(Regex("\\s+"))[1].toInt()
-        }
-        line = reader.readLine()
+    var memTotal = 0L
+    var memFree = 0L
+    for (line in java.io.File("/proc/meminfo").readLines()) {
+      when {
+        line.startsWith("MemTotal") -> memTotal = line.split(Regex("\\s+"))[1].toLong()
+        line.startsWith("MemAvailable") -> memFree = line.split(Regex("\\s+"))[1].toLong()
       }
-      process.waitFor()
-      if (memTotal > 0 && memFree >= 0) (memTotal - memFree) / 1024 else 0
+      if (memTotal > 0 && memFree > 0) break
     }
+    if (memTotal > 0 && memFree >= 0) ((memTotal - memFree) / 1024).toInt() else 0
   } catch (_: Exception) {
     0
   }
