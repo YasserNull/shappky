@@ -169,27 +169,11 @@ class ShappkyTriggerService : Service() {
           if ((hasInactivityRules || hasAutoBgRules) && inactivityCheckCounter >= 5) {
             inactivityCheckCounter = 0
             if (shellManager.isShellCommandReady()) {
-              val psOutput = shellManager.runShellCommandAndGetFullOutput("${com.yassernull.shappky.core.managers.ShellManager.TOYBOX_PATH} ps -A -o rss,name | grep '\\.' | grep -v '[-@]'")
+              val psOutput = shellManager.runShellCommandAndGetFullOutput(com.yassernull.shappky.core.managers.psAllProcessesCommand())
               if (psOutput != null) {
-                val runningPackages = mutableSetOf<String>()
-                val packageRamUsage = mutableMapOf<String, Long>()
-
-                java.io.BufferedReader(java.io.StringReader(psOutput)).use { reader ->
-                  var line = reader.readLine()
-                  while (line != null) {
-                    val parts = line.trim().split(Regex("\\s+"))
-                    if (parts.size >= 2) {
-                      val rawPkg = parts[1].trim()
-                      val pkg = if (rawPkg.contains(":")) rawPkg.substringBefore(":") else rawPkg
-                      val rssKb = parts[0].trim().toLongOrNull() ?: 0L
-                      if (pkg.isNotEmpty() && pkg.contains(".")) {
-                        runningPackages.add(pkg)
-                        packageRamUsage[pkg] = (packageRamUsage[pkg] ?: 0L) + rssKb
-                      }
-                    }
-                    line = reader.readLine()
-                  }
-                }
+                val packageUsages = com.yassernull.shappky.core.managers.aggregatePsOutputToPackages(psOutput, packageManager)
+                val runningPackages = packageUsages.keys.toMutableSet()
+                val packageRamUsage = packageUsages.mapValues { it.value.ramKb }
 
                 foregroundTracker.cleanUpOldForegroundRecords(runningPackages, currentForeground)
                 foregroundTracker.initNewRunningPackages(runningPackages, currentForeground, now)

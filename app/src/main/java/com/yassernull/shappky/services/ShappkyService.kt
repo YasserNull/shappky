@@ -19,8 +19,6 @@ import androidx.core.app.NotificationCompat
 import com.yassernull.shappky.R
 import com.yassernull.shappky.core.managers.ShellManager
 import java.io.BufferedReader
-import java.io.IOException
-import java.io.StringReader
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -123,36 +121,15 @@ class ShappkyService : Service() {
 
     val dumpOutput = shellManager.runShellCommandAndGetFullOutput("dumpsys activity activities") ?: return
     val psOutput =
-      shellManager.runShellCommandAndGetFullOutput("${com.yassernull.shappky.core.managers.ShellManager.TOYBOX_PATH} ps -A -o rss,name | grep '\\.' | grep -v '[-@]'")
+      shellManager.runShellCommandAndGetFullOutput(com.yassernull.shappky.core.managers.psAllProcessesCommand())
         ?: return
 
-    val runningPackages = HashSet<String>()
+    val packageUsages = com.yassernull.shappky.core.managers.aggregatePsOutputToPackages(psOutput, packageManager)
+    val runningPackages = HashSet(packageUsages.keys)
     val packageRamUsage = HashMap<String, Int>()
+    packageUsages.forEach { (pkg, usage) -> packageRamUsage[pkg] = (usage.ramKb / 1024L).toInt() }
+
     val pm = packageManager
-    try {
-      BufferedReader(StringReader(psOutput)).use { reader ->
-        var line = reader.readLine()
-        while (line != null) {
-          val parts = line.trim().split(Regex("\\s+"))
-          if (parts.size >= 2) {
-            val rawPackageName = parts[1].trim()
-            val packageName = if (rawPackageName.contains(":")) rawPackageName.substringBefore(":") else rawPackageName
-            val rssKb = parts[0].trim().toLongOrNull() ?: 0L
-            if (packageName.isNotEmpty() && packageName.contains(".")) {
-              try {
-                pm.getApplicationInfo(packageName, 0)
-                runningPackages.add(packageName)
-                packageRamUsage[packageName] = (packageRamUsage[packageName] ?: 0) + (rssKb / 1024L).toInt() // Convert to MB
-              } catch (_: PackageManager.NameNotFoundException) {
-              }
-            }
-          }
-          line = reader.readLine()
-        }
-      }
-    } catch (e: IOException) {
-      e.printStackTrace()
-    }
 
     val toKill = runningPackages.filter { pkg ->
       try {

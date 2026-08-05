@@ -101,23 +101,12 @@ class AppProcessLoader(
           val protectedApps = ProtectionManager.getProtectedApps(context)
 
           if (shellManager.isShellCommandReady()) {
-            val command = "${ShellManager.TOYBOX_PATH} ps -A -o %cpu,pid,user,rss,name,uid"
             try {
-              val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
+              val fullOutput = shellManager.runShellCommandAndGetFullOutput(psAllProcessesCommand())
               if (fullOutput != null) {
-                val entries = parsePsOutputToProcessEntries(fullOutput)
-                val pm = context.packageManager
-                val packageUsageMap = aggregateByPackage(entries, pm)
-                val validatedEntries = packageUsageMap.filterKeys { pkg ->
-                  try {
-                    pm.getApplicationInfo(pkg, 0)
-                    true
-                  } catch (_: PackageManager.NameNotFoundException) {
-                    false
-                  }
-                }
-                val runningEntries = validatedEntries.map { (pkg, usage) -> "$pkg:${usage.ramKb}:${usage.cpuPercent}" }.toSet()
-                Log.d(TAG, "loadBackgroundApps psLines=${fullOutput.lines().size}, parsedEntries=${entries.size}, packages=${packageUsageMap.size}, validated=${validatedEntries.size}")
+                val packageUsageMap = aggregatePsOutputToPackages(fullOutput, context.packageManager, installedPackages)
+                val runningEntries = packageUsageMap.map { (pkg, usage) -> "$pkg:${usage.ramKb}:${usage.cpuPercent}" }.toSet()
+                Log.d(TAG, "loadBackgroundApps psLines=${fullOutput.lines().size}, packages=${packageUsageMap.size}")
                 Log.d(TAG, "loadBackgroundApps aggregated=${packageUsageMap.entries.joinToString { "${it.key}=${it.value.ramKb}KB" }}")
 
                 result = AppModelFilter.buildRunningAppModels(
@@ -203,12 +192,10 @@ class AppProcessLoader(
         val ramUsageByPackage = mutableMapOf<String, Long>()
         try {
           if (requestedPackages.isNotEmpty() && shellManager.isShellCommandReady()) {
-            val command = "${ShellManager.TOYBOX_PATH} ps -A -o %cpu,pid,user,rss,name,uid"
             try {
-              val fullOutput = shellManager.runShellCommandAndGetFullOutput(command)
+              val fullOutput = shellManager.runShellCommandAndGetFullOutput(psAllProcessesCommand())
               if (fullOutput != null) {
-                val entries = parsePsOutputToProcessEntries(fullOutput)
-                val aggregated = aggregateByPackage(entries, context.packageManager)
+                val aggregated = aggregatePsOutputToPackages(fullOutput, context.packageManager, installedPackages)
                 Log.d(TAG, "loadAppsRamUsage aggregated=${aggregated.entries.joinToString { "${it.key}=${it.value.ramKb}KB" }}")
                 for ((pkg, usage) in aggregated) {
                   if (pkg in requestedPackages) {
@@ -239,8 +226,7 @@ class AppProcessLoader(
             val appUid = resolveAppUid(app.packageName)
             Log.d(TAG, "loadAppDetailedInfo package=${app.packageName}, resolvedUid=$appUid")
             if (appUid != null) {
-              val uidCommand = "${ShellManager.TOYBOX_PATH} ps -A -o %cpu,pid,user,rss,name,uid"
-              val uidOutput = shellManager.runShellCommandAndGetFullOutput(uidCommand)
+              val uidOutput = shellManager.runShellCommandAndGetFullOutput(psAllProcessesCommand())
               if (!uidOutput.isNullOrBlank()) {
                 fullOutput = uidOutput
                 Log.d(TAG, "loadAppDetailedInfo full ps output lines=${uidOutput.lines().size}")
@@ -251,7 +237,7 @@ class AppProcessLoader(
             if (fullOutput == null) {
               val escapedPkg = app.packageName.replace(".", "\\.")
               fullOutput = shellManager.runShellCommandAndGetFullOutput(
-                "${ShellManager.TOYBOX_PATH} ps -A -o %cpu,pid,user,rss,name,uid | grep '\\.' | grep -v '[-@]' | grep -E '" + escapedPkg + "([^A-Za-z0-9]|\$)'",
+                psAllProcessesCommand() + " | grep '\\.' | grep -v '[-@]' | grep -E '" + escapedPkg + "([^A-Za-z0-9]|\$)'",
               )
             }
             var processes = mutableListOf<com.yassernull.shappky.data.models.ProcessInfo>()
@@ -320,49 +306,6 @@ class AppProcessLoader(
     context.packageManager.getApplicationInfo(packageName, 0).uid.toString()
   } catch (_: PackageManager.NameNotFoundException) {
     null
-  }
-
-  private fun aggregateByPackage(entries: List<PsProcessEntry>, pm: PackageManager): Map<String, PackageUsage> {
-    val map = mutableMapOf<String, PackageUsage>()
-    for (entry in entries) {
-      val packageName = resolvePackageForEntry(entry, pm) ?: continue
-      val current = map[packageName] ?: PackageUsage(0L, 0.0)
-      map[packageName] = PackageUsage(
-        ramKb = current.ramKb + entry.rssKb,
-        cpuPercent = current.cpuPercent + entry.cpuPercent,
-      )
-    }
-    return map
-  }
-
-  private fun resolvePackageForEntry(entry: PsProcessEntry, pm: PackageManager): String? {
-    val uid = entry.uid ?: androidUserNameToUid(entry.user)
-    val packagesForUid = uid?.let {
-      if (it < android.os.Process.FIRST_APPLICATION_UID) {
-        null
-      } else {
-        try {
-          pm.getPackagesForUid(it.toInt())
-        } catch (_: Exception) {
-          null
-        }
-      }
-    }
-    val byUidPrefix = packagesForUid?.firstOrNull { pkg -> entry.name.startsWith(pkg) }
-    val byName = resolvePackageForName(entry.name)
-    return when {
-      byUidPrefix != null -> byUidPrefix
-      byName != null -> byName
-      else -> packagesForUid?.firstOrNull()
-    }
-  }
-
-  private fun resolvePackageForName(name: String): String? {
-    val base = name.substringBefore(":")
-    if (base in installedPackages) return base
-    return installedPackages.firstOrNull { pkg ->
-      name.length >= pkg.length + 1 && name.startsWith(pkg) && !name[pkg.length].isLetterOrDigit()
-    }
   }
 
   fun getHiddenApps(): Set<String> = sharedPreferences.getStringSet(KEY_HIDDEN_APPS, HashSet()) ?: HashSet()

@@ -1,10 +1,15 @@
 package com.yassernull.shappky.core.managers
 
+import android.content.pm.PackageManager
 import android.os.Process
 import java.io.BufferedReader
 import java.io.StringReader
 import java.util.Locale
 import java.util.regex.Pattern
+
+const val PS_ALL_PROCESSES_COMMAND = "ps -A -o %cpu,pid,user,rss,name,uid"
+
+fun psAllProcessesCommand(): String = "${ShellManager.TOYBOX_PATH} $PS_ALL_PROCESSES_COMMAND"
 
 data class PsProcessEntry(
   val name: String,
@@ -98,5 +103,58 @@ fun parseMemoryToKb(ram: String?): Long {
     }
   } catch (_: NumberFormatException) {
     0
+  }
+}
+
+fun aggregatePsOutputToPackages(
+  output: String,
+  pm: PackageManager,
+  installedPackages: Set<String>? = null,
+): Map<String, PackageUsage> {
+  val packageNames = installedPackages
+    ?: pm.getInstalledApplications(0).mapTo(HashSet()) { it.packageName }
+  val map = mutableMapOf<String, PackageUsage>()
+  for (entry in parsePsOutputToProcessEntries(output)) {
+    val packageName = resolvePackageForEntry(entry, pm, packageNames) ?: continue
+    val current = map[packageName] ?: PackageUsage(0L, 0.0)
+    map[packageName] = PackageUsage(
+      ramKb = current.ramKb + entry.rssKb,
+      cpuPercent = current.cpuPercent + entry.cpuPercent,
+    )
+  }
+  return map
+}
+
+private fun resolvePackageForEntry(
+  entry: PsProcessEntry,
+  pm: PackageManager,
+  installedPackages: Set<String>,
+): String? {
+  val uid = entry.uid ?: androidUserNameToUid(entry.user)
+  val packagesForUid = uid?.let {
+    if (it < Process.FIRST_APPLICATION_UID) {
+      null
+    } else {
+      try {
+        pm.getPackagesForUid(it.toInt())
+      } catch (_: Exception) {
+        null
+      }
+    }
+  }
+  val byUidPrefix = packagesForUid?.firstOrNull { pkg -> entry.name.startsWith(pkg) }
+  val byName = resolvePackageForName(entry.name, installedPackages)
+  return when {
+    byUidPrefix != null -> byUidPrefix
+    byName != null -> byName
+    else -> packagesForUid?.firstOrNull()
+  }
+}
+
+private fun resolvePackageForName(name: String, installedPackages: Set<String>): String? {
+  val base = name.substringBefore(":")
+  if (base in installedPackages) return base
+  return installedPackages.firstOrNull { pkg ->
+    name.length >= pkg.length + 1 && name.startsWith(pkg) && !name[pkg.length].isLetterOrDigit()
   }
 }
