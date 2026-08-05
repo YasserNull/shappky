@@ -43,7 +43,7 @@ fun ListWidgetConfigAppsList(appWidgetId: Int) {
     mutableStateOf(prefs.getBoolean(WidgetPreferences.getListAutoRefreshAppsKey(appWidgetId), true))
   }
   var appsAutoRefreshIntervalMs by remember {
-    mutableStateOf(prefs.getLong("appsAutoRefreshIntervalMs", 1000L))
+    mutableStateOf(prefs.getLong("appsAutoRefreshIntervalMs", AppsListPreferences.DEFAULT_APPS_AUTO_REFRESH_INTERVAL_MS))
   }
 
   var showSortDialog by remember { mutableStateOf(false) }

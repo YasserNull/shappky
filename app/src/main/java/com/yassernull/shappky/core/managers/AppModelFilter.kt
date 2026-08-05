@@ -3,9 +3,16 @@ package com.yassernull.shappky.core.managers
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
+import android.util.LruCache
 import com.yassernull.shappky.data.models.AppModel
 
 object AppModelFilter {
+  private const val ICON_CACHE_SIZE = 128
+
+  private val iconCache = LruCache<String, Drawable>(ICON_CACHE_SIZE)
+
+  private fun iconFor(packageName: String, loader: () -> Drawable): Drawable = iconCache.get(packageName) ?: loader().also { iconCache.put(packageName, it) }
 
   fun buildRunningAppModels(
     runningEntries: Set<String>,
@@ -49,7 +56,7 @@ object AppModelFilter {
             appRam = formatMemorySize(ramUsage),
             ramKb = ramUsage,
             appCpu = String.format(java.util.Locale.US, "%.1f%%", cpuUsage),
-            appIcon = pm.getApplicationIcon(appInfo),
+            appIcon = iconFor(appInfo.packageName) { pm.getApplicationIcon(appInfo) },
             isSystemApp = isSystemApp,
             isPersistentApp = isPersistentApp,
             isProtected = isProtected,
@@ -83,7 +90,7 @@ object AppModelFilter {
           packageName = pkg,
           appRam = "-",
           ramKb = 0L,
-          appIcon = pm.getApplicationIcon(appInfo),
+          appIcon = iconFor(appInfo.packageName) { pm.getApplicationIcon(appInfo) },
           isSystemApp = isSystem,
           isPersistentApp = isPersistent,
           isProtected = isProtected,

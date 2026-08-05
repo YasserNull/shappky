@@ -4,6 +4,8 @@ import android.os.Handler
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 data class RamState(
   val usedKb: Int = 0,
@@ -18,6 +20,7 @@ class RamMonitorManager(
   private var refreshIntervalMs: Long = DEFAULT_REFRESH_INTERVAL_MS,
   private val onUpdate: (RamState) -> Unit,
 ) {
+  private val executor: ExecutorService = Executors.newSingleThreadExecutor()
   private var isMonitoring = false
   private var ramUsageRunnable: Runnable? = null
 
@@ -27,7 +30,7 @@ class RamMonitorManager(
     ramUsageRunnable = object : Runnable {
       override fun run() {
         if (!isMonitoring) return
-        readRamState()?.let(onUpdate)
+        readRamStateAsync()
         handler.postDelayed(this, refreshIntervalMs)
       }
     }
@@ -42,6 +45,17 @@ class RamMonitorManager(
     isMonitoring = false
     ramUsageRunnable?.let { handler.removeCallbacks(it) }
     ramUsageRunnable = null
+  }
+
+  private fun readRamStateAsync() {
+    executor.execute {
+      val state = readRamState()
+      if (state != null) {
+        handler.post {
+          if (isMonitoring) onUpdate(state)
+        }
+      }
+    }
   }
 
   private fun readRamState(): RamState? {

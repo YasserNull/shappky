@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.yassernull.shappky.R
 import com.yassernull.shappky.core.managers.ProtectionManager
+import com.yassernull.shappky.core.preferences.AppsListPreferences
 import com.yassernull.shappky.ui.components.ActionSettingRow
 import com.yassernull.shappky.ui.components.SettingsHeader
 import com.yassernull.shappky.ui.components.SwitchSettingRow
@@ -36,7 +37,11 @@ fun AppsListSection() {
 
   var appsAutoRefresh by remember { mutableStateOf(sharedPreferences.getBoolean("appsAutoRefresh", true)) }
   var appsAutoRefreshIntervalMs by remember {
-    mutableStateOf(sharedPreferences.getLong("appsAutoRefreshIntervalMs", 1000L).coerceAtLeast(1000L))
+    mutableStateOf(
+      sharedPreferences
+        .getLong("appsAutoRefreshIntervalMs", AppsListPreferences.DEFAULT_APPS_AUTO_REFRESH_INTERVAL_MS)
+        .coerceAtLeast(AppsListPreferences.DEFAULT_APPS_AUTO_REFRESH_INTERVAL_MS),
+    )
   }
 
   var sortMode by remember { mutableStateOf(sharedPreferences.getString("sortMode", "name") ?: "name") }
