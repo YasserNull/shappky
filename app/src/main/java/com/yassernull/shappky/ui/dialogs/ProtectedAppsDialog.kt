@@ -31,9 +31,9 @@ import com.yassernull.shappky.R
 import com.yassernull.shappky.core.managers.ProtectionManager
 import com.yassernull.shappky.core.managers.ShellManager
 import com.yassernull.shappky.data.models.AppModel
-import com.yassernull.shappky.ui.components.ProtectedAppsAppList
 import com.yassernull.shappky.ui.components.ProtectedAppsSearchBar
 import com.yassernull.shappky.ui.components.ProtectedAppsSpecialSection
+import com.yassernull.shappky.ui.components.protectedAppsAppList
 import com.yassernull.shappky.utils.applyRegexToSelectedPackages
 import com.yassernull.shappky.utils.collectActiveWidgetPackages
 import com.yassernull.shappky.utils.getAndroidPackages
@@ -203,13 +203,11 @@ fun ProtectedAppsDialog(
               )
             }
 
-            item {
-              ProtectedAppsAppList(
-                apps = filtered,
-                selectedPackages = selectedPackages,
-                onToggle = ::togglePackage,
-              )
-            }
+            protectedAppsAppList(
+              apps = filtered,
+              selectedPackages = selectedPackages,
+              onToggle = ::togglePackage,
+            )
           }
         }
       }

@@ -7,23 +7,23 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yassernull.shappky.data.models.AppModel
 
-@Composable
-fun ProtectedAppsAppList(
+fun LazyListScope.protectedAppsAppList(
   apps: List<AppModel>,
   selectedPackages: Set<String>,
   onToggle: (String) -> Unit,
 ) {
-  apps.forEach { app ->
+  items(apps, key = { it.packageName }) { app ->
     Row(
       modifier = Modifier
         .fillMaxWidth()
