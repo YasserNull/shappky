@@ -3,6 +3,11 @@ package com.yassernull.shappky.ui.activities.main.logic
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.yassernull.shappky.core.managers.AutoRefreshManager
@@ -45,12 +51,21 @@ fun AppsList(
   ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
       items(apps, key = { it.packageName }) { app ->
-        AppRow(
-          app = app,
-          onToggle = { onToggleApp(app) },
-          onKill = { force -> onKillApp(app, force) },
-          onLongClick = { onAppLongClick(app) },
-        )
+        AnimatedVisibility(
+          visibleState = remember(app.packageName) {
+            MutableTransitionState(false).apply { targetState = true }
+          },
+          enter = fadeIn(tween(300)) +
+            slideInVertically(initialOffsetY = { it / 3 }, animationSpec = tween(300)),
+          modifier = Modifier.animateItem(),
+        ) {
+          AppRow(
+            app = app,
+            onToggle = { onToggleApp(app) },
+            onKill = { force -> onKillApp(app, force) },
+            onLongClick = { onAppLongClick(app) },
+          )
+        }
       }
     }
   }
