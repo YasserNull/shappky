@@ -1,5 +1,6 @@
 package com.yassernull.shappky.utils
 
+import com.yassernull.shappky.core.preferences.AppsListPreferences.SORT_BY_CPU
 import com.yassernull.shappky.core.preferences.AppsListPreferences.SORT_BY_RAM
 import com.yassernull.shappky.core.preferences.AppsListPreferences.SORT_BY_TYPE
 import com.yassernull.shappky.data.models.AppModel
@@ -21,7 +22,15 @@ object AppSortUtils {
         } else {
           compareBy { it.ramKb }
         }
-        appTypeComparator.then(ramComparator).thenBy(String.CASE_INSENSITIVE_ORDER) { it.appName }
+        ramComparator.thenBy(String.CASE_INSENSITIVE_ORDER) { it.appName }
+      }
+      SORT_BY_CPU -> {
+        val cpuComparator = if (descending) {
+          compareByDescending<AppModel> { it.cpuPercent }
+        } else {
+          compareBy<AppModel> { it.cpuPercent }
+        }
+        cpuComparator.thenBy(String.CASE_INSENSITIVE_ORDER) { it.appName }
       }
       SORT_BY_TYPE -> {
         val typeComparator = if (descending) {

@@ -118,6 +118,7 @@ fun AppsListSettingsDialogs(
       initialDescending = sortDescending,
       sortByName = "name",
       sortByRam = "ram",
+      sortByCpu = "cpu",
       onDismiss = onDismissSort,
       onApply = onSortApply,
     )

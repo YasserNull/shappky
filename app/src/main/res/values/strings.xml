@@ -75,6 +75,7 @@
     <string name="sort_apps_title">Sort apps by</string>
     <string name="sort_by_name">Name</string>
     <string name="sort_by_ram_usage">RAM usage</string>
+    <string name="sort_by_cpu_usage">CPU usage</string>
     <string name="sort_by_type">Type</string>
     <string name="sort_descending">Descending</string>
     <string name="ok">Ok</string>

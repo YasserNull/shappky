@@ -11,6 +11,7 @@ object AppsListPreferences {
 
   const val SORT_BY_NAME = "name"
   const val SORT_BY_RAM = "ram"
+  const val SORT_BY_CPU = "cpu"
   const val SORT_BY_TYPE = "type"
 
   const val KEY_APPS_AUTO_REFRESH = "appsAutoRefresh"

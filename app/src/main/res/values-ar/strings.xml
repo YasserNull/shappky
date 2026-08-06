@@ -69,6 +69,7 @@
     <string name="sort_apps_title">ترتيب التطبيقات حسب</string>
     <string name="sort_by_name">الاسم</string>
     <string name="sort_by_ram_usage">استهلاك ذاكرة الوصول العشوائي</string>
+    <string name="sort_by_cpu_usage">استهلاك المعالج</string>
     <string name="sort_by_type">النوع</string>
     <string name="sort_descending">تنازلي</string>
     <string name="ok">موافق</string>

@@ -8,6 +8,7 @@ data class AppModel(
   var appRam: String,
   var ramKb: Long,
   var appCpu: String = "",
+  var cpuPercent: Double = 0.0,
   var appIcon: Drawable,
   var isSystemApp: Boolean,
   var isPersistentApp: Boolean,

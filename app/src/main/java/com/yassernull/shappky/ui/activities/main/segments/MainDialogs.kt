@@ -15,6 +15,7 @@ fun MainDialogs(
   initialSortDescending: Boolean,
   sortByName: String,
   sortByRam: String,
+  sortByCpu: String,
   onApplySort: (String, Boolean) -> Unit,
   showFilterDialog: Boolean,
   onDismissFilterDialog: () -> Unit,
@@ -31,6 +32,7 @@ fun MainDialogs(
       initialDescending = initialSortDescending,
       sortByName = sortByName,
       sortByRam = sortByRam,
+      sortByCpu = sortByCpu,
       onDismiss = onDismissSortDialog,
       onApply = onApplySort,
     )

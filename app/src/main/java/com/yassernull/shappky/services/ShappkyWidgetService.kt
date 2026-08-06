@@ -87,6 +87,13 @@ class ShappkyWidgetFactory(
           loadedApps.sortedBy { it.ramKb }
         }
       }
+      "cpu" -> {
+        if (descending) {
+          loadedApps.sortedByDescending { it.cpuPercent }
+        } else {
+          loadedApps.sortedBy { it.cpuPercent }
+        }
+      }
       "type" -> {
         val typeComparator = if (descending) {
           compareByDescending<AppModel> {

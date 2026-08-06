@@ -69,6 +69,7 @@ fun ListWidgetConfigAppsList(appWidgetId: Int) {
 
   val sortModeText = when (sortMode) {
     "ram" -> stringResource(R.string.sort_by_ram_usage)
+    "cpu" -> stringResource(R.string.sort_by_cpu_usage)
     "type" -> stringResource(R.string.sort_by_type)
     else -> stringResource(R.string.sort_by_name)
   }

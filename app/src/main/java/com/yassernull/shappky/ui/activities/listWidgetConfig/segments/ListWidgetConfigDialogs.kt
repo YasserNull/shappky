@@ -25,6 +25,7 @@ fun ListWidgetConfigAppsListDialogs(
       initialDescending = sortDescending,
       sortByName = "name",
       sortByRam = "ram",
+      sortByCpu = "cpu",
       onDismiss = onDismissSortDialog,
       onApply = onApplySort,
     )

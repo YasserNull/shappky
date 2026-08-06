@@ -114,6 +114,7 @@ fun MainActivity.handleOnCreate(savedInstanceState: Bundle?) {
         initialSortDescending = prefs.getBoolean(AppsListPreferences.KEY_SORT_DESCENDING, false),
         sortByName = AppsListPreferences.SORT_BY_NAME,
         sortByRam = AppsListPreferences.SORT_BY_RAM,
+        sortByCpu = AppsListPreferences.SORT_BY_CPU,
         hiddenApps = AppsListLogic.appManager.getHiddenApps(),
         onSelectAll = { selected ->
           AppsListLogic.replaceAllSelection(activity, selected)

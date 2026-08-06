@@ -56,6 +56,7 @@ object AppModelFilter {
             appRam = formatMemorySize(ramUsage),
             ramKb = ramUsage,
             appCpu = String.format(java.util.Locale.US, "%.1f%%", cpuUsage),
+            cpuPercent = cpuUsage,
             appIcon = iconFor(appInfo.packageName) { pm.getApplicationIcon(appInfo) },
             isSystemApp = isSystemApp,
             isPersistentApp = isPersistentApp,

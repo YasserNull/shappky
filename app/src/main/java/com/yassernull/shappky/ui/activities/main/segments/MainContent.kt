@@ -40,6 +40,7 @@ fun MainContent(
   initialSortDescending: Boolean,
   sortByName: String,
   sortByRam: String,
+  sortByCpu: String,
   hiddenApps: Set<String>,
   onSelectAll: (Boolean) -> Unit,
   onRefresh: () -> Unit,
@@ -153,6 +154,7 @@ fun MainContent(
     initialSortDescending = initialSortDescending,
     sortByName = sortByName,
     sortByRam = sortByRam,
+    sortByCpu = sortByCpu,
     onApplySort = { mode, desc ->
       onApplySort(mode, desc)
       showSortDialog = false

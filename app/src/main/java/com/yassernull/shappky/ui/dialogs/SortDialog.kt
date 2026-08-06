@@ -26,6 +26,7 @@ fun SortDialog(
   initialDescending: Boolean,
   sortByName: String,
   sortByRam: String,
+  sortByCpu: String,
   sortByType: String = "type",
   onDismiss: () -> Unit,
   onApply: (sortMode: String, descending: Boolean) -> Unit,
@@ -49,6 +50,11 @@ fun SortDialog(
           text = stringResource(R.string.sort_by_ram_usage),
           selected = selectedSortMode == sortByRam,
           onClick = { selectedSortMode = sortByRam },
+        )
+        DialogRadioRow(
+          text = stringResource(R.string.sort_by_cpu_usage),
+          selected = selectedSortMode == sortByCpu,
+          onClick = { selectedSortMode = sortByCpu },
         )
         DialogRadioRow(
           text = stringResource(R.string.sort_by_type),
