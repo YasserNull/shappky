@@ -79,8 +79,6 @@ fun AddTriggerContent(
         onSelectUserAppsChange = { selectUserApps = it },
         selectSystemApps = selectSystemApps,
         onSelectSystemAppsChange = { selectSystemApps = it },
-        selectPersistentApps = selectPersistentApps,
-        onSelectPersistentAppsChange = { selectPersistentApps = it },
         excludedApps = excludedApps,
         onExcludedAppsChange = { excludedApps = it },
         manuallySelectedApps = manuallySelectedApps,
