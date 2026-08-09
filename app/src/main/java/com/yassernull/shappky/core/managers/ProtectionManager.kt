@@ -1,7 +1,6 @@
 package com.yassernull.shappky.core.managers
 
 import android.app.WallpaperManager
-import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -13,6 +12,8 @@ object ProtectionManager {
   private const val TAG = "ProtectionManager"
   private const val KEY_PROTECTED_APPS = "protectedApps"
   private const val KEY_PROTECTED_REGEX = "protectedRegex"
+  private const val KEY_PROTECTED_EXEMPTIONS = "protectedAppsExemptions"
+  private const val KEY_GROUP_PREFIX = "group_"
   private const val PREFERENCES_NAME = "AppPreferences"
 
   fun getProtectedApps(context: Context): Set<String> {
@@ -34,21 +35,42 @@ object ProtectionManager {
 
   fun getProtectedRegex(context: Context): String {
     val sharedPrefs = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
-    if (sharedPrefs.contains(KEY_PROTECTED_REGEX)) {
-      return sharedPrefs.getString(KEY_PROTECTED_REGEX, "") ?: ""
-    }
-
-    val isXiaomi = android.os.Build.MANUFACTURER.equals("Xiaomi", ignoreCase = true)
-    return if (isXiaomi) {
-      "com.miui.*|com.xiaomi.*|com.lbe.security.miui"
-    } else {
-      ""
-    }
+    return sharedPrefs.getString(KEY_PROTECTED_REGEX, "") ?: ""
   }
 
   fun saveProtectedRegex(context: Context, regex: String) {
     val sharedPrefs = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
     sharedPrefs.edit().putString(KEY_PROTECTED_REGEX, regex).apply()
+  }
+
+  fun getProtectedAppsExemptions(context: Context): Set<String> {
+    val sharedPrefs = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+    return sharedPrefs.getStringSet(KEY_PROTECTED_EXEMPTIONS, null) ?: emptySet()
+  }
+
+  fun saveProtectedAppsExemptions(context: Context, apps: Set<String>) {
+    val sharedPrefs = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+    sharedPrefs.edit().putStringSet(KEY_PROTECTED_EXEMPTIONS, apps).apply()
+  }
+
+  fun getGroupEnabled(context: Context, group: String): Boolean = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+    .getBoolean(KEY_GROUP_PREFIX + group + "_enabled", false)
+
+  fun getGroupMembers(context: Context, group: String): Set<String> = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+    .getStringSet(KEY_GROUP_PREFIX + group + "_members", null) ?: emptySet()
+
+  fun saveGroupState(context: Context, group: String, enabled: Boolean, members: Set<String>) {
+    context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+      .edit()
+      .putBoolean(KEY_GROUP_PREFIX + group + "_enabled", enabled)
+      .putStringSet(KEY_GROUP_PREFIX + group + "_members", members)
+      .apply()
+  }
+
+  fun isPackageProtected(context: Context, packageName: String): Boolean {
+    if (getProtectedApps(context).contains(packageName)) return true
+    return isAppProtectedByRegex(context, packageName) &&
+      !getProtectedAppsExemptions(context).contains(packageName)
   }
 
   fun isAppProtectedByRegex(context: Context, packageName: String): Boolean {
@@ -109,17 +131,6 @@ object ProtectionManager {
     } catch (e: Exception) {
       Log.e(TAG, "Error getting default wallpaper", e)
     }
-    if (!defaultSet.any { it.contains("wallpaper", ignoreCase = true) }) {
-      try {
-        val wallpaperIntent = Intent("android.service.wallpaper.WallpaperService")
-        val wallpaperServices = pm.queryIntentServices(wallpaperIntent, PackageManager.GET_META_DATA)
-        for (service in wallpaperServices) {
-          service.serviceInfo.packageName?.let { defaultSet.add(it) }
-        }
-      } catch (e: Exception) {
-        Log.e(TAG, "Error finding wallpaper services via PackageManager", e)
-      }
-    }
 
     // com.android.* and android.* packages
     try {
@@ -145,19 +156,6 @@ object ProtectionManager {
       }
     } catch (e: Exception) {
       Log.e(TAG, "Error listing Google services for default protection", e)
-    }
-
-    // Widget providers
-    try {
-      val awm = AppWidgetManager.getInstance(context)
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        val providers = awm.getInstalledProviders()
-        for (provider in providers) {
-          provider.provider.packageName?.let { defaultSet.add(it) }
-        }
-      }
-    } catch (e: Exception) {
-      Log.e(TAG, "Error getting widget providers for default protection", e)
     }
 
     return defaultSet

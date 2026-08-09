@@ -373,7 +373,7 @@ class TriggerRuleEvaluator(
       val manuallySelectedApps = trigger.manuallySelectedApps
 
       val candidatePackages = runningPackages.filter { pkg ->
-        if (pkg == "com.yassernull.shappky" || protectedApps.contains(pkg) || ProtectionManager.isAppProtectedByRegex(context, pkg) || excludedApps.contains(pkg)) return@filter false
+        if (pkg == "com.yassernull.shappky" || protectedApps.contains(pkg) || ProtectionManager.isPackageProtected(context, pkg) || excludedApps.contains(pkg)) return@filter false
         val matchesManual = manuallySelectedApps.contains(pkg)
         if (matchesManual) return@filter true
         if (manuallySelectedApps.isNotEmpty()) return@filter false
@@ -503,7 +503,7 @@ class TriggerRuleEvaluator(
 
       // 1. Running packages matching the trigger (skip protected & persistent for sure)
       val runningMatches = runningPackages.filter { pkg ->
-        if (pkg == context.packageName || protectedApps.contains(pkg) || ProtectionManager.isAppProtectedByRegex(context, pkg) || trigger.excludedApps.contains(pkg)) {
+        if (pkg == context.packageName || protectedApps.contains(pkg) || ProtectionManager.isPackageProtected(context, pkg) || trigger.excludedApps.contains(pkg)) {
           Log.d(TAG, "evaluateAutoStartedBackgroundRules: '$pkg' excluded in trigger '${trigger.name}' (protected/excluded)")
           return@filter false
         }

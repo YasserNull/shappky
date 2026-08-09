@@ -260,7 +260,7 @@
     <!-- Hardcoded strings fixes -->
     <string name="filter_content_desc">تصفية</string>
     <string name="regex_pattern_label">نمط Regex</string>
-    <string name="regex_placeholder">com.miui.*|com.xiaomi.*|com.lbe.security.miui</string>
+    <string name="regex_placeholder"></string>
     <string name="not_found_format">%1$s: غير موجود</string>
     <string name="pid_label">PID</string>
     <string name="user_label">المستخدم</string>

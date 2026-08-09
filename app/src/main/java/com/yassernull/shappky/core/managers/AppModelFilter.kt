@@ -36,8 +36,7 @@ object AppModelFilter {
       try {
         if (hiddenApps.contains(packageName)) continue
 
-        val isProtected = protectedApps.contains(packageName) ||
-          ProtectionManager.isAppProtectedByRegex(context, packageName)
+        val isProtected = ProtectionManager.isPackageProtected(context, packageName)
 
         val appInfo = pm.getApplicationInfo(packageName, 0)
         val isPersistentApp = appInfo.flags and ApplicationInfo.FLAG_PERSISTENT != 0
@@ -82,8 +81,7 @@ object AppModelFilter {
       val isPersistent = appInfo.flags and ApplicationInfo.FLAG_PERSISTENT != 0
       val label = pm.getApplicationLabel(appInfo).toString()
       val pkg = appInfo.packageName
-      val isProtected = protectedApps.contains(pkg) ||
-        ProtectionManager.isAppProtectedByRegex(context, pkg)
+      val isProtected = ProtectionManager.isPackageProtected(context, pkg)
 
       allApps.add(
         AppModel(

@@ -17,7 +17,7 @@ import com.yassernull.shappky.R
 
 @Composable
 fun ProtectedAppsSpecialSection(
-  selectedPackages: Set<String>,
+  selfChecked: Boolean,
   onToggleSelf: (Boolean) -> Unit,
   launcherPackage: String?,
   launcherChecked: Boolean,
@@ -45,10 +45,9 @@ fun ProtectedAppsSpecialSection(
 ) {
   val context = LocalContext.current
 
-  val selfPackage = context.packageName
   SpecialCheckboxRow(
     text = stringResource(R.string.app_name),
-    checked = selectedPackages.contains(selfPackage),
+    checked = selfChecked,
     onCheckedChange = onToggleSelf,
   )
 

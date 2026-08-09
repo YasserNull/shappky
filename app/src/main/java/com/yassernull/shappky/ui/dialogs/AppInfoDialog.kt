@@ -44,8 +44,9 @@ fun AppInfoDialog(
     mutableStateOf(prefs.getStringSet(AppProcessLoader.KEY_HIDDEN_APPS, emptySet()).orEmpty().contains(info.app.packageName))
   }
   var isProtected by remember {
-    mutableStateOf(ProtectionManager.getProtectedApps(context).contains(info.app.packageName))
+    mutableStateOf(ProtectionManager.isPackageProtected(context, info.app.packageName))
   }
+  val packageName = info.app.packageName
   Dialog(onDismissRequest = onDismiss) {
     Surface(
       shape = RoundedCornerShape(16.dp),
@@ -144,9 +145,25 @@ fun AppInfoDialog(
             active = isProtected,
             onClick = {
               isProtected = !isProtected
-              val protectedApps = ProtectionManager.getProtectedApps(context).toMutableSet()
-              if (isProtected) protectedApps.add(info.app.packageName) else protectedApps.remove(info.app.packageName)
-              ProtectionManager.saveProtectedApps(context, protectedApps)
+              if (isProtected) {
+                val exemptApps = ProtectionManager.getProtectedAppsExemptions(context).toMutableSet()
+                exemptApps.remove(packageName)
+                ProtectionManager.saveProtectedAppsExemptions(context, exemptApps)
+                if (!ProtectionManager.isAppProtectedByRegex(context, packageName)) {
+                  val protectedApps = ProtectionManager.getProtectedApps(context).toMutableSet()
+                  protectedApps.add(packageName)
+                  ProtectionManager.saveProtectedApps(context, protectedApps)
+                }
+              } else {
+                val protectedApps = ProtectionManager.getProtectedApps(context).toMutableSet()
+                protectedApps.remove(packageName)
+                ProtectionManager.saveProtectedApps(context, protectedApps)
+                if (ProtectionManager.isAppProtectedByRegex(context, packageName)) {
+                  val exemptApps = ProtectionManager.getProtectedAppsExemptions(context).toMutableSet()
+                  exemptApps.add(packageName)
+                  ProtectionManager.saveProtectedAppsExemptions(context, exemptApps)
+                }
+              }
             },
           )
           TextButton(
