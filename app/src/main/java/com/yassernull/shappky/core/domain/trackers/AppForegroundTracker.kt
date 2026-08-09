@@ -7,8 +7,9 @@ class AppForegroundTracker {
     private const val TAG = "AppForegroundTracker"
   }
 
+  @Volatile
   var lastForegroundApp: String? = null
-  val lastForegroundTimeMap = mutableMapOf<String, Long>()
+  private val lastForegroundTimeMap = mutableMapOf<String, Long>()
 
   fun getForegroundPackage(dumpOutput: String): String? {
     val lines = dumpOutput.split("\n")
@@ -45,6 +46,7 @@ class AppForegroundTracker {
     return null
   }
 
+  @Synchronized
   fun updateForegroundApp(currentForeground: String?, now: Long): String? {
     if (currentForeground != null) {
       lastForegroundTimeMap[currentForeground] = now
@@ -57,10 +59,12 @@ class AppForegroundTracker {
     return null
   }
 
+  @Synchronized
   fun markAppAsInactive(appPackage: String, now: Long) {
     lastForegroundTimeMap[appPackage] = now
   }
 
+  @Synchronized
   fun cleanUpOldForegroundRecords(runningPackages: Set<String>, currentForeground: String?) {
     val iterator = lastForegroundTimeMap.iterator()
     while (iterator.hasNext()) {
@@ -71,6 +75,7 @@ class AppForegroundTracker {
     }
   }
 
+  @Synchronized
   fun initNewRunningPackages(runningPackages: Set<String>, currentForeground: String?, now: Long) {
     for (pkg in runningPackages) {
       if (pkg != currentForeground && !lastForegroundTimeMap.containsKey(pkg)) {
@@ -79,9 +84,11 @@ class AppForegroundTracker {
     }
   }
 
+  @Synchronized
   fun removeRecord(appPackage: String) {
     lastForegroundTimeMap.remove(appPackage)
   }
 
+  @Synchronized
   fun getLastActiveTime(appPackage: String, now: Long): Long = lastForegroundTimeMap[appPackage] ?: now
 }

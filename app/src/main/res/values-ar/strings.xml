@@ -195,12 +195,16 @@
     <string name="service_execution">التنفيذ</string>
     <string name="kill_when_reach_ram_limit">القتل عند تجاوز حد معين من ذاكرة الوصول العشوائي</string>
     <string name="service_duration">المدة الزمنية للخدمة</string>
+    <string name="duration_5s">5 ثوانٍ</string>
+    <string name="duration_10s">10 ثوانٍ</string>
     <string name="duration_15s">15 ثانية</string>
     <string name="duration_30s">30 ثانية</string>
     <string name="duration_1m">دقيقة واحدة</string>
     <string name="duration_2m">دقيقتان</string>
     <string name="duration_5m">5 دقائق</string>
     <string name="duration_10m">10 دقائق</string>
+    <string name="duration_15m">15 دقيقة</string>
+    <string name="duration_30m">30 دقيقة</string>
     <string name="service_kill_all_on_ram_limit">قتل كل التطبيقات عند بلوغ حد معين من ذاكرة الوصول العشوائي</string>
     <string name="service_kill_app_on_ram_limit">قتل تطبيق عند وصوله حد معين من ذاكرة الوصول العشوائي</string>
     <string name="ram_limit_enabled_summary">الحد المسموح: %1$d ميجابايت</string>

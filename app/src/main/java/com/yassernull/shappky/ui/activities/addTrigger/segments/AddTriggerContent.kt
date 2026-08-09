@@ -12,8 +12,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.yassernull.shappky.R
 import com.yassernull.shappky.data.models.TriggerModel
+import com.yassernull.shappky.ui.activities.addTrigger.sections.DEFAULT_TRIGGER_SERVICE_DURATION_MS
+import com.yassernull.shappky.ui.activities.addTrigger.sections.ExecutionSection
 import com.yassernull.shappky.ui.activities.addTrigger.sections.RulesSection
 import com.yassernull.shappky.ui.activities.addTrigger.sections.SelectAppsSection
+import com.yassernull.shappky.ui.activities.addTrigger.sections.defaultDurationForRules
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,6 +37,10 @@ fun AddTriggerContent(
   var manuallySelectedApps by remember { mutableStateOf(initialTrigger?.manuallySelectedApps ?: emptySet()) }
   var rules by remember { mutableStateOf(initialTrigger?.rules ?: emptyList()) }
   var triggerIsEnabled by remember { mutableStateOf(initialTrigger?.isEnabled ?: true) }
+  var serviceDuration by remember { mutableStateOf(initialTrigger?.serviceDuration ?: DEFAULT_TRIGGER_SERVICE_DURATION_MS) }
+  var isDurationUserSet by remember { mutableStateOf(initialTrigger != null) }
+
+  val effectiveDuration = if (isDurationUserSet) serviceDuration else defaultDurationForRules(rules)
 
   Scaffold(
     topBar = {
@@ -51,6 +58,7 @@ fun AddTriggerContent(
             manuallySelectedApps = manuallySelectedApps,
             rules = rules,
             isEnabled = triggerIsEnabled,
+            serviceDuration = effectiveDuration,
           )
           onSave(trigger)
         },
@@ -85,10 +93,25 @@ fun AddTriggerContent(
         onManuallySelectedAppsChange = { manuallySelectedApps = it },
       )
 
-      HorizontalDivider(
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-        modifier = Modifier.padding(vertical = 12.dp),
-      )
+      if (rules.isNotEmpty()) {
+        HorizontalDivider(
+          color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+          modifier = Modifier.padding(vertical = 12.dp),
+        )
+
+        ExecutionSection(
+          serviceDuration = effectiveDuration,
+          onServiceDurationChange = {
+            serviceDuration = it
+            isDurationUserSet = true
+          },
+        )
+
+        HorizontalDivider(
+          color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+          modifier = Modifier.padding(vertical = 12.dp),
+        )
+      }
 
       RulesSection(
         rules = rules,

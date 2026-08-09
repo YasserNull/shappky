@@ -83,6 +83,7 @@ object TriggerManager {
               manuallySelectedApps = manual,
               rules = rules,
               isEnabled = obj.optBoolean("isEnabled", true),
+              serviceDuration = obj.optLong("serviceDuration", 0),
             ),
           )
         } catch (e: Exception) {
@@ -106,6 +107,7 @@ object TriggerManager {
       obj.put("selectSystemApps", trigger.selectSystemApps)
       obj.put("selectPersistentApps", trigger.selectPersistentApps)
       obj.put("isEnabled", trigger.isEnabled)
+      obj.put("serviceDuration", trigger.serviceDuration)
 
       val excludedArray = JSONArray()
       trigger.excludedApps.forEach { excludedArray.put(it) }

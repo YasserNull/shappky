@@ -10,6 +10,7 @@ import com.yassernull.shappky.core.domain.trackers.SystemStateTracker
 import com.yassernull.shappky.core.managers.BackgroundAppManager
 import com.yassernull.shappky.core.managers.ProtectionManager
 import com.yassernull.shappky.core.managers.ShellManager
+import com.yassernull.shappky.core.managers.parseRecentsPackages
 import com.yassernull.shappky.data.models.RuleType
 import com.yassernull.shappky.data.models.TriggerModel
 import com.yassernull.shappky.data.models.TriggerRule
@@ -476,47 +477,71 @@ class TriggerRuleEvaluator(
 
   fun evaluateAutoStartedBackgroundRules(
     triggers: List<TriggerModel>,
-    enableRules: List<TriggerRule>,
-    disableRules: List<TriggerRule>,
     runningPackages: Set<String>,
-    currentForeground: String?,
     packageRamUsage: Map<String, Long>,
-    previousRunningPackages: Set<String>,
   ) {
-    if (previousRunningPackages.isEmpty()) return
-    val newPackages = runningPackages - previousRunningPackages
-    val autoStartedPackages = newPackages - (currentForeground?.let { setOf(it) } ?: emptySet())
-    if (autoStartedPackages.isEmpty()) return
+    if (runningPackages.isEmpty()) {
+      Log.d(TAG, "evaluateAutoStartedBackgroundRules: skipped, no running packages")
+      return
+    }
 
     val pm = context.packageManager
     val protectedApps = ProtectionManager.getProtectedApps(context)
 
+    // Packages the user opened (tasks still present in recents)
+    val recentsOutput = shellManager.runShellCommandAndGetFullOutput("dumpsys activity recents") ?: ""
+    if (recentsOutput.isBlank() || recentsOutput.startsWith("ERROR")) {
+      Log.w(TAG, "evaluateAutoStartedBackgroundRules: dumpsys activity recents empty/error, skipping")
+      return
+    }
+    val userLaunchedPackages = parseRecentsPackages(recentsOutput, pm)
+    Log.d(TAG, "evaluateAutoStartedBackgroundRules: userLaunchedPackages=$userLaunchedPackages")
+
     for (trigger in triggers) {
       val bgRules = trigger.rules.filter { it.type == RuleType.APP_BACKGROUND_STARTED }
       if (bgRules.isEmpty()) continue
-      val matchingPackages = autoStartedPackages.filter { pkg ->
-        if (pkg == context.packageName || protectedApps.contains(pkg) || ProtectionManager.isAppProtectedByRegex(context, pkg) || trigger.excludedApps.contains(pkg)) return@filter false
-        if (trigger.manuallySelectedApps.contains(pkg)) return@filter true
-        if (trigger.manuallySelectedApps.isNotEmpty()) return@filter false
+
+      // 1. Running packages matching the trigger (skip protected & persistent for sure)
+      val runningMatches = runningPackages.filter { pkg ->
+        if (pkg == context.packageName || protectedApps.contains(pkg) || ProtectionManager.isAppProtectedByRegex(context, pkg) || trigger.excludedApps.contains(pkg)) {
+          Log.d(TAG, "evaluateAutoStartedBackgroundRules: '$pkg' excluded in trigger '${trigger.name}' (protected/excluded)")
+          return@filter false
+        }
         try {
           val appInfo = pm.getApplicationInfo(pkg, 0)
           val isSystem = appInfo.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM != 0
           val isPersistent = appInfo.flags and android.content.pm.ApplicationInfo.FLAG_PERSISTENT != 0
-          val matchesUser = !isSystem && !isPersistent && trigger.selectUserApps
+          if (isPersistent) {
+            Log.d(TAG, "evaluateAutoStartedBackgroundRules: '$pkg' skipped (persistent)")
+            return@filter false
+          }
+          if (trigger.manuallySelectedApps.contains(pkg)) return@filter true
+          if (trigger.manuallySelectedApps.isNotEmpty()) {
+            Log.d(TAG, "evaluateAutoStartedBackgroundRules: '$pkg' not in manual list of '${trigger.name}', skipped")
+            return@filter false
+          }
+          val matchesUser = !isSystem && trigger.selectUserApps
           val matchesSystem = isSystem && trigger.selectSystemApps
-          val matchesPersistent = isPersistent && trigger.selectPersistentApps
-          matchesUser || matchesSystem || matchesPersistent
+          if (!matchesUser && !matchesSystem) {
+            Log.d(TAG, "evaluateAutoStartedBackgroundRules: '$pkg' no filter match (system=$isSystem, user=${trigger.selectUserApps}, systemApps=${trigger.selectSystemApps})")
+          }
+          matchesUser || matchesSystem
         } catch (_: Exception) {
           false
         }
       }
-      if (matchingPackages.isNotEmpty()) {
-        Log.d(TAG, "APP_BACKGROUND_STARTED MATCH FOUND! Triggering '${trigger.name}' for $matchingPackages")
+
+      // 3. Auto-started = running and NOT present in recents (user never opened it)
+      val autoStartedPackages = runningMatches - userLaunchedPackages
+      Log.d(TAG, "evaluateAutoStartedBackgroundRules: trigger='${trigger.name}' runningMatches=$runningMatches, autoStartedPackages=$autoStartedPackages")
+      if (autoStartedPackages.isNotEmpty()) {
+        Log.d(TAG, "APP_BACKGROUND_STARTED MATCH FOUND! Triggering '${trigger.name}' for $autoStartedPackages")
         val appManager = BackgroundAppManager(context, handler, executor, shellManager)
-        appManager.killPackages(matchingPackages.toList(), {
-          recentShappkyKills.addAll(matchingPackages)
-          val totalKb = matchingPackages.sumOf { packageRamUsage[it] ?: 0L }
+        appManager.killPackages(autoStartedPackages.toList(), {
+          recentShappkyKills.addAll(autoStartedPackages)
+          val totalKb = autoStartedPackages.sumOf { packageRamUsage[it] ?: 0L }
           val freedText = context.getString(R.string.free_up_memory, appManager.formatMemorySize(totalKb))
+          Log.d(TAG, "APP_BACKGROUND_STARTED kill completed for $autoStartedPackages, freed=$freedText")
           NotificationUtils.showTriggerFreedMemoryNotification(context, trigger.name, freedText)
         }, showToast = false)
       }

@@ -31,6 +31,7 @@ import java.util.concurrent.Executors
 class ShappkyTriggerService : Service() {
   private val executor: ExecutorService = Executors.newSingleThreadExecutor()
   private val triggerExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+  private val backgroundExecutor: ExecutorService = Executors.newSingleThreadExecutor()
   private val handler = Handler(Looper.getMainLooper())
   private lateinit var shellManager: ShellManager
 
@@ -39,7 +40,8 @@ class ShappkyTriggerService : Service() {
   private lateinit var actionExecutor: TriggerActionExecutor
   private lateinit var ruleEvaluator: TriggerRuleEvaluator
 
-  private var inactivityCheckCounter = 0
+  @Volatile
+  private var lastSharedForeground: String? = null
   private val previousRunningPackages = mutableSetOf<String>()
 
   override fun onCreate() {
@@ -68,6 +70,7 @@ class ShappkyTriggerService : Service() {
     }
     isRunning = true
     startTriggerMonitoring()
+    startBackgroundMonitoring()
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -95,6 +98,8 @@ class ShappkyTriggerService : Service() {
             Thread.sleep(10000L)
             continue
           }
+
+          val scanIntervalMs = minServiceDurationOrNull(activeTriggers) ?: 10000L
 
           val now = System.currentTimeMillis()
 
@@ -155,6 +160,7 @@ class ShappkyTriggerService : Service() {
               }
             }
           }
+          lastSharedForeground = currentForeground
 
           if (isPhoneSleepTriggered) {
             foregroundTracker.lastForegroundApp?.let { prevApp ->
@@ -164,60 +170,10 @@ class ShappkyTriggerService : Service() {
             foregroundTracker.lastForegroundApp = null
           }
 
-          // 3. Evaluate background / RAM / Inactivity / Killed manually
-          inactivityCheckCounter++
-          if ((hasInactivityRules || hasAutoBgRules) && inactivityCheckCounter >= 5) {
-            inactivityCheckCounter = 0
-            if (shellManager.isShellCommandReady()) {
-              val psOutput = shellManager.runShellCommandAndGetFullOutput(com.yassernull.shappky.core.managers.psAllProcessesCommand())
-              if (psOutput != null) {
-                val packageUsages = com.yassernull.shappky.core.managers.aggregatePsOutputToPackages(psOutput, packageManager)
-                val runningPackages = packageUsages.keys.toMutableSet()
-                val packageRamUsage = packageUsages.mapValues { it.value.ramKb }
+          // 3. Background / RAM / Inactivity / Killed manually are evaluated by startBackgroundMonitoring()
+          //    at an interval driven by the triggers' service duration.
 
-                foregroundTracker.cleanUpOldForegroundRecords(runningPackages, currentForeground)
-                foregroundTracker.initNewRunningPackages(runningPackages, currentForeground, now)
-                ruleEvaluator.cleanKilledApps(runningPackages)
-
-                // Check APP_KILLED_MANUALLY
-                if (previousRunningPackages.isNotEmpty()) {
-                  val killedPackages = previousRunningPackages - runningPackages
-                  ruleEvaluator.evaluateAppKilledManually(activeTriggers, enableRules, disableRules, killedPackages)
-                }
-
-                // Check APP_BACKGROUND_STARTED (new apps running without user foreground interaction)
-                if (hasAutoBgRules) {
-                  ruleEvaluator.evaluateAutoStartedBackgroundRules(
-                    activeTriggers,
-                    enableRules,
-                    disableRules,
-                    runningPackages,
-                    currentForeground,
-                    packageRamUsage,
-                    previousRunningPackages,
-                  )
-                }
-                previousRunningPackages.clear()
-                previousRunningPackages.addAll(runningPackages)
-
-                // Process APP_RAM_EXCEEDED
-                ruleEvaluator.evaluateRamExceededRules(activeTriggers, enableRules, disableRules, packageRamUsage)
-
-                // Process Inactivity rules
-                ruleEvaluator.evaluateInactivityRules(
-                  activeTriggers,
-                  enableRules,
-                  disableRules,
-                  runningPackages,
-                  currentForeground,
-                  packageRamUsage,
-                  now,
-                )
-              }
-            }
-          }
-
-          Thread.sleep(10000L)
+          Thread.sleep(scanIntervalMs)
         } catch (_: InterruptedException) {
           Log.d(TAG, "startTriggerMonitoring: Monitoring loop interrupted")
           Thread.currentThread().interrupt()
@@ -232,10 +188,99 @@ class ShappkyTriggerService : Service() {
     }
   }
 
+  private fun startBackgroundMonitoring() {
+    backgroundExecutor.execute {
+      while (isRunning) {
+        try {
+          val triggers = TriggerManager.getTriggers(this@ShappkyTriggerService)
+          val activeTriggers = triggers.filter { it.isEnabled }
+          val enableRules = EnableTriggerManager.getEnableRules(this@ShappkyTriggerService)
+          val disableRules = DisableTriggerManager.getDisableRules(this@ShappkyTriggerService)
+
+          val isShappkyServiceRunning = ShappkyService.isRunning()
+          val hasInactivityRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_INACTIVITY } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_INACTIVITY })
+          val hasAutoBgRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_BACKGROUND_STARTED } }
+          val hasKillOldestRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.KILL_OLDEST_APP } }
+
+          if (!hasInactivityRules && !hasAutoBgRules && !hasKillOldestRules) {
+            Thread.sleep(DEFAULT_BACKGROUND_INTERVAL_MS)
+            continue
+          }
+
+          // Effective scan interval = smallest service duration among active triggers (fallback default)
+          val intervalMs = minServiceDurationOrNull(activeTriggers) ?: DEFAULT_BACKGROUND_INTERVAL_MS
+          Log.d(TAG, "startBackgroundMonitoring: scan in ${intervalMs}ms (inactivity=$hasInactivityRules, autoBg=$hasAutoBgRules, killOldest=$hasKillOldestRules)")
+
+          Thread.sleep(intervalMs)
+          if (!isRunning) break
+
+          val now = System.currentTimeMillis()
+          if (shellManager.isShellCommandReady()) {
+            val psOutput = shellManager.runShellCommandAndGetFullOutput(com.yassernull.shappky.core.managers.psAllProcessesCommand())
+            if (psOutput != null) {
+              val packageUsages = com.yassernull.shappky.core.managers.aggregatePsOutputToPackages(psOutput, packageManager)
+              val runningPackages = packageUsages.keys.toMutableSet()
+              val packageRamUsage = packageUsages.mapValues { it.value.ramKb }
+              val currentForeground = lastSharedForeground
+              Log.d(TAG, "startBackgroundMonitoring: running=${runningPackages.size}, previous=${previousRunningPackages.size}, foreground=$currentForeground, added=${runningPackages - previousRunningPackages}")
+
+              foregroundTracker.cleanUpOldForegroundRecords(runningPackages, currentForeground)
+              foregroundTracker.initNewRunningPackages(runningPackages, currentForeground, now)
+              ruleEvaluator.cleanKilledApps(runningPackages)
+
+              // Check APP_KILLED_MANUALLY
+              if (previousRunningPackages.isNotEmpty()) {
+                val killedPackages = previousRunningPackages - runningPackages
+                ruleEvaluator.evaluateAppKilledManually(activeTriggers, enableRules, disableRules, killedPackages)
+              }
+
+              // Check APP_BACKGROUND_STARTED (running apps the user never opened - not present in recents)
+              if (hasAutoBgRules) {
+                ruleEvaluator.evaluateAutoStartedBackgroundRules(
+                  activeTriggers,
+                  runningPackages,
+                  packageRamUsage,
+                )
+              }
+              previousRunningPackages.clear()
+              previousRunningPackages.addAll(runningPackages)
+
+              // Process APP_RAM_EXCEEDED
+              ruleEvaluator.evaluateRamExceededRules(activeTriggers, enableRules, disableRules, packageRamUsage)
+
+              // Process Inactivity / KILL_OLDEST_APP rules
+              ruleEvaluator.evaluateInactivityRules(
+                activeTriggers,
+                enableRules,
+                disableRules,
+                runningPackages,
+                currentForeground,
+                packageRamUsage,
+                now,
+              )
+            }
+          }
+        } catch (_: InterruptedException) {
+          Log.d(TAG, "startBackgroundMonitoring: Background monitoring loop interrupted")
+          Thread.currentThread().interrupt()
+          break
+        } catch (e: Exception) {
+          Log.e(TAG, "startBackgroundMonitoring: Error in background monitoring loop", e)
+          try {
+            Thread.sleep(5000L)
+          } catch (_: Exception) {}
+        }
+      }
+    }
+  }
+
+  private fun minServiceDurationOrNull(triggers: List<com.yassernull.shappky.data.models.TriggerModel>): Long? = triggers.mapNotNull { it.serviceDuration.takeIf { d -> d > 0L } }.minOrNull()
+
   override fun onDestroy() {
     isRunning = false
     super.onDestroy()
     triggerExecutor.shutdownNow()
+    backgroundExecutor.shutdownNow()
     executor.shutdownNow()
   }
 
@@ -255,6 +300,7 @@ class ShappkyTriggerService : Service() {
   companion object {
     private const val TAG = "ShappkyTriggerService"
     private const val CHANNEL_ID = "ShappkyTriggerChannel"
+    private const val DEFAULT_BACKGROUND_INTERVAL_MS = 50000L
 
     @Volatile
     private var isRunning = false

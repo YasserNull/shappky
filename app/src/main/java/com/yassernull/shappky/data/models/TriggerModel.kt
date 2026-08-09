@@ -38,4 +38,5 @@ data class TriggerModel(
   val manuallySelectedApps: Set<String> = emptySet(),
   val rules: List<TriggerRule> = emptyList(),
   val isEnabled: Boolean = true,
+  val serviceDuration: Long = 0,
 )

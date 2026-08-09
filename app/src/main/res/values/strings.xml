@@ -203,12 +203,16 @@
     <string name="service_execution">Execution</string>
     <string name="kill_when_reach_ram_limit">Kill when reaching a RAM limit</string>
     <string name="service_duration">Service Duration</string>
+    <string name="duration_5s">5 seconds</string>
+    <string name="duration_10s">10 seconds</string>
     <string name="duration_15s">15 seconds</string>
     <string name="duration_30s">30 seconds</string>
     <string name="duration_1m">1 minute</string>
     <string name="duration_2m">2 minutes</string>
     <string name="duration_5m">5 minutes</string>
     <string name="duration_10m">10 minutes</string>
+    <string name="duration_15m">15 minutes</string>
+    <string name="duration_30m">30 minutes</string>
     <string name="service_kill_all_on_ram_limit">Kill all apps when reaching a certain RAM limit</string>
     <string name="service_kill_app_on_ram_limit">Kill app when it reaches a certain RAM limit</string>
     <string name="ram_limit_enabled_summary">Threshold: %1$d MB</string>

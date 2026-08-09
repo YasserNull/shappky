@@ -1,4 +1,4 @@
-package com.yassernull.shappky.ui.activities.serviceCustomization.sections
+package com.yassernull.shappky.ui.activities.addTrigger.sections
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,47 +16,56 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yassernull.shappky.R
-import com.yassernull.shappky.ui.activities.serviceCustomization.ServiceCustomizationConfigDialogs
+import com.yassernull.shappky.data.models.RuleType
+import com.yassernull.shappky.data.models.TriggerRule
+import com.yassernull.shappky.ui.activities.serviceCustomization.sections.getDurationLabel
+import com.yassernull.shappky.ui.dialogs.ServiceDurationDialog
 
-@Composable
-fun getDurationLabel(durationMs: Long): String = when (durationMs) {
-  5000L -> stringResource(R.string.duration_5s)
-  10000L -> stringResource(R.string.duration_10s)
-  15000L -> stringResource(R.string.duration_15s)
-  30000L -> stringResource(R.string.duration_30s)
-  60000L -> stringResource(R.string.duration_1m)
-  120000L -> stringResource(R.string.duration_2m)
-  300000L -> stringResource(R.string.duration_5m)
-  600000L -> stringResource(R.string.duration_10m)
-  900000L -> stringResource(R.string.duration_15m)
-  1800000L -> stringResource(R.string.duration_30m)
-  else -> "${durationMs / 1000}s"
+const val DEFAULT_TRIGGER_SERVICE_DURATION_MS = 30000L
+
+fun defaultDurationForRule(ruleType: RuleType): Long = when (ruleType) {
+  RuleType.APP_OPENED,
+  RuleType.APP_RESUMED,
+  RuleType.APP_CLOSED,
+  RuleType.APP_KILLED_MANUALLY,
+  RuleType.APP_BACKGROUND_STARTED,
+  RuleType.PHONE_SLEEP,
+  RuleType.PHONE_WAKE,
+  -> 15000L
+
+  RuleType.KILL_OLDEST_APP,
+  RuleType.APP_RAM_EXCEEDED,
+  RuleType.RAM_LIMIT_REACHED,
+  RuleType.SERVICE_STATE_CHANGED,
+  -> 30000L
+
+  RuleType.SPECIFIC_TIME,
+  RuleType.APP_INACTIVITY,
+  -> 60000L
+}
+
+fun defaultDurationForRules(rules: List<TriggerRule>): Long {
+  if (rules.isEmpty()) return DEFAULT_TRIGGER_SERVICE_DURATION_MS
+  return rules.minOf { defaultDurationForRule(it.type) }
 }
 
 @Composable
-fun ServiceCustomizationRun(
+fun ExecutionSection(
   serviceDuration: Long,
   onServiceDurationChange: (Long) -> Unit,
 ) {
   var showDurationDialog by remember { mutableStateOf(false) }
 
-  ServiceCustomizationConfigDialogs(
-    showDurationDialog = showDurationDialog,
-    onDismissDurationDialog = { showDurationDialog = false },
-    onServiceDurationSelected = {
-      onServiceDurationChange(it)
-      showDurationDialog = false
-    },
-    serviceDuration = serviceDuration,
-    showKillAllRamDialog = false,
-    onDismissKillAllRamDialog = {},
-    onKillAllRamConfirmed = {},
-    killAllRamThreshold = 0,
-    showKillAppRamDialog = false,
-    onDismissKillAppRamDialog = {},
-    onKillAppRamConfirmed = {},
-    killAppRamThreshold = 0,
-  )
+  if (showDurationDialog) {
+    ServiceDurationDialog(
+      currentDurationMs = serviceDuration,
+      onDurationSelected = {
+        onServiceDurationChange(it)
+        showDurationDialog = false
+      },
+      onDismiss = { showDurationDialog = false },
+    )
+  }
 
   Text(
     text = stringResource(R.string.service_execution),

@@ -23,12 +23,16 @@ fun ServiceDurationDialog(
   onDismiss: () -> Unit,
 ) {
   val options = listOf(
+    5000L to R.string.duration_5s,
+    10000L to R.string.duration_10s,
     15000L to R.string.duration_15s,
     30000L to R.string.duration_30s,
     60000L to R.string.duration_1m,
     120000L to R.string.duration_2m,
     300000L to R.string.duration_5m,
     600000L to R.string.duration_10m,
+    900000L to R.string.duration_15m,
+    1800000L to R.string.duration_30m,
   )
 
   AlertDialog(

@@ -90,6 +90,31 @@ fun uidToAndroidUserName(uid: Long): String = when (uid) {
 
 fun isProcessOfPackage(processName: String, packageName: String): Boolean = Regex("^" + Pattern.quote(packageName) + "(?![A-Za-z0-9]).*$").matches(processName)
 
+fun parseRecentsPackages(output: String, pm: PackageManager): Set<String> {
+  val installedPackages = pm.getInstalledApplications(0).mapTo(LinkedHashSet()) { it.packageName }
+  val componentRegex = Regex("[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)+(?:/[A-Za-z_][A-Za-z0-9_.]*)?")
+  val packages = mutableSetOf<String>()
+  for (line in output.split('\n')) {
+    val trimmed = line.trim()
+    if (!trimmed.contains("ACTIVITY") &&
+      !trimmed.contains("Recent") &&
+      !trimmed.contains("TaskRecord") &&
+      !trimmed.contains("rootAffinity") &&
+      !trimmed.contains("activities=")
+    ) {
+      continue
+    }
+    componentRegex.findAll(trimmed).forEach { match ->
+      val token = match.value.substringBefore('/')
+      if (token.startsWith("android.")) {
+        return@forEach
+      }
+      resolvePackageForName(token, installedPackages)?.let { packages.add(it) }
+    }
+  }
+  return packages
+}
+
 fun parseStatForThreads(statOutput: String): Int {
   if (statOutput.startsWith("ERROR")) return 0
   val statParts = statOutput.trim().split(" ")
