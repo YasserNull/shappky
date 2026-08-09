@@ -88,7 +88,10 @@ fun uidToAndroidUserName(uid: Long): String = when (uid) {
   }
 }
 
-fun isProcessOfPackage(processName: String, packageName: String): Boolean = Regex("^" + Pattern.quote(packageName) + "(?![A-Za-z0-9]).*$").matches(processName)
+fun isProcessOfPackage(processName: String, packageName: String): Boolean {
+  if (!packageName.contains(".")) return false
+  return Regex("^" + Pattern.quote(packageName) + "(?![A-Za-z0-9]).*$").matches(processName)
+}
 
 fun parseRecentsPackages(output: String, pm: PackageManager): Set<String> {
   val installedPackages = pm.getInstalledApplications(0).mapTo(LinkedHashSet()) { it.packageName }
@@ -172,7 +175,7 @@ private fun resolvePackageForEntry(
       }
     }
   }
-  val byUidPrefix = packagesForUid?.firstOrNull { pkg -> entry.name.startsWith(pkg) }
+  val byUidPrefix = packagesForUid?.firstOrNull { pkg -> pkg.contains(".") && entry.name.startsWith(pkg) }
   val byName = resolvePackageForName(entry.name, installedPackages)
   return when {
     byUidPrefix != null -> byUidPrefix
@@ -185,6 +188,6 @@ private fun resolvePackageForName(name: String, installedPackages: Set<String>):
   val base = name.substringBefore(":")
   if (base in installedPackages) return base
   return installedPackages.firstOrNull { pkg ->
-    name.length >= pkg.length + 1 && name.startsWith(pkg) && !name[pkg.length].isLetterOrDigit()
+    pkg.contains(".") && name.length >= pkg.length + 1 && name.startsWith(pkg) && !name[pkg.length].isLetterOrDigit()
   }
 }
