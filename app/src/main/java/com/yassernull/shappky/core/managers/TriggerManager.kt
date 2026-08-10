@@ -12,6 +12,63 @@ import org.json.JSONObject
 
 object TriggerManager {
 
+  private fun ruleFromJson(ruleObj: JSONObject): TriggerRule {
+    val appPackages = mutableSetOf<String>()
+    val packagesArray = ruleObj.optJSONArray("appPackages")
+    if (packagesArray != null) {
+      for (k in 0 until packagesArray.length()) {
+        appPackages.add(packagesArray.getString(k))
+      }
+    }
+    val selectedServices = mutableSetOf<String>()
+    val servicesArray = ruleObj.optJSONArray("selectedServices")
+    if (servicesArray != null) {
+      for (k in 0 until servicesArray.length()) {
+        selectedServices.add(servicesArray.getString(k))
+      }
+    }
+    return TriggerRule(
+      id = ruleObj.getString("id"),
+      type = RuleType.valueOf(ruleObj.getString("type")),
+      appPackages = appPackages,
+      ramThresholdMb = ruleObj.optInt("ramThresholdMb", 0),
+      sleepDurationMinutes = ruleObj.optInt("sleepDurationMinutes", 0),
+      timeHour = ruleObj.optInt("timeHour", 0),
+      timeMinute = ruleObj.optInt("timeMinute", 0),
+      inactivityDurationMinutes = ruleObj.optInt("inactivityDurationMinutes", 0),
+      selectedServices = selectedServices,
+    )
+  }
+
+  private fun rulesFromJson(obj: JSONObject, key: String): List<TriggerRule> {
+    val rules = mutableListOf<TriggerRule>()
+    val rulesArray = obj.optJSONArray(key)
+    if (rulesArray != null) {
+      for (j in 0 until rulesArray.length()) {
+        rules.add(ruleFromJson(rulesArray.getJSONObject(j)))
+      }
+    }
+    return rules
+  }
+
+  private fun ruleToJson(rule: TriggerRule): JSONObject {
+    val ruleObj = JSONObject()
+    ruleObj.put("id", rule.id)
+    ruleObj.put("type", rule.type.name)
+    val packagesArray = JSONArray()
+    rule.appPackages.forEach { packagesArray.put(it) }
+    ruleObj.put("appPackages", packagesArray)
+    ruleObj.put("ramThresholdMb", rule.ramThresholdMb)
+    ruleObj.put("sleepDurationMinutes", rule.sleepDurationMinutes)
+    ruleObj.put("timeHour", rule.timeHour)
+    ruleObj.put("timeMinute", rule.timeMinute)
+    ruleObj.put("inactivityDurationMinutes", rule.inactivityDurationMinutes)
+    val servicesArray = JSONArray()
+    rule.selectedServices.forEach { servicesArray.put(it) }
+    ruleObj.put("selectedServices", servicesArray)
+    return ruleObj
+  }
+
   fun getTriggers(context: Context): List<TriggerModel> {
     val prefs = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
     val jsonStr = prefs.getString(TriggerPreferences.KEY_TRIGGERS, null) ?: return emptyList()
@@ -37,40 +94,9 @@ object TriggerManager {
             }
           }
 
-          val rules = mutableListOf<TriggerRule>()
-          val rulesArray = obj.optJSONArray("rules")
-          if (rulesArray != null) {
-            for (j in 0 until rulesArray.length()) {
-              val ruleObj = rulesArray.getJSONObject(j)
-              val appPackages = mutableSetOf<String>()
-              val packagesArray = ruleObj.optJSONArray("appPackages")
-              if (packagesArray != null) {
-                for (k in 0 until packagesArray.length()) {
-                  appPackages.add(packagesArray.getString(k))
-                }
-              }
-              val selectedServices = mutableSetOf<String>()
-              val servicesArray = ruleObj.optJSONArray("selectedServices")
-              if (servicesArray != null) {
-                for (k in 0 until servicesArray.length()) {
-                  selectedServices.add(servicesArray.getString(k))
-                }
-              }
-              rules.add(
-                TriggerRule(
-                  id = ruleObj.getString("id"),
-                  type = RuleType.valueOf(ruleObj.getString("type")),
-                  appPackages = appPackages,
-                  ramThresholdMb = ruleObj.optInt("ramThresholdMb", 0),
-                  sleepDurationMinutes = ruleObj.optInt("sleepDurationMinutes", 0),
-                  timeHour = ruleObj.optInt("timeHour", 0),
-                  timeMinute = ruleObj.optInt("timeMinute", 0),
-                  inactivityDurationMinutes = ruleObj.optInt("inactivityDurationMinutes", 0),
-                  selectedServices = selectedServices,
-                ),
-              )
-            }
-          }
+          val rules = rulesFromJson(obj, "rules")
+          val enableRules = rulesFromJson(obj, "enableRules")
+          val disableRules = rulesFromJson(obj, "disableRules")
 
           list.add(
             TriggerModel(
@@ -82,6 +108,8 @@ object TriggerManager {
               excludedApps = excluded,
               manuallySelectedApps = manual,
               rules = rules,
+              enableRules = enableRules,
+              disableRules = disableRules,
               isEnabled = obj.optBoolean("isEnabled", true),
               serviceDuration = obj.optLong("serviceDuration", 0),
             ),
@@ -119,23 +147,21 @@ object TriggerManager {
 
       val rulesArray = JSONArray()
       for (rule in trigger.rules) {
-        val ruleObj = JSONObject()
-        ruleObj.put("id", rule.id)
-        ruleObj.put("type", rule.type.name)
-        val packagesArray = JSONArray()
-        rule.appPackages.forEach { packagesArray.put(it) }
-        ruleObj.put("appPackages", packagesArray)
-        ruleObj.put("ramThresholdMb", rule.ramThresholdMb)
-        ruleObj.put("sleepDurationMinutes", rule.sleepDurationMinutes)
-        ruleObj.put("timeHour", rule.timeHour)
-        ruleObj.put("timeMinute", rule.timeMinute)
-        ruleObj.put("inactivityDurationMinutes", rule.inactivityDurationMinutes)
-        val servicesArray = JSONArray()
-        rule.selectedServices.forEach { servicesArray.put(it) }
-        ruleObj.put("selectedServices", servicesArray)
-        rulesArray.put(ruleObj)
+        rulesArray.put(ruleToJson(rule))
       }
       obj.put("rules", rulesArray)
+
+      val enableRulesArray = JSONArray()
+      for (rule in trigger.enableRules) {
+        enableRulesArray.put(ruleToJson(rule))
+      }
+      obj.put("enableRules", enableRulesArray)
+
+      val disableRulesArray = JSONArray()
+      for (rule in trigger.disableRules) {
+        disableRulesArray.put(ruleToJson(rule))
+      }
+      obj.put("disableRules", disableRulesArray)
 
       jsonArray.put(obj)
     }

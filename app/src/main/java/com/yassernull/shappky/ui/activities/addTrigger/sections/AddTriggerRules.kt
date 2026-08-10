@@ -20,6 +20,8 @@ import com.yassernull.shappky.R
 import com.yassernull.shappky.data.models.RuleType
 import com.yassernull.shappky.data.models.TriggerRule
 import com.yassernull.shappky.ui.activities.addTrigger.AddTriggerRulesDialogs
+import com.yassernull.shappky.ui.activities.serviceCustomization.sections.ServiceCustomizationDisableTriggers
+import com.yassernull.shappky.ui.activities.serviceCustomization.sections.ServiceCustomizationEnableTriggers
 import com.yassernull.shappky.ui.components.buildRuleSummary
 import com.yassernull.shappky.utils.loadAllApps
 import java.util.UUID
@@ -28,6 +30,10 @@ import java.util.UUID
 fun RulesSection(
   rules: List<TriggerRule>,
   onRulesChange: (List<TriggerRule>) -> Unit,
+  enableRules: List<TriggerRule>,
+  onEnableRulesChange: (List<TriggerRule>) -> Unit,
+  disableRules: List<TriggerRule>,
+  onDisableRulesChange: (List<TriggerRule>) -> Unit,
 ) {
   val context = LocalContext.current
   var showRuleSelection by remember { mutableStateOf(false) }
@@ -212,4 +218,16 @@ fun RulesSection(
       }
     }
   }
+
+  Spacer(modifier = Modifier.height(16.dp))
+
+  ServiceCustomizationEnableTriggers(
+    enableRules = enableRules,
+    onEnableRulesChange = onEnableRulesChange,
+  )
+
+  ServiceCustomizationDisableTriggers(
+    disableRules = disableRules,
+    onDisableRulesChange = onDisableRulesChange,
+  )
 }

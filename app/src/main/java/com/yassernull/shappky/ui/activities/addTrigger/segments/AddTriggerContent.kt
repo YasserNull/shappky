@@ -36,6 +36,8 @@ fun AddTriggerContent(
   var excludedApps by remember { mutableStateOf(initialTrigger?.excludedApps ?: emptySet()) }
   var manuallySelectedApps by remember { mutableStateOf(initialTrigger?.manuallySelectedApps ?: emptySet()) }
   var rules by remember { mutableStateOf(initialTrigger?.rules ?: emptyList()) }
+  var enableRules by remember { mutableStateOf(initialTrigger?.enableRules ?: emptyList()) }
+  var disableRules by remember { mutableStateOf(initialTrigger?.disableRules ?: emptyList()) }
   var triggerIsEnabled by remember { mutableStateOf(initialTrigger?.isEnabled ?: true) }
   var serviceDuration by remember { mutableStateOf(initialTrigger?.serviceDuration ?: DEFAULT_TRIGGER_SERVICE_DURATION_MS) }
   var isDurationUserSet by remember { mutableStateOf(initialTrigger != null) }
@@ -57,6 +59,8 @@ fun AddTriggerContent(
             excludedApps = excludedApps,
             manuallySelectedApps = manuallySelectedApps,
             rules = rules,
+            enableRules = enableRules,
+            disableRules = disableRules,
             isEnabled = triggerIsEnabled,
             serviceDuration = effectiveDuration,
           )
@@ -116,6 +120,10 @@ fun AddTriggerContent(
       RulesSection(
         rules = rules,
         onRulesChange = { rules = it },
+        enableRules = enableRules,
+        onEnableRulesChange = { enableRules = it },
+        disableRules = disableRules,
+        onDisableRulesChange = { disableRules = it },
       )
     }
   }

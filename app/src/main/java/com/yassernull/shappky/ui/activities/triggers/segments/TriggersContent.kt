@@ -61,26 +61,28 @@ fun TriggersContent(
       }
     },
   ) { padding ->
-    if (triggers.isEmpty()) {
-      Box(
-        modifier = Modifier
-          .fillMaxSize()
-          .padding(padding),
-        contentAlignment = Alignment.Center,
-      ) {
-        Text(
-          text = stringResource(R.string.triggers_empty),
-          color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-          fontSize = 16.sp,
-        )
-      }
-    } else {
-      LazyColumn(
-        modifier = Modifier
-          .fillMaxSize()
-          .padding(padding)
-          .padding(horizontal = 16.dp),
-      ) {
+    LazyColumn(
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(padding)
+        .padding(horizontal = 16.dp),
+    ) {
+      if (triggers.isEmpty()) {
+        item {
+          Box(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(vertical = 32.dp),
+            contentAlignment = Alignment.Center,
+          ) {
+            Text(
+              text = stringResource(R.string.triggers_empty),
+              color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+              fontSize = 16.sp,
+            )
+          }
+        }
+      } else {
         items(triggers, key = { it.id }) { trigger ->
           TriggerItem(
             trigger = trigger,

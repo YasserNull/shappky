@@ -86,8 +86,8 @@ class ShappkyTriggerService : Service() {
         try {
           val triggers = TriggerManager.getTriggers(this@ShappkyTriggerService)
           val activeTriggers = triggers.filter { it.isEnabled }
-          val enableRules = EnableTriggerManager.getEnableRules(this@ShappkyTriggerService)
-          val disableRules = DisableTriggerManager.getDisableRules(this@ShappkyTriggerService)
+          val enableRules = EnableTriggerManager.getEnableRules(this@ShappkyTriggerService) + activeTriggers.flatMap { it.enableRules }
+          val disableRules = DisableTriggerManager.getDisableRules(this@ShappkyTriggerService) + activeTriggers.flatMap { it.disableRules }
 
           val isShappkyServiceRunning = ShappkyService.isRunning()
           val hasWorkToDo = activeTriggers.isNotEmpty() ||
@@ -194,8 +194,8 @@ class ShappkyTriggerService : Service() {
         try {
           val triggers = TriggerManager.getTriggers(this@ShappkyTriggerService)
           val activeTriggers = triggers.filter { it.isEnabled }
-          val enableRules = EnableTriggerManager.getEnableRules(this@ShappkyTriggerService)
-          val disableRules = DisableTriggerManager.getDisableRules(this@ShappkyTriggerService)
+          val enableRules = EnableTriggerManager.getEnableRules(this@ShappkyTriggerService) + activeTriggers.flatMap { it.enableRules }
+          val disableRules = DisableTriggerManager.getDisableRules(this@ShappkyTriggerService) + activeTriggers.flatMap { it.disableRules }
 
           val isShappkyServiceRunning = ShappkyService.isRunning()
           val hasInactivityRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_INACTIVITY } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_INACTIVITY })
