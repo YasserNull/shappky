@@ -99,7 +99,13 @@ class ShappkyTriggerService : Service() {
             continue
           }
 
-          val scanIntervalMs = minServiceDurationOrNull(activeTriggers) ?: 10000L
+          val hasFastAppForegroundRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_OPENED || r.type == com.yassernull.shappky.data.models.RuleType.APP_RESUMED || r.type == com.yassernull.shappky.data.models.RuleType.APP_CLOSED } } || enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_OPENED || it.type == com.yassernull.shappky.data.models.RuleType.APP_RESUMED || it.type == com.yassernull.shappky.data.models.RuleType.APP_CLOSED } || disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_OPENED || it.type == com.yassernull.shappky.data.models.RuleType.APP_RESUMED || it.type == com.yassernull.shappky.data.models.RuleType.APP_CLOSED }
+
+          val baseIntervalMs = minServiceDurationOrNull(activeTriggers) ?: 10000L
+          val scanIntervalMs = if (hasFastAppForegroundRules) minOf(baseIntervalMs, FAST_APP_SCAN_INTERVAL_MS) else baseIntervalMs
+          if (hasFastAppForegroundRules) {
+            Log.d(TAG, "startTriggerMonitoring: fast app-foreground scanning at ${scanIntervalMs}ms")
+          }
 
           val now = System.currentTimeMillis()
 
@@ -141,9 +147,13 @@ class ShappkyTriggerService : Service() {
           val hasInactivityRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_INACTIVITY } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_INACTIVITY })
           val hasAutoBgRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_BACKGROUND_STARTED } }
           val hasAppOpenedRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_OPENED } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_OPENED })
+          val hasAppResumedRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_RESUMED } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_RESUMED }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_RESUMED })
+          val hasAppClosedRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_CLOSED } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_CLOSED }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_CLOSED })
+
+          Log.d(TAG, "startTriggerMonitoring: triggers=${activeTriggers.size}, interactive=${stateTracker.currentInteractive}, appOpened=$hasAppOpenedRules, appResumed=$hasAppResumedRules, appClosed=$hasAppClosedRules, inactivity=$hasInactivityRules, autoBg=$hasAutoBgRules")
 
           var currentForeground: String? = null
-          if (stateTracker.currentInteractive && (hasAppOpenedRules || hasInactivityRules || hasAutoBgRules)) {
+          if (stateTracker.currentInteractive && (hasAppOpenedRules || hasAppResumedRules || hasAppClosedRules || hasInactivityRules || hasAutoBgRules)) {
             if (shellManager.isShellCommandReady()) {
               val dumpOutput = shellManager.runShellCommandAndGetFullOutput("dumpsys activity activities")
               if (dumpOutput != null) {
@@ -201,8 +211,12 @@ class ShappkyTriggerService : Service() {
           val hasInactivityRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_INACTIVITY } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_INACTIVITY })
           val hasAutoBgRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_BACKGROUND_STARTED } }
           val hasKillOldestRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.KILL_OLDEST_APP } }
+          val hasManualKillRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_KILLED_MANUALLY } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_KILLED_MANUALLY }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_KILLED_MANUALLY })
+          val hasRamExceededRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_RAM_EXCEEDED } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_RAM_EXCEEDED }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_RAM_EXCEEDED })
 
-          if (!hasInactivityRules && !hasAutoBgRules && !hasKillOldestRules) {
+          Log.d(TAG, "startBackgroundMonitoring: triggers=${activeTriggers.size}, inactivity=$hasInactivityRules, autoBg=$hasAutoBgRules, killOldest=$hasKillOldestRules, manualKill=$hasManualKillRules, ramExceeded=$hasRamExceededRules")
+
+          if (!hasInactivityRules && !hasAutoBgRules && !hasKillOldestRules && !hasManualKillRules && !hasRamExceededRules) {
             Thread.sleep(DEFAULT_BACKGROUND_INTERVAL_MS)
             continue
           }
@@ -301,6 +315,7 @@ class ShappkyTriggerService : Service() {
     private const val TAG = "ShappkyTriggerService"
     private const val CHANNEL_ID = "ShappkyTriggerChannel"
     private const val DEFAULT_BACKGROUND_INTERVAL_MS = 50000L
+    private const val FAST_APP_SCAN_INTERVAL_MS = 2000L
 
     @Volatile
     private var isRunning = false

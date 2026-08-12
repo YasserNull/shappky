@@ -45,6 +45,7 @@ class TriggerRuleEvaluator(
     now: Long,
   ) {
     val isShappkyServiceRunning = ShappkyService.isRunning()
+    Log.d(TAG, "evaluateServiceStateRules: triggers=${triggers.size}, sleepTriggered=$isPhoneSleepTriggered, wakeTriggered=$isPhoneWakeTriggered, usedMb=$usedMb, serviceRunning=$isShappkyServiceRunning, enableRules=${enableRules.size}, disableRules=${disableRules.size}")
 
     // Evaluate rules for active triggers
     for (trigger in triggers) {
@@ -64,7 +65,9 @@ class TriggerRuleEvaluator(
           }
           RuleType.SERVICE_STATE_CHANGED -> {
             for (serviceKey in rule.selectedServices) {
-              if (stateTracker.hasServiceStateChanged(serviceKey)) {
+              val changed = stateTracker.hasServiceStateChanged(serviceKey)
+              Log.d(TAG, "SERVICE_STATE_CHANGED check: key=$serviceKey changed=$changed")
+              if (changed) {
                 isRuleTriggered = true
                 Log.d(TAG, "Service state changed: $serviceKey")
                 break
@@ -109,7 +112,9 @@ class TriggerRuleEvaluator(
         }
         RuleType.SERVICE_STATE_CHANGED -> {
           for (serviceKey in rule.selectedServices) {
-            if (stateTracker.hasServiceStateChanged(serviceKey)) {
+            val changed = stateTracker.hasServiceStateChanged(serviceKey)
+            Log.d(TAG, "SERVICE_STATE_CHANGED check (service rule): key=$serviceKey changed=$changed")
+            if (changed) {
               isRuleTriggered = true
               break
             }
@@ -122,6 +127,7 @@ class TriggerRuleEvaluator(
         val lastRun = lastExecutedTime[rule.id] ?: 0L
         if (rule.type == RuleType.SPECIFIC_TIME || (now - lastRun >= ruleCooldownMs)) {
           lastExecutedTime[rule.id] = now
+          Log.d(TAG, "Enable/Disable rule matched! type=${rule.type}, serviceRunning=$isShappkyServiceRunning")
           if (!isShappkyServiceRunning) {
             actionExecutor.enableShappkyService(rule)
           } else {
@@ -141,6 +147,7 @@ class TriggerRuleEvaluator(
   ) {
     val isShappkyServiceRunning = ShappkyService.isRunning()
     val now = System.currentTimeMillis()
+    Log.d(TAG, "evaluateAppForegroundRules: currentForeground=$currentForeground, previouslyForeground=$previouslyForeground, triggers=${triggers.size}")
 
     for (trigger in triggers) {
       val appOpenedRules = trigger.rules.filter { it.type == RuleType.APP_OPENED }
@@ -155,6 +162,9 @@ class TriggerRuleEvaluator(
       }
 
       val appResumedRules = trigger.rules.filter { it.type == RuleType.APP_RESUMED }
+      if (appResumedRules.isNotEmpty()) {
+        Log.d(TAG, "APP_RESUMED check: trigger='${trigger.name}', rules=${appResumedRules.size}, current=$currentForeground")
+      }
       if (currentForeground != null && appResumedRules.any { rule -> rule.appPackages.contains(currentForeground) }) {
         val matchedRule = appResumedRules.first { rule -> rule.appPackages.contains(currentForeground) }
         val lastRun = lastExecutedTime[matchedRule.id] ?: 0L
@@ -167,6 +177,9 @@ class TriggerRuleEvaluator(
 
       if (previouslyForeground != null) {
         val appClosedRules = trigger.rules.filter { it.type == RuleType.APP_CLOSED }
+        if (appClosedRules.isNotEmpty()) {
+          Log.d(TAG, "APP_CLOSED check: trigger='${trigger.name}', rules=${appClosedRules.size}, previous=$previouslyForeground")
+        }
         if (appClosedRules.any { rule -> rule.appPackages.contains(previouslyForeground) }) {
           Log.d(TAG, "APP_CLOSED MATCH FOUND! Triggering '${trigger.name}' for $previouslyForeground")
           actionExecutor.executeServiceTrigger(trigger)
@@ -240,9 +253,11 @@ class TriggerRuleEvaluator(
     prevApp: String,
   ) {
     val isShappkyServiceRunning = ShappkyService.isRunning()
+    Log.d(TAG, "handleSleepAppClosedRules: prevApp=$prevApp, serviceRunning=$isShappkyServiceRunning")
 
     for (trigger in triggers) {
       val appClosedRules = trigger.rules.filter { it.type == RuleType.APP_CLOSED }
+      Log.d(TAG, "APP_CLOSED check (sleep): trigger='${trigger.name}', rules=${appClosedRules.size}, previous=$prevApp")
       if (appClosedRules.any { rule -> rule.appPackages.contains(prevApp) }) {
         Log.d(TAG, "APP_CLOSED MATCH FOUND (Sleep)! Triggering '${trigger.name}' for $prevApp")
         actionExecutor.executeServiceTrigger(trigger)
@@ -269,6 +284,8 @@ class TriggerRuleEvaluator(
     killedPackages: Set<String>,
   ) {
     val isShappkyServiceRunning = ShappkyService.isRunning()
+
+    Log.d(TAG, "evaluateAppKilledManually: killedPackages=$killedPackages, serviceRunning=$isShappkyServiceRunning")
 
     for (pkg in killedPackages) {
       if (!recentShappkyKills.contains(pkg)) {
@@ -304,12 +321,15 @@ class TriggerRuleEvaluator(
     val isShappkyServiceRunning = ShappkyService.isRunning()
     val appManager = BackgroundAppManager(context, handler, executor, shellManager)
 
+    Log.d(TAG, "evaluateRamExceededRules: packages=${packageRamUsage.size}, serviceRunning=$isShappkyServiceRunning")
+
     for (trigger in triggers) {
       val ramExceededRules = trigger.rules.filter { it.type == RuleType.APP_RAM_EXCEEDED }
       if (ramExceededRules.isEmpty()) continue
       for (rule in ramExceededRules) {
         for (pkg in rule.appPackages) {
           val pkgRam = (packageRamUsage[pkg] ?: 0L) / 1024L
+          Log.d(TAG, "APP_RAM_EXCEEDED check: pkg=$pkg ram=${pkgRam}MB threshold=${rule.ramThresholdMb}MB")
           if (pkgRam >= rule.ramThresholdMb && rule.ramThresholdMb > 0) {
             Log.d(TAG, "APP_RAM_EXCEEDED! $pkg is using $pkgRam MB")
             appManager.killPackages(listOf(pkg), {

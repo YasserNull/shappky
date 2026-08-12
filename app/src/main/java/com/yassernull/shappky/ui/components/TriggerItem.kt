@@ -66,13 +66,17 @@ fun TriggerItem(
         )
       }
 
-      Switch(
-        checked = trigger.isEnabled,
-        onCheckedChange = { isChecked ->
-          onToggleState(isChecked)
-        },
-        modifier = Modifier.padding(horizontal = 8.dp),
-      )
+      val hasRules = trigger.rules.isNotEmpty() || trigger.enableRules.isNotEmpty() || trigger.disableRules.isNotEmpty()
+
+      if (hasRules) {
+        Switch(
+          checked = trigger.isEnabled,
+          onCheckedChange = { isChecked ->
+            onToggleState(isChecked)
+          },
+          modifier = Modifier.padding(horizontal = 8.dp),
+        )
+      }
 
       if (trigger.rules.isEmpty()) {
         IconButton(onClick = onExecute, enabled = trigger.isEnabled) {
