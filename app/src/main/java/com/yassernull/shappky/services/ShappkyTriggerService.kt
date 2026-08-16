@@ -228,9 +228,10 @@ class ShappkyTriggerService : Service() {
                   val entry = pendingIterator.next()
                   val pkg = entry.key
                   val startedWatching = entry.value
-                  if (!activityDumpContainsPackage(dumpOutput, pkg)) {
+                  val isShappkyKill = com.yassernull.shappky.core.managers.KillTracker.contains(pkg)
+                  if (isShappkyKill || !activityDumpContainsPackage(dumpOutput, pkg)) {
                     pendingIterator.remove()
-                    Log.d(TAG, "startTriggerMonitoring: exit detected for $pkg (no activity/task record)")
+                    Log.d(TAG, "startTriggerMonitoring: exit/kill detected for $pkg (killRecorded=$isShappkyKill, no activity/task record)")
                     ruleEvaluator.evaluateAppExitRules(activeTriggers, enableRules, disableRules, emptySet(), setOf(pkg))
                   } else if (now - startedWatching > EXIT_CONFIRM_TIMEOUT_MS) {
                     pendingIterator.remove()
@@ -339,8 +340,11 @@ class ShappkyTriggerService : Service() {
 
               // Check APP_EXITED / APP_KILLED (stopped processes, classified by Shappky kill)
               val killedPackages = if (previousRunningPackages.isNotEmpty()) previousRunningPackages - runningPackages else emptySet()
-              if (killedPackages.isNotEmpty() || swipedFromRecents.isNotEmpty()) {
-                ruleEvaluator.evaluateAppExitRules(activeTriggers, enableRules, disableRules, killedPackages, swipedFromRecents)
+              val trackerKilledNotRunning = com.yassernull.shappky.core.managers.KillTracker.getKilledPackages().filter { !runningPackages.contains(it) }
+              val allStopped = killedPackages + trackerKilledNotRunning
+              if (allStopped.isNotEmpty() || swipedFromRecents.isNotEmpty()) {
+                Log.d(TAG, "startBackgroundMonitoring: stopped=killedDiff=$killedPackages, trackerNotRunning=$trackerKilledNotRunning, swiped=$swipedFromRecents")
+                ruleEvaluator.evaluateAppExitRules(activeTriggers, enableRules, disableRules, allStopped, swipedFromRecents)
               }
               ruleEvaluator.cleanKilledApps(runningPackages)
 

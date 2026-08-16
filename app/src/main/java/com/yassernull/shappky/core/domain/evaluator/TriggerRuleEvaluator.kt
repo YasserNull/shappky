@@ -8,6 +8,7 @@ import com.yassernull.shappky.core.domain.executors.TriggerActionExecutor
 import com.yassernull.shappky.core.domain.trackers.AppForegroundTracker
 import com.yassernull.shappky.core.domain.trackers.SystemStateTracker
 import com.yassernull.shappky.core.managers.BackgroundAppManager
+import com.yassernull.shappky.core.managers.KillTracker
 import com.yassernull.shappky.core.managers.ProtectionManager
 import com.yassernull.shappky.core.managers.ShellManager
 import com.yassernull.shappky.data.models.RuleType
@@ -33,7 +34,7 @@ class TriggerRuleEvaluator(
   }
 
   private val lastExecutedTime = java.util.concurrent.ConcurrentHashMap<String, Long>()
-  private val recentShappkyKills = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+
   private val recentlyReportedExits = java.util.concurrent.ConcurrentHashMap<String, Long>()
 
   fun clearCooldowns() {
@@ -309,13 +310,15 @@ class TriggerRuleEvaluator(
 
     for (pkg in stoppedSet) {
       val now = System.currentTimeMillis()
-      val lastReported = recentlyReportedExits[pkg] ?: 0L
-      if (now - lastReported < EXIT_REPORT_COOLDOWN_MS) {
-        Log.d(TAG, "evaluateAppExitRules: $pkg already reported recently, skipping")
-        continue
+      val killedByShappky = KillTracker.contains(pkg)
+      if (!killedByShappky) {
+        val lastReported = recentlyReportedExits[pkg] ?: 0L
+        if (now - lastReported < EXIT_REPORT_COOLDOWN_MS) {
+          Log.d(TAG, "evaluateAppExitRules: $pkg already reported recently, skipping")
+          continue
+        }
+        recentlyReportedExits[pkg] = now
       }
-      recentlyReportedExits[pkg] = now
-      val killedByShappky = recentShappkyKills.contains(pkg)
       Log.d(TAG, "evaluateAppExitRules: pkg=$pkg, killedByShappky=$killedByShappky")
       for (trigger in triggers) {
         if (killedByShappky) {
@@ -382,7 +385,7 @@ class TriggerRuleEvaluator(
           if (pkgRam >= rule.ramThresholdMb && rule.ramThresholdMb > 0) {
             Log.d(TAG, "APP_RAM_EXCEEDED! $pkg is using $pkgRam MB")
             appManager.killPackages(listOf(pkg), {
-              recentShappkyKills.add(pkg)
+              KillTracker.markKilled(pkg)
               val freedText = context.getString(R.string.free_up_memory, appManager.formatMemorySize(pkgRam * 1024))
               NotificationUtils.showTriggerFreedMemoryNotification(context, trigger.name, freedText)
             }, showToast = false)
@@ -475,7 +478,7 @@ class TriggerRuleEvaluator(
         if (oldestPkg != null) {
           Log.d(TAG, "KILL_OLDEST_APP triggered! Killing $oldestPkg")
           appManager.killPackages(listOf(oldestPkg), {
-            recentShappkyKills.add(oldestPkg)
+            KillTracker.markKilled(oldestPkg)
             val totalKb = packageRamUsage[oldestPkg] ?: 0L
             val freedText = context.getString(R.string.free_up_memory, appManager.formatMemorySize(totalKb))
             NotificationUtils.showTriggerFreedMemoryNotification(context, trigger.name, freedText)
@@ -500,7 +503,7 @@ class TriggerRuleEvaluator(
       if (packagesToKill.isNotEmpty()) {
         Log.d(TAG, "Inactivity rule triggered in trigger '${trigger.name}'. Killing: $packagesToKill")
         appManager.killPackages(packagesToKill, {
-          recentShappkyKills.addAll(packagesToKill)
+          KillTracker.markKilledAll(packagesToKill)
           val totalKb = packagesToKill.sumOf { packageRamUsage[it] ?: 0L }
           val freedText = context.getString(R.string.free_up_memory, appManager.formatMemorySize(totalKb))
           NotificationUtils.showTriggerFreedMemoryNotification(context, trigger.name, freedText)
@@ -601,7 +604,7 @@ class TriggerRuleEvaluator(
         Log.d(TAG, "APP_BACKGROUND_STARTED MATCH FOUND! Triggering '${trigger.name}' for $autoStartedPackages")
         val appManager = BackgroundAppManager(context, handler, executor, shellManager)
         appManager.killPackages(autoStartedPackages.toList(), {
-          recentShappkyKills.addAll(autoStartedPackages)
+          KillTracker.markKilledAll(autoStartedPackages)
           val totalKb = autoStartedPackages.sumOf { packageRamUsage[it] ?: 0L }
           val freedText = context.getString(R.string.free_up_memory, appManager.formatMemorySize(totalKb))
           Log.d(TAG, "APP_BACKGROUND_STARTED kill completed for $autoStartedPackages, freed=$freedText")
@@ -612,14 +615,8 @@ class TriggerRuleEvaluator(
   }
 
   fun cleanKilledApps(runningPackages: Set<String>) {
+    KillTracker.cleanUp(runningPackages)
     val now = System.currentTimeMillis()
-    val iteratorKill = recentShappkyKills.iterator()
-    while (iteratorKill.hasNext()) {
-      val pkg = iteratorKill.next()
-      if (!runningPackages.contains(pkg)) {
-        iteratorKill.remove()
-      }
-    }
     val iteratorReported = recentlyReportedExits.entries.iterator()
     while (iteratorReported.hasNext()) {
       val entry = iteratorReported.next()

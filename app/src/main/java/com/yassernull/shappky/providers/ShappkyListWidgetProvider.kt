@@ -50,6 +50,7 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
         val shellManager = getShellManager(context)
         if (shellManager.hasAnyShellPermission()) {
           shellManager.runShellCommand("am force-stop $packageName") {
+            com.yassernull.shappky.core.managers.KillTracker.markKilled(packageName)
             val localCtx = getLocalizedContext(context)
             val message = localCtx.getString(R.string.free_up_memory, appRam)
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()

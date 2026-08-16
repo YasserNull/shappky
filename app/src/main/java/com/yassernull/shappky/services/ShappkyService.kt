@@ -15,6 +15,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.service.quicksettings.TileService
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.yassernull.shappky.R
 import com.yassernull.shappky.core.managers.ShellManager
@@ -185,6 +186,8 @@ class ShappkyService : Service() {
       val shouldKillAll = selectSystemApps || selectUserApps
       val finalCommand = com.yassernull.shappky.core.managers.BackgroundAppManager.buildSmartKillCommand(toKill, shouldKillAll)
       shellManager.runShellCommandAndGetFullOutput(finalCommand) ?: return
+      com.yassernull.shappky.core.managers.KillTracker.markKilledAll(toKill)
+      Log.d(TAG, "killBackgroundApps: killed and recorded ${toKill.size} packages: $toKill")
 
       val lines = toKill.map { pkg ->
         val ramMb = packageRamUsage[pkg] ?: 0
@@ -250,6 +253,7 @@ class ShappkyService : Service() {
     private const val CHANNEL_ID = "ShappkyChannel"
     private const val PREFERENCES_NAME = "AppPreferences"
     private const val KEY_HIDDEN_APPS = "hidden_apps"
+    private const val TAG = "ShappkyService"
 
     @JvmStatic
     fun isRunning(): Boolean = isRunning

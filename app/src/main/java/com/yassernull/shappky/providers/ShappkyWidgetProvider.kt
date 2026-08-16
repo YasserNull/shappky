@@ -135,6 +135,7 @@ class ShappkyWidgetProvider : AppWidgetProvider() {
       val killLatch = CountDownLatch(1)
 
       shellManager.runShellCommand(command) {
+        com.yassernull.shappky.core.managers.KillTracker.markKilledAll(toKill.map { it.packageName })
         killLatch.countDown()
       }
       killLatch.await()

@@ -44,6 +44,7 @@ class AppKillHandler(
 
     val command = buildSmartKillCommand(safePackageNames, appendKillAll)
     shellManager.runShellCommand(command, onComplete)
+    KillTracker.markKilledAll(safePackageNames)
     if (showToast) {
       val message = context.getString(R.string.free_up_memory, formatMemorySize(totalKb))
       handler.post { Toast.makeText(context, message, Toast.LENGTH_LONG).show() }
@@ -77,6 +78,7 @@ class AppKillHandler(
 
     val command = buildSmartKillCommand(listOf(packageName), appendKillAll)
     shellManager.runShellCommand(command, onComplete)
+    KillTracker.markKilled(packageName)
     val ramKb = getAppRamKb?.invoke(packageName) ?: 0L
     if (ramKb > 0) {
       val message = context.getString(R.string.free_up_memory, formatMemorySize(ramKb))
