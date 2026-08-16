@@ -33,7 +33,8 @@ fun ServiceCustomizationDisableTriggers(
   var activeConfigType by remember { mutableStateOf<RuleType?>(null) }
   var showAppOpenedPicker by remember { mutableStateOf(false) }
   var showAppResumedPicker by remember { mutableStateOf(false) }
-  var showAppClosedPicker by remember { mutableStateOf(false) }
+  var showAppPausedPicker by remember { mutableStateOf(false) }
+  var showAppExitedPicker by remember { mutableStateOf(false) }
   var showAppKilledPicker by remember { mutableStateOf(false) }
   var showAppRamPicker by remember { mutableStateOf(false) }
   var showInactivityPicker by remember { mutableStateOf(false) }
@@ -55,8 +56,9 @@ fun ServiceCustomizationDisableTriggers(
         RuleType.RAM_LIMIT_REACHED -> activeConfigType = type
         RuleType.APP_OPENED -> showAppOpenedPicker = true
         RuleType.APP_RESUMED -> showAppResumedPicker = true
-        RuleType.APP_CLOSED -> showAppClosedPicker = true
-        RuleType.APP_KILLED_MANUALLY -> showAppKilledPicker = true
+        RuleType.APP_PAUSED -> showAppPausedPicker = true
+        RuleType.APP_EXITED -> showAppExitedPicker = true
+        RuleType.APP_KILLED -> showAppKilledPicker = true
         RuleType.APP_RAM_EXCEEDED -> showAppRamPicker = true
         RuleType.APP_INACTIVITY -> showInactivityPicker = true
         else -> activeConfigType = type
@@ -78,19 +80,27 @@ fun ServiceCustomizationDisableTriggers(
       }
       showAppResumedPicker = false
     },
-    showAppClosedPicker = showAppClosedPicker,
-    onDismissAppClosedPicker = { showAppClosedPicker = false },
-    onAppClosedSaved = { pkgs ->
+    showAppPausedPicker = showAppPausedPicker,
+    onDismissAppPausedPicker = { showAppPausedPicker = false },
+    onAppPausedSaved = { pkgs ->
       if (pkgs.isNotEmpty()) {
-        addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.APP_CLOSED, appPackages = pkgs))
+        addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.APP_PAUSED, appPackages = pkgs))
       }
-      showAppClosedPicker = false
+      showAppPausedPicker = false
+    },
+    showAppExitedPicker = showAppExitedPicker,
+    onDismissAppExitedPicker = { showAppExitedPicker = false },
+    onAppExitedSaved = { pkgs ->
+      if (pkgs.isNotEmpty()) {
+        addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.APP_EXITED, appPackages = pkgs))
+      }
+      showAppExitedPicker = false
     },
     showAppKilledPicker = showAppKilledPicker,
     onDismissAppKilledPicker = { showAppKilledPicker = false },
     onAppKilledSaved = { pkgs ->
       if (pkgs.isNotEmpty()) {
-        addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.APP_KILLED_MANUALLY, appPackages = pkgs))
+        addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.APP_KILLED, appPackages = pkgs))
       }
       showAppKilledPicker = false
     },

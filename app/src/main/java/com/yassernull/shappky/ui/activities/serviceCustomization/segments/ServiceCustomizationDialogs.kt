@@ -61,9 +61,12 @@ fun ServiceCustomizationRulesDialogs(
   showAppResumedPicker: Boolean,
   onDismissAppResumedPicker: () -> Unit,
   onAppResumedSaved: (Set<String>) -> Unit,
-  showAppClosedPicker: Boolean,
-  onDismissAppClosedPicker: () -> Unit,
-  onAppClosedSaved: (Set<String>) -> Unit,
+  showAppPausedPicker: Boolean,
+  onDismissAppPausedPicker: () -> Unit,
+  onAppPausedSaved: (Set<String>) -> Unit,
+  showAppExitedPicker: Boolean,
+  onDismissAppExitedPicker: () -> Unit,
+  onAppExitedSaved: (Set<String>) -> Unit,
   showAppKilledPicker: Boolean,
   onDismissAppKilledPicker: () -> Unit,
   onAppKilledSaved: (Set<String>) -> Unit,
@@ -108,19 +111,29 @@ fun ServiceCustomizationRulesDialogs(
     )
   }
 
-  if (showAppClosedPicker) {
+  if (showAppPausedPicker) {
     AppSelectionDialog(
-      title = stringResource(R.string.rule_app_closed),
+      title = stringResource(R.string.rule_app_paused),
       initialSelectedPackages = emptySet(),
       loadAllApps = { callback -> context.loadAllApps(callback) },
-      onDismiss = onDismissAppClosedPicker,
-      onSave = onAppClosedSaved,
+      onDismiss = onDismissAppPausedPicker,
+      onSave = onAppPausedSaved,
+    )
+  }
+
+  if (showAppExitedPicker) {
+    AppSelectionDialog(
+      title = stringResource(R.string.rule_app_exited),
+      initialSelectedPackages = emptySet(),
+      loadAllApps = { callback -> context.loadAllApps(callback) },
+      onDismiss = onDismissAppExitedPicker,
+      onSave = onAppExitedSaved,
     )
   }
 
   if (showAppKilledPicker) {
     AppSelectionDialog(
-      title = stringResource(R.string.rule_app_killed_manually),
+      title = stringResource(R.string.rule_app_killed),
       initialSelectedPackages = emptySet(),
       loadAllApps = { callback -> context.loadAllApps(callback) },
       onDismiss = onDismissAppKilledPicker,

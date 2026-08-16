@@ -19,13 +19,17 @@ fun buildRuleSummary(rule: TriggerRule): String {
       val appNames = rule.appPackages.joinToString(", ") { context.getAppName(it) }
       context.getString(R.string.rule_summary_app_resumed, appNames)
     }
-    RuleType.APP_CLOSED -> {
+    RuleType.APP_PAUSED -> {
       val appNames = rule.appPackages.joinToString(", ") { context.getAppName(it) }
-      context.getString(R.string.rule_summary_app_closed, appNames)
+      context.getString(R.string.rule_summary_app_paused, appNames)
     }
-    RuleType.APP_KILLED_MANUALLY -> {
+    RuleType.APP_EXITED -> {
       val appNames = rule.appPackages.joinToString(", ") { context.getAppName(it) }
-      context.getString(R.string.rule_summary_app_killed_manually, appNames)
+      context.getString(R.string.rule_summary_app_exited, appNames)
+    }
+    RuleType.APP_KILLED -> {
+      val appNames = rule.appPackages.joinToString(", ") { context.getAppName(it) }
+      context.getString(R.string.rule_summary_app_killed, appNames)
     }
     RuleType.RAM_LIMIT_REACHED -> {
       context.getString(R.string.rule_summary_ram_limit, rule.ramThresholdMb)

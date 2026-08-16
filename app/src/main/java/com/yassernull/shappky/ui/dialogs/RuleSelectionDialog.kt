@@ -61,21 +61,30 @@ fun RuleSelectionDialog(
         }
 
         Button(
-          onClick = { onSelectRuleType(RuleType.APP_CLOSED) },
+          onClick = { onSelectRuleType(RuleType.APP_PAUSED) },
           colors = buttonColors,
           shape = buttonShape,
           modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         ) {
-          Text(stringResource(R.string.rule_app_closed))
+          Text(stringResource(R.string.rule_app_paused))
         }
 
         Button(
-          onClick = { onSelectRuleType(RuleType.APP_KILLED_MANUALLY) },
+          onClick = { onSelectRuleType(RuleType.APP_EXITED) },
           colors = buttonColors,
           shape = buttonShape,
           modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         ) {
-          Text(stringResource(R.string.rule_app_killed_manually))
+          Text(stringResource(R.string.rule_app_exited))
+        }
+
+        Button(
+          onClick = { onSelectRuleType(RuleType.APP_KILLED) },
+          colors = buttonColors,
+          shape = buttonShape,
+          modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        ) {
+          Text(stringResource(R.string.rule_app_killed))
         }
 
         Button(

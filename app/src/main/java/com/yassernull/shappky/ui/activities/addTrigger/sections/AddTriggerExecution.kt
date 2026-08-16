@@ -26,8 +26,9 @@ const val DEFAULT_TRIGGER_SERVICE_DURATION_MS = 30000L
 fun defaultDurationForRule(ruleType: RuleType): Long = when (ruleType) {
   RuleType.APP_OPENED,
   RuleType.APP_RESUMED,
-  RuleType.APP_CLOSED,
-  RuleType.APP_KILLED_MANUALLY,
+  RuleType.APP_PAUSED,
+  RuleType.APP_EXITED,
+  RuleType.APP_KILLED,
   RuleType.APP_BACKGROUND_STARTED,
   RuleType.PHONE_SLEEP,
   RuleType.PHONE_WAKE,

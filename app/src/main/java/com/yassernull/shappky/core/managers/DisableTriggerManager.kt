@@ -39,6 +39,7 @@ object DisableTriggerManager {
             type = RuleType.valueOf(ruleObj.getString("type")),
             appPackages = appPackages,
             ramThresholdMb = ruleObj.optInt("ramThresholdMb", 0),
+            sleepDurationMinutes = ruleObj.optInt("sleepDurationMinutes", 0),
             timeHour = ruleObj.optInt("timeHour", 0),
             timeMinute = ruleObj.optInt("timeMinute", 0),
             inactivityDurationMinutes = ruleObj.optInt("inactivityDurationMinutes", 0),
@@ -66,6 +67,7 @@ object DisableTriggerManager {
       rule.appPackages.forEach { packagesArray.put(it) }
       ruleObj.put("appPackages", packagesArray)
       ruleObj.put("ramThresholdMb", rule.ramThresholdMb)
+      ruleObj.put("sleepDurationMinutes", rule.sleepDurationMinutes)
       ruleObj.put("timeHour", rule.timeHour)
       ruleObj.put("timeMinute", rule.timeMinute)
       ruleObj.put("inactivityDurationMinutes", rule.inactivityDurationMinutes)

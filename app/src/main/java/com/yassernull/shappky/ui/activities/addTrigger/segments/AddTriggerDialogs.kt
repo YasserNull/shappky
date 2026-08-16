@@ -19,9 +19,12 @@ fun AddTriggerRulesDialogs(
   showAppResumedPicker: Boolean,
   onDismissAppResumedPicker: () -> Unit,
   onSaveAppResumedPicker: (Set<String>) -> Unit,
-  showAppClosedPicker: Boolean,
-  onDismissAppClosedPicker: () -> Unit,
-  onSaveAppClosedPicker: (Set<String>) -> Unit,
+  showAppPausedPicker: Boolean,
+  onDismissAppPausedPicker: () -> Unit,
+  onSaveAppPausedPicker: (Set<String>) -> Unit,
+  showAppExitedPicker: Boolean,
+  onDismissAppExitedPicker: () -> Unit,
+  onSaveAppExitedPicker: (Set<String>) -> Unit,
   showAppKilledPicker: Boolean,
   onDismissAppKilledPicker: () -> Unit,
   onSaveAppKilledPicker: (Set<String>) -> Unit,
@@ -58,19 +61,29 @@ fun AddTriggerRulesDialogs(
     )
   }
 
-  if (showAppClosedPicker) {
+  if (showAppPausedPicker) {
     AppSelectionDialog(
-      title = stringResource(R.string.rule_app_closed),
+      title = stringResource(R.string.rule_app_paused),
       initialSelectedPackages = emptySet(),
       loadAllApps = loadAllApps,
-      onDismiss = onDismissAppClosedPicker,
-      onSave = onSaveAppClosedPicker,
+      onDismiss = onDismissAppPausedPicker,
+      onSave = onSaveAppPausedPicker,
+    )
+  }
+
+  if (showAppExitedPicker) {
+    AppSelectionDialog(
+      title = stringResource(R.string.rule_app_exited),
+      initialSelectedPackages = emptySet(),
+      loadAllApps = loadAllApps,
+      onDismiss = onDismissAppExitedPicker,
+      onSave = onSaveAppExitedPicker,
     )
   }
 
   if (showAppKilledPicker) {
     AppSelectionDialog(
-      title = stringResource(R.string.rule_app_killed_manually),
+      title = stringResource(R.string.rule_app_killed),
       initialSelectedPackages = emptySet(),
       loadAllApps = loadAllApps,
       onDismiss = onDismissAppKilledPicker,

@@ -161,6 +161,19 @@ class ShellManager(
     }
   }
 
+  fun runShellCommandAndGetFullOutputWithTimeout(command: String, timeoutMs: Long): String? {
+    val mode = getPermissionMode()
+    return when {
+      mode == "root" && hasRootAccess() -> {
+        executeRootCommandAndGetFullOutput(command)
+      }
+      mode == "shizuku" && hasShizukuPermission() -> {
+        executeShizukuCommandAndGetFullOutput(command, timeoutMs)
+      }
+      else -> null
+    }
+  }
+
   private fun executeRootCommand(
     command: String,
     onSuccess: Runnable?,
@@ -185,6 +198,10 @@ class ShellManager(
     Log.d(TAG, "Shizuku command executed command=$command")
     onSuccess?.let { handler.post(it) }
     true
+  } catch (e: InterruptedException) {
+    Log.w(TAG, "Shizuku command interrupted command=$command")
+    Thread.currentThread().interrupt()
+    false
   } catch (e: Exception) {
     Log.e(TAG, "Shizuku command Exception command=$command", e)
     e.printStackTrace()
@@ -194,32 +211,42 @@ class ShellManager(
   private fun executeShizukuCommandWithOutput(
     command: String,
     outputProcessor: Consumer<String>,
-  ): Boolean = try {
-    Log.d(TAG, "Shizuku command with output executing command=$command")
-    val process = createShizukuProcess(command)
+  ): Boolean {
+    var process: java.lang.Process? = null
+    return try {
+      Log.d(TAG, "Shizuku command with output executing command=$command")
+      process = createShizukuProcess(command)
 
-    val stdoutThread = Thread {
-      process.inputStream.bufferedReader().useLines { lines ->
-        lines.forEach { line -> handler.post { outputProcessor.accept(line) } }
+      val stdoutThread = Thread {
+        process!!.inputStream.bufferedReader().useLines { lines ->
+          lines.forEach { line -> handler.post { outputProcessor.accept(line) } }
+        }
       }
-    }
 
-    val stderrThread = Thread {
-      process.errorStream.bufferedReader().useLines { lines ->
-        lines.forEach { line -> handler.post { outputProcessor.accept("ERROR: $line") } }
+      val stderrThread = Thread {
+        process!!.errorStream.bufferedReader().useLines { lines ->
+          lines.forEach { line -> handler.post { outputProcessor.accept("ERROR: $line") } }
+        }
       }
-    }
 
-    stdoutThread.start()
-    stderrThread.start()
-    process.waitFor()
-    stdoutThread.join()
-    stderrThread.join()
-    true
-  } catch (e: Exception) {
-    Log.e(TAG, "Shizuku command with output failed command=$command", e)
-    e.printStackTrace()
-    false
+      stdoutThread.start()
+      stderrThread.start()
+      process!!.waitFor()
+      stdoutThread.join()
+      stderrThread.join()
+      true
+    } catch (e: InterruptedException) {
+      Log.w(TAG, "Shizuku command with output interrupted command=$command")
+      try {
+        process?.destroyForcibly()
+      } catch (_: Exception) {}
+      Thread.currentThread().interrupt()
+      false
+    } catch (e: Exception) {
+      Log.e(TAG, "Shizuku command with output failed command=$command", e)
+      e.printStackTrace()
+      false
+    }
   }
 
   private fun executeRootCommandAndGetFullOutput(command: String): String? {
@@ -235,34 +262,63 @@ class ShellManager(
     }
   }
 
-  private fun executeShizukuCommandAndGetFullOutput(command: String): String? = try {
-    Log.d(TAG, "Shizuku full output command executing command=$command")
-    val process = createShizukuProcess(command)
+  private fun executeShizukuCommandAndGetFullOutput(command: String, timeoutMs: Long? = null): String? {
+    var process: java.lang.Process? = null
+    return try {
+      Log.d(TAG, "Shizuku full output command executing command=$command")
+      process = createShizukuProcess(command)
 
-    val output = StringBuilder()
-    val stdoutThread = Thread {
-      process.inputStream.bufferedReader().useLines { lines ->
-        lines.forEach { line -> synchronized(output) { output.append(line).append("\n") } }
+      val output = StringBuilder()
+      val stdoutThread = Thread {
+        process!!.inputStream.bufferedReader().useLines { lines ->
+          lines.forEach { line -> synchronized(output) { output.append(line).append("\n") } }
+        }
       }
-    }
 
-    val stderrThread = Thread {
-      process.errorStream.bufferedReader().useLines { lines ->
-        lines.forEach { line -> synchronized(output) { output.append("ERROR: ").append(line).append("\n") } }
+      val stderrThread = Thread {
+        process!!.errorStream.bufferedReader().useLines { lines ->
+          lines.forEach { line -> synchronized(output) { output.append("ERROR: ").append(line).append("\n") } }
+        }
       }
+
+      stdoutThread.start()
+      stderrThread.start()
+      if (timeoutMs != null) {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        var exited = false
+        while (System.currentTimeMillis() < deadline && !exited) {
+          exited = try {
+            process!!.exitValue()
+            true
+          } catch (_: Exception) {
+            false
+          }
+          if (!exited) Thread.sleep(100L)
+        }
+        if (!exited) {
+          Log.w(TAG, "Shizuku full output command timed out, killing process command=$command")
+          process!!.destroyForcibly()
+        }
+      } else {
+        process!!.waitFor()
+      }
+      stdoutThread.join()
+      stderrThread.join()
+
+      Log.d(TAG, "Shizuku full output command done command=$command")
+      output.toString()
+    } catch (e: InterruptedException) {
+      Log.w(TAG, "Shizuku full output command interrupted, killing process command=$command")
+      try {
+        process?.destroyForcibly()
+      } catch (_: Exception) {}
+      Thread.currentThread().interrupt()
+      null
+    } catch (e: Exception) {
+      Log.e(TAG, "Shizuku command failed command=$command", e)
+      e.printStackTrace()
+      null
     }
-
-    stdoutThread.start()
-    stderrThread.start()
-    process.waitFor()
-    stdoutThread.join()
-    stderrThread.join()
-
-    output.toString()
-  } catch (e: Exception) {
-    Log.e(TAG, "Shizuku command failed command=$command", e)
-    e.printStackTrace()
-    null
   }
 
   private fun createShizukuProcess(command: String): java.lang.Process {
@@ -294,13 +350,15 @@ class ShellManager(
             }
           }
           Log.d(TAG, "Toybox deployed to $dest")
+        } catch (e: InterruptedException) {
+          Log.w(TAG, "Toybox deploy interrupted")
+          Thread.currentThread().interrupt()
         } catch (e: Exception) {
           Log.e(TAG, "Failed to deploy toybox", e)
         }
       }
     }
   }
-
   companion object {
     const val TOYBOX_PATH = "/data/local/tmp/toybox"
     private const val TAG = "ShappkyShell"

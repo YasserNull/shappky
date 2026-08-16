@@ -130,7 +130,7 @@
     <!-- Rules -->
     <string name="rules">القوانين</string>
     <string name="add_rule">إضافة قانون</string>
-    <string name="rule_app_opened">عند فتح تطبيق معين</string>
+    <string name="rule_app_opened">عند فتح تطبيق</string>
     <string name="rule_ram_limit">عند وصول ذاكرة الوصول العشوائي لحد معين</string>
     <string name="rule_app_ram_exceeded">عندما يستهلك التطبيق حد معين من ذاكرة الوصول العشوائي</string>
     <string name="rule_phone_sleep">عند سكون الهاتف</string>
@@ -162,9 +162,10 @@
     <string name="rule_app_inactivity">بعد مدة من عدم الاستخدام</string>
     <string name="rule_service_state">عندما تتغير حالة الخدمة</string>
     <string name="rule_kill_oldest">إيقاف أقدم تطبيق في القائمة تلقائياً</string>
-    <string name="rule_app_resumed">عند استئناف تطبيق معين</string>
-    <string name="rule_app_closed">عند إغلاق تطبيق معين</string>
-    <string name="rule_app_killed_manually">عند إيقاف تطبيق معين يدوياً</string>
+    <string name="rule_app_resumed">عند استئناف تطبيق</string>
+    <string name="rule_app_paused">عند إيقاف تطبيق مؤقتاً</string>
+    <string name="rule_app_exited">عند الخروج من تطبيق</string>
+    <string name="rule_app_killed">عند قتل تطبيق</string>
     <string name="rule_auto_background_started">إيقاف التطبيق عندما يشتغل في الخلفية تلقائيا</string>
 
     <string name="inactivity_duration">مدة عدم الاستعمال (بالدقائق)</string>
@@ -183,8 +184,9 @@
     <string name="rule_summary_service_state">إيقاف عند تغير خدمة: %1$s</string>
     <string name="rule_summary_kill_oldest">إيقاف أقدم تطبيق تلقائياً: %1$d دقيقة</string>
     <string name="rule_summary_app_resumed">عند استئناف: %1$s</string>
-    <string name="rule_summary_app_closed">عند إغلاق للخلفية: %1$s</string>
-    <string name="rule_summary_app_killed_manually">عند الإيقاف اليدوي: %1$s</string>
+    <string name="rule_summary_app_exited">عند الخروج الكامل: %1$s</string>
+    <string name="rule_summary_app_killed">عند القتل عبر شابكي: %1$s</string>
+    <string name="rule_summary_app_paused">عند الإيقاف المؤقت: %1$s</string>
     <string name="rule_summary_auto_background_started">إيقاف التطبيق عندما يشتغل في الخلفية تلقائيا</string>
 
     <string name="service_active">نشط</string>

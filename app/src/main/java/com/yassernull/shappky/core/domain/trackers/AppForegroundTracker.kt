@@ -47,6 +47,9 @@ class AppForegroundTracker {
   }
 
   @Synchronized
+  fun isKnownPackage(pkg: String): Boolean = lastForegroundTimeMap.containsKey(pkg)
+
+  @Synchronized
   fun updateForegroundApp(currentForeground: String?, now: Long): String? {
     if (currentForeground != null) {
       lastForegroundTimeMap[currentForeground] = now

@@ -10,7 +10,6 @@ import com.yassernull.shappky.core.domain.trackers.SystemStateTracker
 import com.yassernull.shappky.core.managers.BackgroundAppManager
 import com.yassernull.shappky.core.managers.ProtectionManager
 import com.yassernull.shappky.core.managers.ShellManager
-import com.yassernull.shappky.core.managers.parseRecentsPackages
 import com.yassernull.shappky.data.models.RuleType
 import com.yassernull.shappky.data.models.TriggerModel
 import com.yassernull.shappky.data.models.TriggerRule
@@ -32,8 +31,13 @@ class TriggerRuleEvaluator(
     private const val APP_FOREGROUND_RULE_COOLDOWN_MS = 60000L
   }
 
-  private val lastExecutedTime = mutableMapOf<String, Long>()
+  private val lastExecutedTime = java.util.concurrent.ConcurrentHashMap<String, Long>()
   private val recentShappkyKills = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+
+  fun clearCooldowns() {
+    lastExecutedTime.clear()
+    Log.d(TAG, "Cooldowns cleared due to service state change")
+  }
 
   fun evaluateServiceStateRules(
     triggers: List<TriggerModel>,
@@ -144,53 +148,65 @@ class TriggerRuleEvaluator(
     disableRules: List<TriggerRule>,
     currentForeground: String?,
     previouslyForeground: String?,
+    currentForegroundWasKnown: Boolean,
   ) {
     val isShappkyServiceRunning = ShappkyService.isRunning()
     val now = System.currentTimeMillis()
     Log.d(TAG, "evaluateAppForegroundRules: currentForeground=$currentForeground, previouslyForeground=$previouslyForeground, triggers=${triggers.size}")
 
     for (trigger in triggers) {
+      val prev = previouslyForeground
+      val current = currentForeground
+      val isTransition = prev != null && current != null && prev != current
+
       val appOpenedRules = trigger.rules.filter { it.type == RuleType.APP_OPENED }
-      if (currentForeground != null && appOpenedRules.any { rule -> rule.appPackages.contains(currentForeground) }) {
-        val matchedRule = appOpenedRules.first { rule -> rule.appPackages.contains(currentForeground) }
+      if (isTransition && !currentForegroundWasKnown && appOpenedRules.any { rule -> rule.appPackages.contains(current) }) {
+        val matchedRule = appOpenedRules.first { rule -> rule.appPackages.contains(current) }
         val lastRun = lastExecutedTime[matchedRule.id] ?: 0L
         if (now - lastRun >= APP_FOREGROUND_RULE_COOLDOWN_MS) {
           lastExecutedTime[matchedRule.id] = now
-          Log.d(TAG, "APP_OPENED MATCH FOUND! Triggering '${trigger.name}' for $currentForeground")
+          Log.d(TAG, "APP_OPENED MATCH FOUND! Triggering '${trigger.name}' for $current (first time, not running before)")
           actionExecutor.executeServiceTrigger(trigger)
         }
       }
 
       val appResumedRules = trigger.rules.filter { it.type == RuleType.APP_RESUMED }
       if (appResumedRules.isNotEmpty()) {
-        Log.d(TAG, "APP_RESUMED check: trigger='${trigger.name}', rules=${appResumedRules.size}, current=$currentForeground")
+        Log.d(TAG, "APP_RESUMED check: trigger='${trigger.name}', rules=${appResumedRules.size}, current=$current, wasKnown=$currentForegroundWasKnown, isTransition=$isTransition")
       }
-      if (currentForeground != null && appResumedRules.any { rule -> rule.appPackages.contains(currentForeground) }) {
-        val matchedRule = appResumedRules.first { rule -> rule.appPackages.contains(currentForeground) }
+      if (isTransition && currentForegroundWasKnown && appResumedRules.any { rule -> rule.appPackages.contains(current) }) {
+        val matchedRule = appResumedRules.first { rule -> rule.appPackages.contains(current) }
         val lastRun = lastExecutedTime[matchedRule.id] ?: 0L
         if (now - lastRun >= APP_FOREGROUND_RULE_COOLDOWN_MS) {
           lastExecutedTime[matchedRule.id] = now
-          Log.d(TAG, "APP_RESUMED MATCH FOUND! Triggering '${trigger.name}' for $currentForeground")
+          Log.d(TAG, "APP_RESUMED MATCH FOUND! Triggering '${trigger.name}' for $current")
           actionExecutor.executeServiceTrigger(trigger)
         }
       }
 
-      if (previouslyForeground != null) {
-        val appClosedRules = trigger.rules.filter { it.type == RuleType.APP_CLOSED }
-        if (appClosedRules.isNotEmpty()) {
-          Log.d(TAG, "APP_CLOSED check: trigger='${trigger.name}', rules=${appClosedRules.size}, previous=$previouslyForeground")
-        }
-        if (appClosedRules.any { rule -> rule.appPackages.contains(previouslyForeground) }) {
-          Log.d(TAG, "APP_CLOSED MATCH FOUND! Triggering '${trigger.name}' for $previouslyForeground")
+      val appPausedRules = trigger.rules.filter { it.type == RuleType.APP_PAUSED }
+      if (appPausedRules.isNotEmpty()) {
+        Log.d(TAG, "APP_PAUSED check: trigger='${trigger.name}', rules=${appPausedRules.size}, previous=$prev, isTransition=$isTransition")
+      }
+      if (prev != null && isTransition && foregroundTracker.isKnownPackage(prev) && appPausedRules.any { rule -> rule.appPackages.contains(prev) }) {
+        val matchedRule = appPausedRules.first { rule -> rule.appPackages.contains(prev) }
+        val lastRun = lastExecutedTime[matchedRule.id] ?: 0L
+        if (now - lastRun >= APP_FOREGROUND_RULE_COOLDOWN_MS) {
+          lastExecutedTime[matchedRule.id] = now
+          Log.d(TAG, "APP_PAUSED MATCH FOUND! Triggering '${trigger.name}' for $prev")
           actionExecutor.executeServiceTrigger(trigger)
         }
       }
     }
 
     if (!isShappkyServiceRunning && enableRules.isNotEmpty()) {
+      val prev = previouslyForeground
+      val current = currentForeground
+      val isTransition = prev != null && current != null && prev != current
+
       val appOpenedRules = enableRules.filter { it.type == RuleType.APP_OPENED }
-      if (currentForeground != null && appOpenedRules.any { rule -> rule.appPackages.contains(currentForeground) }) {
-        val matchedRule = appOpenedRules.first { rule -> rule.appPackages.contains(currentForeground) }
+      if (isTransition && !currentForegroundWasKnown && appOpenedRules.any { rule -> rule.appPackages.contains(current) }) {
+        val matchedRule = appOpenedRules.first { rule -> rule.appPackages.contains(current) }
         val lastRun = lastExecutedTime[matchedRule.id] ?: 0L
         if (now - lastRun >= APP_FOREGROUND_RULE_COOLDOWN_MS) {
           lastExecutedTime[matchedRule.id] = now
@@ -199,8 +215,8 @@ class TriggerRuleEvaluator(
       }
 
       val appResumedRules = enableRules.filter { it.type == RuleType.APP_RESUMED }
-      if (currentForeground != null && appResumedRules.any { rule -> rule.appPackages.contains(currentForeground) }) {
-        val matchedRule = appResumedRules.first { rule -> rule.appPackages.contains(currentForeground) }
+      if (isTransition && currentForegroundWasKnown && appResumedRules.any { rule -> rule.appPackages.contains(current) }) {
+        val matchedRule = appResumedRules.first { rule -> rule.appPackages.contains(current) }
         val lastRun = lastExecutedTime[matchedRule.id] ?: 0L
         if (now - lastRun >= APP_FOREGROUND_RULE_COOLDOWN_MS) {
           lastExecutedTime[matchedRule.id] = now
@@ -208,18 +224,20 @@ class TriggerRuleEvaluator(
         }
       }
 
-      if (previouslyForeground != null) {
-        val appClosedRules = enableRules.filter { it.type == RuleType.APP_CLOSED }
-        if (appClosedRules.any { rule -> rule.appPackages.contains(previouslyForeground) }) {
-          actionExecutor.enableShappkyService(appClosedRules.first())
-        }
+      val appPausedRules = enableRules.filter { it.type == RuleType.APP_PAUSED }
+      if (prev != null && isTransition && foregroundTracker.isKnownPackage(prev) && appPausedRules.any { rule -> rule.appPackages.contains(prev) }) {
+        actionExecutor.enableShappkyService(appPausedRules.first())
       }
     }
 
     if (isShappkyServiceRunning && disableRules.isNotEmpty()) {
+      val prev = previouslyForeground
+      val current = currentForeground
+      val isTransition = prev != null && current != null && prev != current
+
       val appOpenedRules = disableRules.filter { it.type == RuleType.APP_OPENED }
-      if (currentForeground != null && appOpenedRules.any { rule -> rule.appPackages.contains(currentForeground) }) {
-        val matchedRule = appOpenedRules.first { rule -> rule.appPackages.contains(currentForeground) }
+      if (isTransition && !currentForegroundWasKnown && appOpenedRules.any { rule -> rule.appPackages.contains(current) }) {
+        val matchedRule = appOpenedRules.first { rule -> rule.appPackages.contains(current) }
         val lastRun = lastExecutedTime[matchedRule.id] ?: 0L
         if (now - lastRun >= APP_FOREGROUND_RULE_COOLDOWN_MS) {
           lastExecutedTime[matchedRule.id] = now
@@ -228,8 +246,8 @@ class TriggerRuleEvaluator(
       }
 
       val appResumedRules = disableRules.filter { it.type == RuleType.APP_RESUMED }
-      if (currentForeground != null && appResumedRules.any { rule -> rule.appPackages.contains(currentForeground) }) {
-        val matchedRule = appResumedRules.first { rule -> rule.appPackages.contains(currentForeground) }
+      if (isTransition && currentForegroundWasKnown && appResumedRules.any { rule -> rule.appPackages.contains(current) }) {
+        val matchedRule = appResumedRules.first { rule -> rule.appPackages.contains(current) }
         val lastRun = lastExecutedTime[matchedRule.id] ?: 0L
         if (now - lastRun >= APP_FOREGROUND_RULE_COOLDOWN_MS) {
           lastExecutedTime[matchedRule.id] = now
@@ -237,75 +255,97 @@ class TriggerRuleEvaluator(
         }
       }
 
-      if (previouslyForeground != null) {
-        val appClosedRules = disableRules.filter { it.type == RuleType.APP_CLOSED }
-        if (appClosedRules.any { rule -> rule.appPackages.contains(previouslyForeground) }) {
-          actionExecutor.disableShappkyService(appClosedRules.first())
-        }
+      val appPausedRules = disableRules.filter { it.type == RuleType.APP_PAUSED }
+      if (prev != null && isTransition && foregroundTracker.isKnownPackage(prev) && appPausedRules.any { rule -> rule.appPackages.contains(prev) }) {
+        actionExecutor.disableShappkyService(appPausedRules.first())
       }
     }
   }
 
-  fun handleSleepAppClosedRules(
+  fun handleSleepAppPausedRules(
     triggers: List<TriggerModel>,
     enableRules: List<TriggerRule>,
     disableRules: List<TriggerRule>,
     prevApp: String,
   ) {
     val isShappkyServiceRunning = ShappkyService.isRunning()
-    Log.d(TAG, "handleSleepAppClosedRules: prevApp=$prevApp, serviceRunning=$isShappkyServiceRunning")
+    Log.d(TAG, "handleSleepAppPausedRules: prevApp=$prevApp, serviceRunning=$isShappkyServiceRunning")
 
     for (trigger in triggers) {
-      val appClosedRules = trigger.rules.filter { it.type == RuleType.APP_CLOSED }
-      Log.d(TAG, "APP_CLOSED check (sleep): trigger='${trigger.name}', rules=${appClosedRules.size}, previous=$prevApp")
-      if (appClosedRules.any { rule -> rule.appPackages.contains(prevApp) }) {
-        Log.d(TAG, "APP_CLOSED MATCH FOUND (Sleep)! Triggering '${trigger.name}' for $prevApp")
+      val appPausedRules = trigger.rules.filter { it.type == RuleType.APP_PAUSED }
+      Log.d(TAG, "APP_PAUSED check (sleep): trigger='${trigger.name}', rules=${appPausedRules.size}, previous=$prevApp")
+      if (appPausedRules.any { rule -> rule.appPackages.contains(prevApp) }) {
+        Log.d(TAG, "APP_PAUSED MATCH FOUND (Sleep)! Triggering '${trigger.name}' for $prevApp")
         actionExecutor.executeServiceTrigger(trigger)
       }
     }
     if (!isShappkyServiceRunning && enableRules.isNotEmpty()) {
-      val appClosedRules = enableRules.filter { it.type == RuleType.APP_CLOSED }
-      if (appClosedRules.any { rule -> rule.appPackages.contains(prevApp) }) {
-        actionExecutor.enableShappkyService(appClosedRules.first())
+      val appPausedRules = enableRules.filter { it.type == RuleType.APP_PAUSED }
+      if (appPausedRules.any { rule -> rule.appPackages.contains(prevApp) }) {
+        actionExecutor.enableShappkyService(appPausedRules.first())
       }
     }
     if (isShappkyServiceRunning && disableRules.isNotEmpty()) {
-      val appClosedRules = disableRules.filter { it.type == RuleType.APP_CLOSED }
-      if (appClosedRules.any { rule -> rule.appPackages.contains(prevApp) }) {
-        actionExecutor.disableShappkyService(appClosedRules.first())
+      val appPausedRules = disableRules.filter { it.type == RuleType.APP_PAUSED }
+      if (appPausedRules.any { rule -> rule.appPackages.contains(prevApp) }) {
+        actionExecutor.disableShappkyService(appPausedRules.first())
       }
     }
   }
 
-  fun evaluateAppKilledManually(
+  fun evaluateAppExitRules(
     triggers: List<TriggerModel>,
     enableRules: List<TriggerRule>,
     disableRules: List<TriggerRule>,
     killedPackages: Set<String>,
+    swipedFromRecentsPackages: Set<String>,
   ) {
     val isShappkyServiceRunning = ShappkyService.isRunning()
+    val stoppedSet = killedPackages + swipedFromRecentsPackages
 
-    Log.d(TAG, "evaluateAppKilledManually: killedPackages=$killedPackages, serviceRunning=$isShappkyServiceRunning")
+    Log.d(TAG, "evaluateAppExitRules: processStopped=$killedPackages, swipedFromRecents=$swipedFromRecentsPackages, serviceRunning=$isShappkyServiceRunning")
 
-    for (pkg in killedPackages) {
-      if (!recentShappkyKills.contains(pkg)) {
-        for (trigger in triggers) {
-          val manualKillRules = trigger.rules.filter { it.type == RuleType.APP_KILLED_MANUALLY }
-          if (manualKillRules.any { rule -> rule.appPackages.contains(pkg) }) {
-            Log.d(TAG, "APP_KILLED_MANUALLY MATCH FOUND! Triggering '${trigger.name}' for $pkg")
+    for (pkg in stoppedSet) {
+      val killedByShappky = recentShappkyKills.contains(pkg)
+      Log.d(TAG, "evaluateAppExitRules: pkg=$pkg, killedByShappky=$killedByShappky")
+      for (trigger in triggers) {
+        if (killedByShappky) {
+          val killedRules = trigger.rules.filter { it.type == RuleType.APP_KILLED }
+          if (killedRules.any { rule -> rule.appPackages.contains(pkg) }) {
+            Log.d(TAG, "APP_KILLED MATCH FOUND! Triggering '${trigger.name}' for $pkg")
+            actionExecutor.executeServiceTrigger(trigger)
+          }
+        } else {
+          val exitedRules = trigger.rules.filter { it.type == RuleType.APP_EXITED }
+          if (exitedRules.any { rule -> rule.appPackages.contains(pkg) }) {
+            Log.d(TAG, "APP_EXITED MATCH FOUND! Triggering '${trigger.name}' for $pkg")
             actionExecutor.executeServiceTrigger(trigger)
           }
         }
-        if (!isShappkyServiceRunning && enableRules.isNotEmpty()) {
-          val manualKillRules = enableRules.filter { it.type == RuleType.APP_KILLED_MANUALLY }
-          if (manualKillRules.any { rule -> rule.appPackages.contains(pkg) }) {
-            actionExecutor.enableShappkyService(manualKillRules.first())
+      }
+      if (!isShappkyServiceRunning && enableRules.isNotEmpty()) {
+        if (killedByShappky) {
+          val killedRules = enableRules.filter { it.type == RuleType.APP_KILLED }
+          if (killedRules.any { rule -> rule.appPackages.contains(pkg) }) {
+            actionExecutor.enableShappkyService(killedRules.first())
+          }
+        } else {
+          val exitedRules = enableRules.filter { it.type == RuleType.APP_EXITED }
+          if (exitedRules.any { rule -> rule.appPackages.contains(pkg) }) {
+            actionExecutor.enableShappkyService(exitedRules.first())
           }
         }
-        if (isShappkyServiceRunning && disableRules.isNotEmpty()) {
-          val manualKillRules = disableRules.filter { it.type == RuleType.APP_KILLED_MANUALLY }
-          if (manualKillRules.any { rule -> rule.appPackages.contains(pkg) }) {
-            actionExecutor.disableShappkyService(manualKillRules.first())
+      }
+      if (isShappkyServiceRunning && disableRules.isNotEmpty()) {
+        if (killedByShappky) {
+          val killedRules = disableRules.filter { it.type == RuleType.APP_KILLED }
+          if (killedRules.any { rule -> rule.appPackages.contains(pkg) }) {
+            actionExecutor.disableShappkyService(killedRules.first())
+          }
+        } else {
+          val exitedRules = disableRules.filter { it.type == RuleType.APP_EXITED }
+          if (exitedRules.any { rule -> rule.appPackages.contains(pkg) }) {
+            actionExecutor.disableShappkyService(exitedRules.first())
           }
         }
       }
@@ -499,6 +539,7 @@ class TriggerRuleEvaluator(
     triggers: List<TriggerModel>,
     runningPackages: Set<String>,
     packageRamUsage: Map<String, Long>,
+    userLaunchedPackages: Set<String>,
   ) {
     if (runningPackages.isEmpty()) {
       Log.d(TAG, "evaluateAutoStartedBackgroundRules: skipped, no running packages")
@@ -508,13 +549,6 @@ class TriggerRuleEvaluator(
     val pm = context.packageManager
     val protectedApps = ProtectionManager.getProtectedApps(context)
 
-    // Packages the user opened (tasks still present in recents)
-    val recentsOutput = shellManager.runShellCommandAndGetFullOutput("dumpsys activity recents") ?: ""
-    if (recentsOutput.isBlank() || recentsOutput.startsWith("ERROR")) {
-      Log.w(TAG, "evaluateAutoStartedBackgroundRules: dumpsys activity recents empty/error, skipping")
-      return
-    }
-    val userLaunchedPackages = parseRecentsPackages(recentsOutput, pm)
     Log.d(TAG, "evaluateAutoStartedBackgroundRules: userLaunchedPackages=$userLaunchedPackages")
 
     for (trigger in triggers) {

@@ -138,7 +138,7 @@
     <!-- Rules -->
     <string name="rules">Rules</string>
     <string name="add_rule">Add Rule</string>
-    <string name="rule_app_opened">When opening a specific app</string>
+    <string name="rule_app_opened">When open an app</string>
     <string name="rule_ram_limit">When RAM reaches a limit</string>
     <string name="rule_app_ram_exceeded">When an app consumes a limit of RAM</string>
     <string name="rule_phone_sleep">When the phone goes to sleep</string>
@@ -170,9 +170,10 @@
     <string name="rule_app_inactivity">after a duration of inactivity</string>
     <string name="rule_service_state">When service state changes</string>
     <string name="rule_kill_oldest">Kill oldest app in the list automatically</string>
-    <string name="rule_app_resumed">When resume a specific app</string>
-    <string name="rule_app_closed">When close a specific app</string>
-    <string name="rule_app_killed_manually">When kill a specific app</string>
+    <string name="rule_app_resumed">When resume an app</string>
+    <string name="rule_app_paused">When pause an app</string>
+    <string name="rule_app_exited">When exit an app</string>
+    <string name="rule_app_killed">When kill an app</string>
     <string name="rule_auto_background_started">Kill app when it auto-runs in background</string>
 
     <string name="inactivity_duration">Inactivity Duration (Minutes)</string>
@@ -191,8 +192,9 @@
     <string name="rule_summary_service_state">Kill when service changes: %1$s</string>
     <string name="rule_summary_kill_oldest">Kill oldest app automatically: %1$d min</string>
     <string name="rule_summary_app_resumed">When resume: %1$s</string>
-    <string name="rule_summary_app_closed">When close: %1$s</string>
-    <string name="rule_summary_app_killed_manually">When kill: %1$s</string>
+    <string name="rule_summary_app_exited">When exit: %1$s</string>
+    <string name="rule_summary_app_killed">When killed by Shappky: %1$s</string>
+    <string name="rule_summary_app_paused">When paused: %1$s</string>
     <string name="rule_summary_auto_background_started">Kill app when it auto-runs in background</string>
 
     <string name="service_active">Active</string>

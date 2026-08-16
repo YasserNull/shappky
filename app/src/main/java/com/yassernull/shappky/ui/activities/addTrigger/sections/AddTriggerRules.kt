@@ -40,7 +40,8 @@ fun RulesSection(
   var activeConfigType by remember { mutableStateOf<RuleType?>(null) }
   var showAppOpenedPicker by remember { mutableStateOf(false) }
   var showAppResumedPicker by remember { mutableStateOf(false) }
-  var showAppClosedPicker by remember { mutableStateOf(false) }
+  var showAppPausedPicker by remember { mutableStateOf(false) }
+  var showAppExitedPicker by remember { mutableStateOf(false) }
   var showAppKilledPicker by remember { mutableStateOf(false) }
 
   AddTriggerRulesDialogs(
@@ -67,8 +68,9 @@ fun RulesSection(
         }
         RuleType.APP_OPENED -> showAppOpenedPicker = true
         RuleType.APP_RESUMED -> showAppResumedPicker = true
-        RuleType.APP_CLOSED -> showAppClosedPicker = true
-        RuleType.APP_KILLED_MANUALLY -> showAppKilledPicker = true
+        RuleType.APP_PAUSED -> showAppPausedPicker = true
+        RuleType.APP_EXITED -> showAppExitedPicker = true
+        RuleType.APP_KILLED -> showAppKilledPicker = true
         else -> activeConfigType = type
       }
     },
@@ -100,19 +102,33 @@ fun RulesSection(
       }
       showAppResumedPicker = false
     },
-    showAppClosedPicker = showAppClosedPicker,
-    onDismissAppClosedPicker = { showAppClosedPicker = false },
-    onSaveAppClosedPicker = { selected ->
+    showAppPausedPicker = showAppPausedPicker,
+    onDismissAppPausedPicker = { showAppPausedPicker = false },
+    onSaveAppPausedPicker = { selected ->
       if (selected.isNotEmpty()) {
         onRulesChange(
           rules + TriggerRule(
             id = UUID.randomUUID().toString(),
-            type = RuleType.APP_CLOSED,
+            type = RuleType.APP_PAUSED,
             appPackages = selected,
           ),
         )
       }
-      showAppClosedPicker = false
+      showAppPausedPicker = false
+    },
+    showAppExitedPicker = showAppExitedPicker,
+    onDismissAppExitedPicker = { showAppExitedPicker = false },
+    onSaveAppExitedPicker = { selected ->
+      if (selected.isNotEmpty()) {
+        onRulesChange(
+          rules + TriggerRule(
+            id = UUID.randomUUID().toString(),
+            type = RuleType.APP_EXITED,
+            appPackages = selected,
+          ),
+        )
+      }
+      showAppExitedPicker = false
     },
     showAppKilledPicker = showAppKilledPicker,
     onDismissAppKilledPicker = { showAppKilledPicker = false },
@@ -121,7 +137,7 @@ fun RulesSection(
         onRulesChange(
           rules + TriggerRule(
             id = UUID.randomUUID().toString(),
-            type = RuleType.APP_KILLED_MANUALLY,
+            type = RuleType.APP_KILLED,
             appPackages = selected,
           ),
         )
@@ -182,8 +198,9 @@ fun RulesSection(
         val ruleIcon = when (rule.type) {
           RuleType.APP_OPENED -> Icons.Filled.Apps
           RuleType.APP_RESUMED -> Icons.Filled.Apps
-          RuleType.APP_CLOSED -> Icons.Filled.Apps
-          RuleType.APP_KILLED_MANUALLY -> Icons.Filled.Close
+          RuleType.APP_PAUSED -> Icons.Filled.Pause
+          RuleType.APP_EXITED -> Icons.Filled.ExitToApp
+          RuleType.APP_KILLED -> Icons.Filled.Close
           RuleType.RAM_LIMIT_REACHED -> Icons.Filled.Speed
           RuleType.APP_RAM_EXCEEDED -> Icons.Filled.SdStorage
           RuleType.PHONE_SLEEP -> Icons.Filled.PowerSettingsNew
