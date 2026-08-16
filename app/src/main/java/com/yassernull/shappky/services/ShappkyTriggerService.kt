@@ -47,6 +47,7 @@ class ShappkyTriggerService : Service() {
   private var lastSharedForeground: String? = null
   private val previousRunningPackages = mutableSetOf<String>()
   private val previousRecentsPackages = mutableSetOf<String>()
+  private val pendingExitChecks = mutableMapOf<String, Long>()
 
   @Volatile
   private var pendingSleepEvent = false
@@ -188,8 +189,10 @@ class ShappkyTriggerService : Service() {
           val hasAppOpenedRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_OPENED } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_OPENED })
           val hasAppResumedRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_RESUMED } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_RESUMED }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_RESUMED })
           val hasAppPausedRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_PAUSED } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_PAUSED }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_PAUSED })
+          val hasExitRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_EXITED } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_EXITED }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_EXITED })
+          val hasKillRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_KILLED } } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_KILLED }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_KILLED })
 
-          Log.d(TAG, "startTriggerMonitoring: triggers=${activeTriggers.size}, interactive=${stateTracker.currentInteractive}, appOpened=$hasAppOpenedRules, appResumed=$hasAppResumedRules, appPaused=$hasAppPausedRules, inactivity=$hasInactivityRules, autoBg=$hasAutoBgRules")
+          Log.d(TAG, "startTriggerMonitoring: triggers=${activeTriggers.size}, interactive=${stateTracker.currentInteractive}, appOpened=$hasAppOpenedRules, appResumed=$hasAppResumedRules, appPaused=$hasAppPausedRules, exit=$hasExitRules, kill=$hasKillRules, inactivity=$hasInactivityRules, autoBg=$hasAutoBgRules")
 
           var currentForeground: String? = null
           if (stateTracker.currentInteractive && (hasAppOpenedRules || hasAppResumedRules || hasAppPausedRules || hasInactivityRules || hasAutoBgRules)) {
@@ -208,6 +211,32 @@ class ShappkyTriggerService : Service() {
                   previouslyForeground,
                   currentForegroundWasKnown,
                 )
+
+                // Fast exit detection: when the user leaves a known foreground app,
+                // watch whether its activity/task disappears from the activity dump
+                // (back-exit destroys the task; home-pause keeps it) and confirm exit.
+                val leftApp = previouslyForeground
+                if (leftApp != null && leftApp != currentForeground && (hasExitRules || hasKillRules) && foregroundTracker.isKnownPackage(leftApp)) {
+                  if (!pendingExitChecks.containsKey(leftApp)) {
+                    Log.d(TAG, "startTriggerMonitoring: watching $leftApp for exit (left foreground)")
+                  }
+                  pendingExitChecks.putIfAbsent(leftApp, now)
+                }
+
+                val pendingIterator = pendingExitChecks.entries.iterator()
+                while (pendingIterator.hasNext()) {
+                  val entry = pendingIterator.next()
+                  val pkg = entry.key
+                  val startedWatching = entry.value
+                  if (!activityDumpContainsPackage(dumpOutput, pkg)) {
+                    pendingIterator.remove()
+                    Log.d(TAG, "startTriggerMonitoring: exit detected for $pkg (no activity/task record)")
+                    ruleEvaluator.evaluateAppExitRules(activeTriggers, enableRules, disableRules, emptySet(), setOf(pkg))
+                  } else if (now - startedWatching > EXIT_CONFIRM_TIMEOUT_MS) {
+                    pendingIterator.remove()
+                    Log.d(TAG, "startTriggerMonitoring: $pkg still active after ${now - startedWatching}ms (paused, not exited)")
+                  }
+                }
               }
             }
           }
@@ -269,9 +298,14 @@ class ShappkyTriggerService : Service() {
 
           // Effective scan interval = smallest service duration among active triggers (fallback default)
           val intervalMs = minServiceDurationOrNull(activeTriggers) ?: DEFAULT_BACKGROUND_INTERVAL_MS
-          Log.d(TAG, "startBackgroundMonitoring: scan in ${intervalMs}ms (inactivity=$hasInactivityRules, autoBg=$hasAutoBgRules, killOldest=$hasKillOldestRules)")
+          val effectiveIntervalMs = if (hasExitRules || hasManualKillRules) {
+            minOf(intervalMs, EXIT_SCAN_INTERVAL_MS)
+          } else {
+            intervalMs
+          }
+          Log.d(TAG, "startBackgroundMonitoring: scan in ${effectiveIntervalMs}ms (inactivity=$hasInactivityRules, autoBg=$hasAutoBgRules, killOldest=$hasKillOldestRules)")
 
-          Thread.sleep(intervalMs)
+          Thread.sleep(effectiveIntervalMs)
           if (!isRunning) break
 
           val now = System.currentTimeMillis()
@@ -357,6 +391,13 @@ class ShappkyTriggerService : Service() {
 
   private fun minServiceDurationOrNull(triggers: List<com.yassernull.shappky.data.models.TriggerModel>): Long? = triggers.mapNotNull { it.serviceDuration.takeIf { d -> d > 0L } }.minOrNull()
 
+  private fun activityDumpContainsPackage(dump: String, pkg: String): Boolean {
+    val escaped = Regex.escape(pkg)
+    val componentRegex = Regex("$escaped(/[A-Za-z0-9_.$]*)?[\\s,}]")
+    val affinityRegex = Regex("A=$escaped\\s")
+    return componentRegex.containsMatchIn(dump) || affinityRegex.containsMatchIn(dump)
+  }
+
   override fun onDestroy() {
     isRunning = false
     try {
@@ -387,6 +428,8 @@ class ShappkyTriggerService : Service() {
     private const val DEFAULT_BACKGROUND_INTERVAL_MS = 50000L
     private const val MONITOR_SCAN_INTERVAL_MS = 1000L
     private const val MONITOR_COMMAND_TIMEOUT_MS = 10000L
+    private const val EXIT_SCAN_INTERVAL_MS = 10000L
+    private const val EXIT_CONFIRM_TIMEOUT_MS = 5000L
 
     @Volatile
     private var isRunning = false

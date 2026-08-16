@@ -29,10 +29,12 @@ class TriggerRuleEvaluator(
   companion object {
     private const val TAG = "TriggerRuleEvaluator"
     private const val APP_FOREGROUND_RULE_COOLDOWN_MS = 60000L
+    private const val EXIT_REPORT_COOLDOWN_MS = 20000L
   }
 
   private val lastExecutedTime = java.util.concurrent.ConcurrentHashMap<String, Long>()
   private val recentShappkyKills = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+  private val recentlyReportedExits = java.util.concurrent.ConcurrentHashMap<String, Long>()
 
   fun clearCooldowns() {
     lastExecutedTime.clear()
@@ -306,6 +308,13 @@ class TriggerRuleEvaluator(
     Log.d(TAG, "evaluateAppExitRules: processStopped=$killedPackages, swipedFromRecents=$swipedFromRecentsPackages, serviceRunning=$isShappkyServiceRunning")
 
     for (pkg in stoppedSet) {
+      val now = System.currentTimeMillis()
+      val lastReported = recentlyReportedExits[pkg] ?: 0L
+      if (now - lastReported < EXIT_REPORT_COOLDOWN_MS) {
+        Log.d(TAG, "evaluateAppExitRules: $pkg already reported recently, skipping")
+        continue
+      }
+      recentlyReportedExits[pkg] = now
       val killedByShappky = recentShappkyKills.contains(pkg)
       Log.d(TAG, "evaluateAppExitRules: pkg=$pkg, killedByShappky=$killedByShappky")
       for (trigger in triggers) {
@@ -603,11 +612,19 @@ class TriggerRuleEvaluator(
   }
 
   fun cleanKilledApps(runningPackages: Set<String>) {
+    val now = System.currentTimeMillis()
     val iteratorKill = recentShappkyKills.iterator()
     while (iteratorKill.hasNext()) {
       val pkg = iteratorKill.next()
       if (!runningPackages.contains(pkg)) {
         iteratorKill.remove()
+      }
+    }
+    val iteratorReported = recentlyReportedExits.entries.iterator()
+    while (iteratorReported.hasNext()) {
+      val entry = iteratorReported.next()
+      if (now - entry.value >= EXIT_REPORT_COOLDOWN_MS) {
+        iteratorReported.remove()
       }
     }
   }
