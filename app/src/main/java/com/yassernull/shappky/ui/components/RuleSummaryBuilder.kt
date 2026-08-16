@@ -39,7 +39,11 @@ fun buildRuleSummary(rule: TriggerRule): String {
       context.getString(R.string.rule_summary_app_ram, appNames, rule.ramThresholdMb)
     }
     RuleType.PHONE_SLEEP -> {
-      context.getString(R.string.rule_summary_phone_sleep, rule.sleepDurationMinutes)
+      if (rule.sleepDurationMinutes > 0) {
+        context.getString(R.string.rule_summary_phone_sleep, rule.sleepDurationMinutes)
+      } else {
+        context.getString(R.string.rule_summary_phone_sleep_immediate)
+      }
     }
     RuleType.PHONE_WAKE -> {
       context.getString(R.string.rule_summary_phone_wake)

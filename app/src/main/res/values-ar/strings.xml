@@ -144,6 +144,7 @@
     <string name="rule_summary_ram_limit">عند وصول ذاكرة الوصول العشوائي لـ %1$d م.ب</string>
     <string name="rule_summary_app_ram">عندما يستهلك %1$s أكثر من %2$d م.ب</string>
     <string name="rule_summary_phone_sleep">بعد سكون الهاتف بـ %1$d دقيقة</string>
+    <string name="rule_summary_phone_sleep_immediate">عند نوم الهاتف</string>
     <string name="rule_summary_phone_wake">عند تشغيل الهاتف من وضع السكون</string>
     <string name="rule_summary_specific_time">عند الساعة %1$02d:%2$02d</string>
     <string name="rules_empty">لم يتم إضافة أي قوانين بعد</string>

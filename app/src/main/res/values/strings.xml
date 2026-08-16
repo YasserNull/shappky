@@ -152,6 +152,7 @@
     <string name="rule_summary_ram_limit">When RAM reaches %1$d MB</string>
     <string name="rule_summary_app_ram">When %1$s exceeds %2$d MB</string>
     <string name="rule_summary_phone_sleep">After sleep: %1$d min</string>
+    <string name="rule_summary_phone_sleep_immediate">When phone sleeps</string>
     <string name="rule_summary_phone_wake">When phone wakes up</string>
     <string name="rule_summary_specific_time">At %1$02d:%2$02d</string>
     <string name="rules_empty">No rules added yet</string>

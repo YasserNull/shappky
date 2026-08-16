@@ -58,6 +58,14 @@ fun RulesSection(
             ),
           )
         }
+        RuleType.PHONE_SLEEP -> {
+          onRulesChange(
+            rules + TriggerRule(
+              id = UUID.randomUUID().toString(),
+              type = RuleType.PHONE_SLEEP,
+            ),
+          )
+        }
         RuleType.APP_BACKGROUND_STARTED -> {
           onRulesChange(
             rules + TriggerRule(

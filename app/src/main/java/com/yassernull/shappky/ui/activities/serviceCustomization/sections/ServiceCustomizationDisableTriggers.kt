@@ -51,7 +51,7 @@ fun ServiceCustomizationDisableTriggers(
       showRuleSelection = false
       when (type) {
         RuleType.PHONE_WAKE -> addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.PHONE_WAKE))
-        RuleType.PHONE_SLEEP -> activeConfigType = type
+        RuleType.PHONE_SLEEP -> addRule(TriggerRule(id = UUID.randomUUID().toString(), type = RuleType.PHONE_SLEEP))
         RuleType.SPECIFIC_TIME -> activeConfigType = type
         RuleType.RAM_LIMIT_REACHED -> activeConfigType = type
         RuleType.APP_OPENED -> showAppOpenedPicker = true
