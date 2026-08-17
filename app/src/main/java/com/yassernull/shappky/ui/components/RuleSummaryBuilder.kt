@@ -73,7 +73,7 @@ fun buildRuleSummary(rule: TriggerRule): String {
       context.getString(R.string.rule_summary_service_state, serviceNames)
     }
     RuleType.KILL_OLDEST_APP -> {
-      context.getString(R.string.rule_summary_kill_oldest)
+      context.getString(R.string.rule_summary_kill_oldest, rule.inactivityDurationMinutes)
     }
     RuleType.APP_BACKGROUND_STARTED -> {
       context.getString(R.string.rule_summary_auto_background_started)
