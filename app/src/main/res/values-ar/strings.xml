@@ -158,6 +158,8 @@
     <string name="add_disable_rule">إضافة قاعدة تعطيل</string>
     <string name="no_disable_rules">لم يتم إضافة قواعد تعطيل</string>
     <string name="shappky_service_disabled_notification_text">تم إيقاف خدمة شابكي تلقائياً.</string>
+    <string name="trigger_enabled_notification_text">تم تفعيل المشغل تلقائياً.</string>
+    <string name="trigger_disabled_notification_text">تم إيقاف المشغل تلقائياً.</string>
 
     <!-- New Rules -->
     <string name="rule_app_inactivity">بعد مدة من عدم الاستخدام</string>

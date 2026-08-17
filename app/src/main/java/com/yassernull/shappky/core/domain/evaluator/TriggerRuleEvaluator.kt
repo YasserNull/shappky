@@ -11,6 +11,7 @@ import com.yassernull.shappky.core.managers.BackgroundAppManager
 import com.yassernull.shappky.core.managers.KillTracker
 import com.yassernull.shappky.core.managers.ProtectionManager
 import com.yassernull.shappky.core.managers.ShellManager
+import com.yassernull.shappky.core.managers.TriggerManager
 import com.yassernull.shappky.data.models.RuleType
 import com.yassernull.shappky.data.models.TriggerModel
 import com.yassernull.shappky.data.models.TriggerRule
@@ -31,6 +32,7 @@ class TriggerRuleEvaluator(
     private const val TAG = "TriggerRuleEvaluator"
     private const val APP_FOREGROUND_RULE_COOLDOWN_MS = 60000L
     private const val EXIT_REPORT_COOLDOWN_MS = 20000L
+    private const val SERVICE_RULE_COOLDOWN_MS = 60000L
   }
 
   private val lastExecutedTime = java.util.concurrent.ConcurrentHashMap<String, Long>()
@@ -611,6 +613,124 @@ class TriggerRuleEvaluator(
           NotificationUtils.showTriggerFreedMemoryNotification(context, trigger.name, freedText)
         }, showToast = false)
       }
+    }
+  }
+
+  fun evaluateTriggerEnableDisableRules(
+    triggers: List<TriggerModel>,
+    isPhoneSleepTriggered: Boolean,
+    isPhoneWakeTriggered: Boolean,
+    usedMb: Long,
+    now: Long,
+  ) {
+    for (trigger in triggers) {
+      for (rule in trigger.enableRules) {
+        if (!matchesStateRule(rule, isPhoneSleepTriggered, isPhoneWakeTriggered, usedMb)) continue
+        val lastRun = lastExecutedTime[rule.id] ?: 0L
+        if (now - lastRun >= SERVICE_RULE_COOLDOWN_MS) {
+          lastExecutedTime[rule.id] = now
+          if (!trigger.isEnabled) {
+            TriggerManager.setTriggerEnabled(context, trigger.id, true)
+            Log.d(TAG, "Enable rule matched! Trigger '${trigger.name}' enabled (rule ${rule.type})")
+            NotificationUtils.showTriggerFreedMemoryNotification(
+              context,
+              trigger.name,
+              context.getString(R.string.trigger_enabled_notification_text),
+            )
+          }
+        }
+      }
+      for (rule in trigger.disableRules) {
+        if (!matchesStateRule(rule, isPhoneSleepTriggered, isPhoneWakeTriggered, usedMb)) continue
+        val lastRun = lastExecutedTime[rule.id] ?: 0L
+        if (now - lastRun >= SERVICE_RULE_COOLDOWN_MS) {
+          lastExecutedTime[rule.id] = now
+          if (trigger.isEnabled) {
+            TriggerManager.setTriggerEnabled(context, trigger.id, false)
+            Log.d(TAG, "Disable rule matched! Trigger '${trigger.name}' disabled (rule ${rule.type})")
+            NotificationUtils.showTriggerFreedMemoryNotification(
+              context,
+              trigger.name,
+              context.getString(R.string.trigger_disabled_notification_text),
+            )
+          }
+        }
+      }
+    }
+  }
+
+  private fun matchesStateRule(
+    rule: TriggerRule,
+    isPhoneSleepTriggered: Boolean,
+    isPhoneWakeTriggered: Boolean,
+    usedMb: Long,
+  ): Boolean = when (rule.type) {
+    RuleType.PHONE_SLEEP -> isPhoneSleepTriggered
+    RuleType.PHONE_WAKE -> isPhoneWakeTriggered
+    RuleType.RAM_LIMIT_REACHED -> usedMb >= rule.ramThresholdMb
+    RuleType.SERVICE_STATE_CHANGED -> rule.selectedServices.any { stateTracker.hasServiceStateChanged(it) }
+    else -> false
+  }
+
+  fun evaluateTriggerEnableDisableAppRules(
+    triggers: List<TriggerModel>,
+    currentForeground: String?,
+    previouslyForeground: String?,
+    currentForegroundWasKnown: Boolean,
+    stoppedPackages: Set<String>,
+    now: Long,
+  ) {
+    for (trigger in triggers) {
+      for (rule in trigger.enableRules) {
+        if (!matchesAppRule(rule, currentForeground, previouslyForeground, currentForegroundWasKnown, stoppedPackages)) continue
+        val lastRun = lastExecutedTime[rule.id] ?: 0L
+        if (now - lastRun >= SERVICE_RULE_COOLDOWN_MS) {
+          lastExecutedTime[rule.id] = now
+          if (!trigger.isEnabled) {
+            TriggerManager.setTriggerEnabled(context, trigger.id, true)
+            Log.d(TAG, "Enable rule matched (app)! Trigger '${trigger.name}' enabled (rule ${rule.type})")
+            NotificationUtils.showTriggerFreedMemoryNotification(
+              context,
+              trigger.name,
+              context.getString(R.string.trigger_enabled_notification_text),
+            )
+          }
+        }
+      }
+      for (rule in trigger.disableRules) {
+        if (!matchesAppRule(rule, currentForeground, previouslyForeground, currentForegroundWasKnown, stoppedPackages)) continue
+        val lastRun = lastExecutedTime[rule.id] ?: 0L
+        if (now - lastRun >= SERVICE_RULE_COOLDOWN_MS) {
+          lastExecutedTime[rule.id] = now
+          if (trigger.isEnabled) {
+            TriggerManager.setTriggerEnabled(context, trigger.id, false)
+            Log.d(TAG, "Disable rule matched (app)! Trigger '${trigger.name}' disabled (rule ${rule.type})")
+            NotificationUtils.showTriggerFreedMemoryNotification(
+              context,
+              trigger.name,
+              context.getString(R.string.trigger_disabled_notification_text),
+            )
+          }
+        }
+      }
+    }
+  }
+
+  private fun matchesAppRule(
+    rule: TriggerRule,
+    currentForeground: String?,
+    previouslyForeground: String?,
+    currentForegroundWasKnown: Boolean,
+    stoppedPackages: Set<String>,
+  ): Boolean {
+    val isTransition = previouslyForeground != null && currentForeground != null && previouslyForeground != currentForeground
+    return when (rule.type) {
+      RuleType.APP_OPENED -> isTransition && !currentForegroundWasKnown && rule.appPackages.contains(currentForeground)
+      RuleType.APP_RESUMED -> isTransition && currentForegroundWasKnown && rule.appPackages.contains(currentForeground)
+      RuleType.APP_PAUSED -> isTransition && rule.appPackages.contains(previouslyForeground)
+      RuleType.APP_EXITED -> rule.appPackages.any { it in stoppedPackages && !KillTracker.contains(it) }
+      RuleType.APP_KILLED -> rule.appPackages.any { it in stoppedPackages && KillTracker.contains(it) }
+      else -> false
     }
   }
 

@@ -14,7 +14,7 @@ object TriggerServiceManager {
     val triggers = TriggerManager.getTriggers(context)
     val enableRules = EnableTriggerManager.getEnableRules(context)
     val disableRules = DisableTriggerManager.getDisableRules(context)
-    val hasActiveTriggers = triggers.any { it.isEnabled && (it.rules.isNotEmpty() || it.enableRules.isNotEmpty() || it.disableRules.isNotEmpty()) } || enableRules.isNotEmpty() || disableRules.isNotEmpty()
+    val hasActiveTriggers = triggers.any { it.isEnabled && (it.rules.isNotEmpty() || it.enableRules.isNotEmpty() || it.disableRules.isNotEmpty()) } || triggers.any { it.enableRules.isNotEmpty() || it.disableRules.isNotEmpty() } || enableRules.isNotEmpty() || disableRules.isNotEmpty()
     Log.d(TAG, "updateTriggerServiceState: active=$hasActiveTriggers, running=${ShappkyTriggerService.isRunning()}")
     val intent = Intent(context, ShappkyTriggerService::class.java)
     if (hasActiveTriggers) {

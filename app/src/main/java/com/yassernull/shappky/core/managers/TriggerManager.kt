@@ -179,6 +179,16 @@ object TriggerManager {
     saveTriggers(context, triggers)
   }
 
+  fun setTriggerEnabled(context: Context, id: String, enabled: Boolean) {
+    val triggers = getTriggers(context)
+    val index = triggers.indexOfFirst { it.id == id }
+    if (index >= 0 && triggers[index].isEnabled != enabled) {
+      val updated = triggers.toMutableList()
+      updated[index] = triggers[index].copy(isEnabled = enabled)
+      saveTriggers(context, updated)
+    }
+  }
+
   fun deleteTrigger(context: Context, id: String) {
     val triggers = getTriggers(context).filter { it.id != id }
     saveTriggers(context, triggers)

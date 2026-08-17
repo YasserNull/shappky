@@ -166,6 +166,8 @@
     <string name="add_disable_rule">Add Disable rule</string>
     <string name="no_disable_rules">No disable rules added</string>
     <string name="shappky_service_disabled_notification_text">Shappky Service has been automatically disabled.</string>
+    <string name="trigger_enabled_notification_text">Trigger has been automatically enabled.</string>
+    <string name="trigger_disabled_notification_text">Trigger has been automatically disabled.</string>
 
     <!-- New Rules -->
     <string name="rule_app_inactivity">after a duration of inactivity</string>
