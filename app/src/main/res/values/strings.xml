@@ -252,7 +252,7 @@
     <string name="widget_icon_color">Icon Color</string>
     <string name="widget_bg_color">Background Color</string>
     <string name="widget_show_trigger_name">Show Trigger Name</string>
-    <string name="widget_no_triggers_warning">You must add a trigger first from the app to configure the widget.</string>
+    <string name="widget_no_triggers_warning">No manual triggers available. Add a trigger without rules to configure the widget.</string>
     <string name="widget_select_color">Select Color</string>
     <string name="widget_brightness">Brightness</string>
     <string name="widget_opacity">Opacity</string>

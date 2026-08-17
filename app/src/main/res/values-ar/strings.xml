@@ -244,7 +244,7 @@
     <string name="widget_icon_color">لون الأيقونة</string>
     <string name="widget_bg_color">لون الخلفية</string>
     <string name="widget_show_trigger_name">عرض اسم المشغل</string>
-    <string name="widget_no_triggers_warning">يجب إضافة مشغل أولاً من التطبيق لتتمكن من إعداد الويدجت.</string>
+    <string name="widget_no_triggers_warning">لا توجد مشغلات يدوية متاحة. أضف مشغلاً بدون قواعد لإعداد الويدجت.</string>
     <string name="widget_select_color">اختر اللون</string>
     <string name="widget_brightness">السطوع</string>
     <string name="widget_opacity">الشفافية</string>

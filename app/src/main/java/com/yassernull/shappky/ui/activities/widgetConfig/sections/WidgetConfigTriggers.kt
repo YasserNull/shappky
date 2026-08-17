@@ -19,7 +19,7 @@ fun WidgetConfigTriggers(
   onTriggerSelected: (String) -> Unit,
 ) {
   var expanded by remember { mutableStateOf(false) }
-  val selectableTriggers = triggers.filter { it.rules.isNotEmpty() }
+  val selectableTriggers = triggers.filter { it.rules.isEmpty() }
 
   Text(
     text = stringResource(R.string.widget_select_trigger),
