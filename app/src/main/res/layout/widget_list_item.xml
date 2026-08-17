@@ -12,13 +12,13 @@
     <!-- App Icon -->
     <ImageView
         android:id="@+id/app_icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="12dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="10dp"
         android:scaleType="fitCenter"
         tools:src="@drawable/ic_shappky" />
 
-    <!-- App Name and RAM -->
+    <!-- App Name and Details -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -30,8 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:textSize="14sp"
+            android:textSize="15sp"
             android:ellipsize="end"
             android:singleLine="true"
             tools:text="Application Name" />
@@ -50,6 +49,50 @@
                 android:tint="#80FFFFFF"
                 android:visibility="gone"
                 tools:src="@drawable/ic_person_outlined"
+                tools:ignore="UseAppTint" />
+
+            <TextView
+                android:id="@+id/app_package"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#A0FFFFFF"
+                android:textSize="11sp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                tools:text="com.example.app" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/app_cpu_icon"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginEnd="4dp"
+                android:src="@drawable/memory"
+                android:tint="#A0FFFFFF"
+                tools:ignore="UseAppTint" />
+
+            <TextView
+                android:id="@+id/app_cpu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#A0FFFFFF"
+                android:textSize="11sp"
+                tools:text="5.2%" />
+
+            <ImageView
+                android:id="@+id/app_ram_icon"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
+                android:src="@drawable/memory_alt"
+                android:tint="#A0FFFFFF"
                 tools:ignore="UseAppTint" />
 
             <TextView

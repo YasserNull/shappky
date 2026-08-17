@@ -140,9 +140,11 @@ class ShappkyWidgetFactory(
     val app = appsList[position]
     val views = RemoteViews(context.packageName, R.layout.widget_list_item)
 
-    val localCtx = getLocalizedContext(context)
-    val formattedRam = formatMemorySize(localCtx, app.ramKb)
+    val formattedRam = formatMemorySizeFixed(app.ramKb)
+    val formattedCpu = String.format(java.util.Locale.US, "%.1f%%", app.cpuPercent)
     views.setTextViewText(R.id.app_name, app.appName)
+    views.setTextViewText(R.id.app_package, app.packageName)
+    views.setTextViewText(R.id.app_cpu, formattedCpu)
     views.setTextViewText(R.id.app_ram, formattedRam)
 
     val prefs = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
@@ -166,11 +168,15 @@ class ShappkyWidgetFactory(
     if (app.isProtected) {
       views.setViewVisibility(R.id.btn_close_app, android.view.View.GONE)
       views.setTextColor(R.id.app_name, primaryTextColor)
+      views.setTextColor(R.id.app_package, secondaryTextColor)
+      views.setTextColor(R.id.app_cpu, secondaryTextColor)
       views.setTextColor(R.id.app_ram, secondaryTextColor)
       views.setFloat(R.id.app_icon, "setAlpha", 0.4f)
     } else {
       views.setViewVisibility(R.id.btn_close_app, android.view.View.VISIBLE)
       views.setTextColor(R.id.app_name, primaryTextColor)
+      views.setTextColor(R.id.app_package, secondaryTextColor)
+      views.setTextColor(R.id.app_cpu, secondaryTextColor)
       views.setTextColor(R.id.app_ram, secondaryTextColor)
       views.setFloat(R.id.app_icon, "setAlpha", 1.0f)
     }
@@ -185,6 +191,8 @@ class ShappkyWidgetFactory(
     }
     views.setImageViewResource(R.id.app_type_icon, iconRes)
     views.setInt(R.id.app_type_icon, "setColorFilter", secondaryTextColor)
+    views.setInt(R.id.app_cpu_icon, "setColorFilter", secondaryTextColor)
+    views.setInt(R.id.app_ram_icon, "setColorFilter", secondaryTextColor)
 
     try {
       val bitmap = drawableToBitmap(app.appIcon)
@@ -229,21 +237,8 @@ class ShappkyWidgetFactory(
   }
 }
 
-private fun getLocalizedContext(context: Context): Context {
-  val prefs = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-  val language = prefs.getString("appLanguage", "system") ?: "system"
-  if (language != "system") {
-    val locale = java.util.Locale.forLanguageTag(language)
-    java.util.Locale.setDefault(locale)
-    val config = android.content.res.Configuration(context.resources.configuration)
-    config.setLocale(locale)
-    return context.createConfigurationContext(config)
-  }
-  return context
-}
-
-private fun formatMemorySize(context: Context, kb: Long): String = when {
-  kb < 1024 -> context.getString(R.string.kb_format, kb)
-  kb < 1024 * 1024 -> context.getString(R.string.mb_format, kb / 1024f)
-  else -> context.getString(R.string.gb_format, kb / (1024f * 1024f))
+private fun formatMemorySizeFixed(kb: Long): String = when {
+  kb < 1024 -> String.format(java.util.Locale.US, "%d KB", kb)
+  kb < 1024 * 1024 -> String.format(java.util.Locale.US, "%.2f MB", kb / 1024f)
+  else -> String.format(java.util.Locale.US, "%.2f GB", kb / (1024f * 1024f))
 }
