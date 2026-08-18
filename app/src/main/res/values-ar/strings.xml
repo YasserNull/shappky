@@ -19,11 +19,11 @@
     <string name="apps_auto_refresh_interval_title">فترة التحديث التلقائي للتطبيقات</string>
     <string name="protected_apps_list_title">قائمة التطبيقات المحمية</string>
     <string name="protected_apps_list_summary">تحديد التطبيقات المحمية التي يتم تخطيها على مستوى التطبيق</string>
-    <string name="launcher">المشغل (لانشر)</string>
-    <string name="keyboard">الكيبورد</string>
+    <string name="launcher">مشغل الشاشة الرئيسية</string>
+    <string name="keyboard">لوحة المفتاح</string>
     <string name="wallpaper">الخلفية</string>
-    <string name="widgets">الويدجات (Widgets)</string>
-    <string name="android_services">خدمات الاندرويد</string>
+    <string name="widgets">عناصر الشاشة</string>
+    <string name="android_services">خدمات الأندرويد</string>
     <string name="google_android_services">خدمات جوجل أندرويد</string>
     <string name="auto_background_apps">التطبيقات الشغالة تلقائياً في الخلفية</string>
     <string name="ram_usage_bar_refresh_ms">تحديث شريط استهلاك ذاكرة الوصول العشوائي</string>
