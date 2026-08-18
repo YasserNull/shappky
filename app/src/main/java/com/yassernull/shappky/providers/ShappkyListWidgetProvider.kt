@@ -178,8 +178,8 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
                 if (autoRefresh) {
                   @Suppress("DEPRECATION")
                   appWidgetManager.notifyAppWidgetViewDataChanged(id, R.id.widget_list_view)
-                  updateAppWidget(context, appWidgetManager, id)
-                } else if (ramBarRefresh) {
+                }
+                if (ramBarRefresh || autoRefresh) {
                   updateAppWidget(context, appWidgetManager, id)
                 }
               }
@@ -201,7 +201,6 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
     fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
       val localCtx = getLocalizedContext(context)
       val views = RemoteViews(context.packageName, R.layout.shappky_list_widget)
-
       val prefs = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
 
       // Background Color configuration
@@ -274,7 +273,7 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
       val percentage = if (totalMb > 0) (usedMb * 100 / totalMb).toInt() else 0
 
       // RAM Usage Bar configuration
-      val ramBarRefresh = prefs.getBoolean("widget_list_ram_bar_refresh_$appWidgetId", true)
+      val ramBarRefresh = prefs.getBoolean(WidgetPreferences.getListRamBarRefreshKey(appWidgetId), true)
       if (ramBarRefresh) {
         views.setViewVisibility(R.id.widget_ram_bar, android.view.View.VISIBLE)
         views.setViewVisibility(R.id.widget_ram_text, android.view.View.VISIBLE)
