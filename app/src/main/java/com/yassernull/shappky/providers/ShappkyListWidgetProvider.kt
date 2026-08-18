@@ -14,6 +14,8 @@ import android.widget.Toast
 import com.yassernull.shappky.App
 import com.yassernull.shappky.R
 import com.yassernull.shappky.core.managers.ShellManager
+import com.yassernull.shappky.core.preferences.RamUsageBarPreferences
+import com.yassernull.shappky.core.preferences.WidgetPreferences
 import com.yassernull.shappky.services.ShappkyWidgetService
 
 class ShappkyListWidgetProvider : AppWidgetProvider() {
@@ -101,13 +103,22 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
       var minIntervalMs = Long.MAX_VALUE
 
       for (id in appWidgetIds) {
-        val autoRefresh = prefs.getBoolean("widget_list_auto_refresh_apps_$id", prefs.getBoolean("appsAutoRefresh", true))
+        val autoRefresh = prefs.getBoolean(WidgetPreferences.getListAutoRefreshAppsKey(id), prefs.getBoolean("appsAutoRefresh", true))
+        val ramBarRefresh = prefs.getBoolean(WidgetPreferences.getListRamBarRefreshKey(id), true)
 
-        if (autoRefresh) {
+        if (autoRefresh || ramBarRefresh) {
           isRefreshEnabled = true
-          val interval = prefs.getLong("appsAutoRefreshIntervalMs", 1000L)
-          if (interval < minIntervalMs) {
-            minIntervalMs = interval
+          if (autoRefresh) {
+            val interval = prefs.getLong("appsAutoRefreshIntervalMs", 1000L)
+            if (interval < minIntervalMs) {
+              minIntervalMs = interval
+            }
+          }
+          if (ramBarRefresh) {
+            val interval = prefs.getLong(RamUsageBarPreferences.KEY_REFRESH_INTERVAL_MS, RamUsageBarPreferences.DEFAULT_REFRESH_INTERVAL_MS)
+            if (interval < minIntervalMs) {
+              minIntervalMs = interval
+            }
           }
         }
       }
@@ -135,13 +146,22 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
           var innerMinInterval = Long.MAX_VALUE
 
           for (id in innerWidgetIds) {
-            val autoRefresh = innerPrefs.getBoolean("widget_list_auto_refresh_apps_$id", innerPrefs.getBoolean("appsAutoRefresh", true))
+            val autoRefresh = innerPrefs.getBoolean(WidgetPreferences.getListAutoRefreshAppsKey(id), innerPrefs.getBoolean("appsAutoRefresh", true))
+            val ramBarRefresh = innerPrefs.getBoolean(WidgetPreferences.getListRamBarRefreshKey(id), true)
 
-            if (autoRefresh) {
+            if (autoRefresh || ramBarRefresh) {
               innerRefreshEnabled = true
-              val interval = innerPrefs.getLong("appsAutoRefreshIntervalMs", 1000L)
-              if (interval < innerMinInterval) {
-                innerMinInterval = interval
+              if (autoRefresh) {
+                val interval = innerPrefs.getLong("appsAutoRefreshIntervalMs", 1000L)
+                if (interval < innerMinInterval) {
+                  innerMinInterval = interval
+                }
+              }
+              if (ramBarRefresh) {
+                val interval = innerPrefs.getLong(RamUsageBarPreferences.KEY_REFRESH_INTERVAL_MS, RamUsageBarPreferences.DEFAULT_REFRESH_INTERVAL_MS)
+                if (interval < innerMinInterval) {
+                  innerMinInterval = interval
+                }
               }
             }
           }
@@ -153,10 +173,13 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
 
             if (isInteractive && !isAppInForeground) {
               for (id in innerWidgetIds) {
-                val autoRefresh = innerPrefs.getBoolean("widget_list_auto_refresh_apps_$id", innerPrefs.getBoolean("appsAutoRefresh", true))
+                val autoRefresh = innerPrefs.getBoolean(WidgetPreferences.getListAutoRefreshAppsKey(id), innerPrefs.getBoolean("appsAutoRefresh", true))
+                val ramBarRefresh = innerPrefs.getBoolean(WidgetPreferences.getListRamBarRefreshKey(id), true)
                 if (autoRefresh) {
                   @Suppress("DEPRECATION")
                   appWidgetManager.notifyAppWidgetViewDataChanged(id, R.id.widget_list_view)
+                  updateAppWidget(context, appWidgetManager, id)
+                } else if (ramBarRefresh) {
                   updateAppWidget(context, appWidgetManager, id)
                 }
               }
