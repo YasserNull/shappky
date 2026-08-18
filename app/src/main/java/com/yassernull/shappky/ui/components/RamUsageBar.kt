@@ -28,7 +28,11 @@ fun RamUsageBar(ramState: RamState) {
   ) {
     Text(
       text = if (ramState.totalKb > 0) {
-        stringResource(R.string.ram_usage, ramState.usedKb / 1024, ramState.totalKb / 1024)
+        stringResource(
+          R.string.ram_usage,
+          String.format(java.util.Locale.US, "%d", ramState.usedKb / 1024),
+          String.format(java.util.Locale.US, "%d", ramState.totalKb / 1024),
+        )
       } else {
         stringResource(R.string.ram_usage_unknown)
       },

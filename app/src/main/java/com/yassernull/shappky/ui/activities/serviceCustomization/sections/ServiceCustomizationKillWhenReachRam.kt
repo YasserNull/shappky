@@ -81,7 +81,7 @@ fun ServiceCustomizationKillWhenReachRam(
       )
       if (killAllOnRamLimit && killAllRamThreshold > 0) {
         Text(
-          text = stringResource(R.string.ram_limit_enabled_summary, killAllRamThreshold),
+          text = stringResource(R.string.ram_limit_enabled_summary, String.format(java.util.Locale.US, "%d", killAllRamThreshold)),
           fontSize = 14.sp,
           color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
         )
@@ -120,7 +120,7 @@ fun ServiceCustomizationKillWhenReachRam(
       )
       if (killAppOnRamLimit && killAppRamThreshold > 0) {
         Text(
-          text = stringResource(R.string.ram_limit_enabled_summary, killAppRamThreshold),
+          text = stringResource(R.string.ram_limit_enabled_summary, String.format(java.util.Locale.US, "%d", killAppRamThreshold)),
           fontSize = 14.sp,
           color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
         )

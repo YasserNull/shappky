@@ -191,7 +191,7 @@ class ShappkyService : Service() {
 
       val lines = toKill.map { pkg ->
         val ramMb = packageRamUsage[pkg] ?: 0
-        val ramStr = getString(R.string.mb_format, ramMb.toFloat())
+        val ramStr = String.format(java.util.Locale.US, "%.2f MB", ramMb.toFloat())
         getString(R.string.ram_freed_from_pkg, ramStr, pkg)
       }
       val contentText = lines.first()

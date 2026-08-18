@@ -32,11 +32,11 @@ fun buildRuleSummary(rule: TriggerRule): String {
       context.getString(R.string.rule_summary_app_killed, appNames)
     }
     RuleType.RAM_LIMIT_REACHED -> {
-      context.getString(R.string.rule_summary_ram_limit, rule.ramThresholdMb)
+      context.getString(R.string.rule_summary_ram_limit, String.format(java.util.Locale.US, "%d", rule.ramThresholdMb))
     }
     RuleType.APP_RAM_EXCEEDED -> {
       val appNames = rule.appPackages.joinToString(", ") { context.getAppName(it) }
-      context.getString(R.string.rule_summary_app_ram, appNames, rule.ramThresholdMb)
+      context.getString(R.string.rule_summary_app_ram, appNames, String.format(java.util.Locale.US, "%d", rule.ramThresholdMb))
     }
     RuleType.PHONE_SLEEP -> {
       if (rule.sleepDurationMinutes > 0) {

@@ -2,9 +2,6 @@
     <string name="app_name">Shappky</string>
     <string name="app_name_en">Shappky</string>
     <string name="app_name_ar">شابكي</string>
-    <string name="kb_format">%1$d KB</string>
-    <string name="mb_format">%1$.2f MB</string>
-    <string name="gb_format">%1$.2f GB</string>
 
     <!-- Settings -->
     <string name="force_kill_protected_title">Do you want to kill this app?</string>
@@ -69,7 +66,7 @@
     <string name="permission_denied">Permission denied</string>
     <string name="running_apps_default">Running apps:</string>
     <string name="running_apps_count">Running apps: %1$d</string>
-    <string name="ram_usage">RAM Usage: %1$dMB / %2$dMB</string>
+    <string name="ram_usage">RAM Usage: %1$sMB / %2$sMB</string>
     <string name="ram_usage_unknown">RAM Usage: --</string>
     <string name="sort_apps">Sort apps</string>
     <string name="sort_apps_title">Sort apps by</string>
@@ -149,8 +146,8 @@
     <string name="ram_limit_mb">RAM Limit (MB)</string>
     <string name="duration_minutes">Duration (Minutes)</string>
     <string name="rule_summary_app_opened">When opening: %1$s</string>
-    <string name="rule_summary_ram_limit">When RAM reaches %1$d MB</string>
-    <string name="rule_summary_app_ram">When %1$s exceeds %2$d MB</string>
+    <string name="rule_summary_ram_limit">When RAM reaches %1$s MB</string>
+    <string name="rule_summary_app_ram">When %1$s exceeds %2$s MB</string>
     <string name="rule_summary_phone_sleep">After sleep: %1$d min</string>
     <string name="rule_summary_phone_sleep_immediate">When phone sleeps</string>
     <string name="rule_summary_phone_wake">When phone wakes up</string>
@@ -220,7 +217,7 @@
     <string name="duration_30m">30 minutes</string>
     <string name="service_kill_all_on_ram_limit">Kill all apps when reaching a certain RAM limit</string>
     <string name="service_kill_app_on_ram_limit">Kill app when it reaches a certain RAM limit</string>
-    <string name="ram_limit_enabled_summary">Threshold: %1$d MB</string>
+    <string name="ram_limit_enabled_summary">Threshold: %1$s MB</string>
 
     <!-- Settings Categories -->
     <string name="settings_permissions">Permissions</string>

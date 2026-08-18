@@ -1,7 +1,6 @@
 package com.yassernull.shappky.ui.dialogs
 
 import android.content.Context
-import android.text.format.Formatter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -92,7 +91,7 @@ fun AppInfoDialog(
         InfoRow(label = stringResource(R.string.is_persistent_label), value = if (info.app.isPersistentApp) stringResource(R.string.yes) else stringResource(R.string.no))
         InfoRow(label = stringResource(R.string.cpu_usage_label), value = info.cpuUsage)
         InfoRow(label = stringResource(R.string.threads_label), value = info.threads)
-        InfoRow(label = stringResource(R.string.total_ram_usage_label), value = Formatter.formatFileSize(context, info.totalRamKb * 1024L))
+        InfoRow(label = stringResource(R.string.total_ram_usage_label), value = formatMemorySizeFixed(info.totalRamKb))
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -192,4 +191,10 @@ private fun ToggleIconButton(
       tint = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
     )
   }
+}
+
+private fun formatMemorySizeFixed(kb: Long): String = when {
+  kb < 1024 -> String.format(java.util.Locale.US, "%d KB", kb)
+  kb < 1024 * 1024 -> String.format(java.util.Locale.US, "%.2f MB", kb / 1024f)
+  else -> String.format(java.util.Locale.US, "%.2f GB", kb / (1024f * 1024f))
 }

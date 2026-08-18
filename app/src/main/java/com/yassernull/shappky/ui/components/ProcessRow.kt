@@ -1,6 +1,5 @@
 package com.yassernull.shappky.ui.components
 
-import android.text.format.Formatter
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -20,7 +18,6 @@ import com.yassernull.shappky.data.models.ProcessInfo
 
 @Composable
 fun ProcessRow(process: ProcessInfo) {
-  val context = LocalContext.current
   Column(
     modifier = Modifier
       .fillMaxWidth()
@@ -43,10 +40,16 @@ fun ProcessRow(process: ProcessInfo) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
       Text(
-        text = Formatter.formatFileSize(context, process.ramKb * 1024L),
+        text = formatMemorySizeFixed(process.ramKb),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
     }
   }
+}
+
+private fun formatMemorySizeFixed(kb: Long): String = when {
+  kb < 1024 -> String.format(java.util.Locale.US, "%d KB", kb)
+  kb < 1024 * 1024 -> String.format(java.util.Locale.US, "%.2f MB", kb / 1024f)
+  else -> String.format(java.util.Locale.US, "%.2f GB", kb / (1024f * 1024f))
 }

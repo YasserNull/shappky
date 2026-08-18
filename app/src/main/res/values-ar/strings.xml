@@ -3,9 +3,6 @@
     <string name="app_name">شابكي</string>
     <string name="app_name_en">Shappky</string>
     <string name="app_name_ar">شابكي</string>
-    <string name="kb_format">%1$d ك.ب</string>
-    <string name="mb_format">%1$.2f م.ب</string>
-    <string name="gb_format">%1$.2f ج.ب</string>
     <string name="force_kill_protected_title">هل تريد قتل هذا التطبيق؟</string>
     <string name="force_kill_protected_message">هذا التطبيق ضمن قائمة التطبيقات المحمية ، هل تريد ايقافه؟</string>
     <string name="yes">نعم</string>
@@ -63,7 +60,7 @@
     <string name="permission_denied">تم رفض الصلاحية</string>
     <string name="running_apps_default">التطبيقات المشغلة:</string>
     <string name="running_apps_count">التطبيقات المشغلة: %1$d</string>
-    <string name="ram_usage">استهلاك ذاكرة الوصول العشوائي: %1$d ميجابايت / %2$d ميجابايت</string>
+    <string name="ram_usage">استهلاك ذاكرة الوصول العشوائي: %1$sMB / %2$sMB</string>
     <string name="ram_usage_unknown">استهلاك ذاكرة الوصول العشوائي: --</string>
     <string name="sort_apps">ترتيب التطبيقات</string>
     <string name="sort_apps_title">ترتيب التطبيقات حسب</string>
@@ -138,11 +135,11 @@
     <string name="rule_specific_time">عند وقت معين</string>
 
     <string name="select_condition">اختر الشرط</string>
-    <string name="ram_limit_mb">حد ذاكرة الوصول العشوائي (ميجابايت)</string>
+    <string name="ram_limit_mb">حد ذاكرة الوصول العشوائي (MB)</string>
     <string name="duration_minutes">المدة (بالدقائق)</string>
     <string name="rule_summary_app_opened">عند فتح: %1$s</string>
-    <string name="rule_summary_ram_limit">عند وصول ذاكرة الوصول العشوائي لـ %1$d م.ب</string>
-    <string name="rule_summary_app_ram">عندما يستهلك %1$s أكثر من %2$d م.ب</string>
+    <string name="rule_summary_ram_limit">عند وصول ذاكرة الوصول العشوائي إلى %1$s MB</string>
+    <string name="rule_summary_app_ram">عندما يستهلك %1$s أكثر من %2$s MB</string>
     <string name="rule_summary_phone_sleep">بعد سكون الهاتف بـ %1$d دقيقة</string>
     <string name="rule_summary_phone_sleep_immediate">عند نوم الهاتف</string>
     <string name="rule_summary_phone_wake">عند تشغيل الهاتف من وضع السكون</string>
@@ -212,7 +209,7 @@
     <string name="duration_30m">30 دقيقة</string>
     <string name="service_kill_all_on_ram_limit">قتل كل التطبيقات عند بلوغ حد معين من ذاكرة الوصول العشوائي</string>
     <string name="service_kill_app_on_ram_limit">قتل تطبيق عند وصوله حد معين من ذاكرة الوصول العشوائي</string>
-    <string name="ram_limit_enabled_summary">الحد المسموح: %1$d ميجابايت</string>
+    <string name="ram_limit_enabled_summary">الحد المسموح: %1$s MB</string>
 
     <!-- Settings Categories -->
     <string name="settings_permissions">الصلاحيات</string>

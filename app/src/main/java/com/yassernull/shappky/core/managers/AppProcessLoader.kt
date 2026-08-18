@@ -42,9 +42,9 @@ class AppProcessLoader(
   }
 
   fun formatMemorySize(kb: Long): String = when {
-    kb < 1024 -> context.getString(R.string.kb_format, kb)
-    kb < 1024 * 1024 -> context.getString(R.string.mb_format, kb / 1024f)
-    else -> context.getString(R.string.gb_format, kb / (1024f * 1024f))
+    kb < 1024 -> String.format(java.util.Locale.US, "%d KB", kb)
+    kb < 1024 * 1024 -> String.format(java.util.Locale.US, "%.2f MB", kb / 1024f)
+    else -> String.format(java.util.Locale.US, "%.2f GB", kb / (1024f * 1024f))
   }
 
   fun getActiveWidgetPackages(): Set<String> {

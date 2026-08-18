@@ -140,7 +140,7 @@ class ShappkyWidgetFactory(
     val app = appsList[position]
     val views = RemoteViews(context.packageName, R.layout.widget_list_item)
 
-    val formattedRam = formatMemorySizeFixed(app.ramKb)
+    val formattedRam = appManager?.formatMemorySize(app.ramKb) ?: formatMemorySizeFixed(app.ramKb)
     val formattedCpu = String.format(java.util.Locale.US, "%.1f%%", app.cpuPercent)
     views.setTextViewText(R.id.app_name, app.appName)
     views.setTextViewText(R.id.app_package, app.packageName)
