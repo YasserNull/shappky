@@ -3,9 +3,9 @@ package com.yassernull.shappky.ui.activities.settings
 import android.content.Context
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.DoNotDisturb
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
@@ -55,7 +55,7 @@ fun AppsListSection() {
 
   SettingsHeader(text = stringResource(R.string.settings_apps_list))
   SwitchSettingRow(
-    icon = Icons.Filled.Apps,
+    icon = Icons.Filled.Person,
     title = stringResource(R.string.show_user_apps),
     summary = stringResource(R.string.show_user_apps_summary),
     checked = showUserApps,
@@ -79,7 +79,7 @@ fun AppsListSection() {
     },
   )
   SwitchSettingRow(
-    icon = Icons.Filled.Security,
+    icon = Icons.Filled.PushPin,
     title = stringResource(R.string.show_persistent_apps),
     summary = stringResource(R.string.show_persistent_apps_summary),
     checked = showPersistentApps,
@@ -91,7 +91,7 @@ fun AppsListSection() {
     },
   )
   SwitchSettingRow(
-    icon = Icons.Filled.DoNotDisturb,
+    icon = Icons.Filled.Security,
     title = stringResource(R.string.show_protected_apps),
     summary = stringResource(R.string.show_protected_apps_summary),
     checked = showProtectedApps,
