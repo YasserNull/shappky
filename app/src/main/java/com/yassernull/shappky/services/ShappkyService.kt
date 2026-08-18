@@ -58,7 +58,7 @@ class ShappkyService : Service() {
           try {
             killBackgroundApps()
             val sharedpreferences = getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
-            val intervalMs = sharedpreferences.getLong("service_duration", 18000L)
+            val intervalMs = sharedpreferences.getLong("service_duration", 5000L)
             Thread.sleep(intervalMs)
           } catch (_: InterruptedException) {
             Thread.currentThread().interrupt()

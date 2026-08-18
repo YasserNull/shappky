@@ -32,7 +32,7 @@ fun defaultDurationForRule(ruleType: RuleType): Long = when (ruleType) {
   RuleType.APP_BACKGROUND_STARTED,
   RuleType.PHONE_SLEEP,
   RuleType.PHONE_WAKE,
-  -> 15000L
+  -> 5000L
 
   RuleType.KILL_OLDEST_APP,
   RuleType.APP_RAM_EXCEEDED,

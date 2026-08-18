@@ -44,8 +44,8 @@ fun AppsListSection() {
     )
   }
 
-  var sortMode by remember { mutableStateOf(sharedPreferences.getString("sortMode", "name") ?: "name") }
-  var sortDescending by remember { mutableStateOf(sharedPreferences.getBoolean("sortDescending", false)) }
+  var sortMode by remember { mutableStateOf(sharedPreferences.getString("sortMode", "ram") ?: "ram") }
+  var sortDescending by remember { mutableStateOf(sharedPreferences.getBoolean("sortDescending", true)) }
   var hiddenApps by remember { mutableStateOf(sharedPreferences.getStringSet("hidden_apps", emptySet()) ?: emptySet()) }
 
   var showSortDialog by remember { mutableStateOf(false) }

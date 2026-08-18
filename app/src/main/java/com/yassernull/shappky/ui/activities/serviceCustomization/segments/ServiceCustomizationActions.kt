@@ -16,7 +16,7 @@ object ServiceCustomizationActions {
     val selectSystemApps = sharedPreferences.getBoolean("service_select_system_apps", false)
     val excludedApps = sharedPreferences.getStringSet("service_excluded_apps", emptySet()) ?: emptySet()
     val manuallySelectedApps = sharedPreferences.getStringSet("service_manually_selected_apps", emptySet()) ?: emptySet()
-    val serviceDuration = sharedPreferences.getLong("service_duration", 18000L)
+    val serviceDuration = sharedPreferences.getLong("service_duration", 5000L)
     val killAllOnRamLimit = sharedPreferences.getBoolean("service_kill_all_on_ram_limit", false)
     val killAllRamThreshold = sharedPreferences.getInt("service_kill_all_ram_threshold", 0)
     val killAppOnRamLimit = sharedPreferences.getBoolean("service_kill_app_on_ram_limit", false)

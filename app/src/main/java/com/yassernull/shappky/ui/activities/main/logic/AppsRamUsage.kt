@@ -37,7 +37,7 @@ object AppsRamUsageLogic {
         AppsListLogic.appsDataList.addAll(updatedApps)
 
         val prefs = activity.getSharedPreferences(com.yassernull.shappky.core.preferences.PREFERENCES_NAME, android.content.Context.MODE_PRIVATE)
-        if (prefs.getString(com.yassernull.shappky.core.preferences.AppsListPreferences.KEY_SORT_MODE, com.yassernull.shappky.core.preferences.AppsListPreferences.SORT_BY_NAME) == com.yassernull.shappky.core.preferences.AppsListPreferences.SORT_BY_RAM) {
+        if (prefs.getString(com.yassernull.shappky.core.preferences.AppsListPreferences.KEY_SORT_MODE, com.yassernull.shappky.core.preferences.AppsListPreferences.SORT_BY_RAM) == com.yassernull.shappky.core.preferences.AppsListPreferences.SORT_BY_RAM) {
           AppsListLogic.sortAppsDataList(activity)
         }
       }

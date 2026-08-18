@@ -311,8 +311,8 @@ object AppsListLogic {
 
   fun sortAppsDataList(activity: MainActivity) {
     val prefs = activity.getSharedPreferences(PREFERENCES_NAME, android.content.Context.MODE_PRIVATE)
-    val sortMode = prefs.getString(AppsListPreferences.KEY_SORT_MODE, AppsListPreferences.SORT_BY_NAME)
-    val descending = prefs.getBoolean(AppsListPreferences.KEY_SORT_DESCENDING, false)
+    val sortMode = prefs.getString(AppsListPreferences.KEY_SORT_MODE, AppsListPreferences.SORT_BY_RAM)
+    val descending = prefs.getBoolean(AppsListPreferences.KEY_SORT_DESCENDING, true)
 
     val sorted = AppSortUtils.sortApps(appsDataList, sortMode, descending)
     appsDataList.clear()

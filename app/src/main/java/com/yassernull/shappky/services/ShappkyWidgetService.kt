@@ -77,8 +77,8 @@ class ShappkyWidgetFactory(
       e.printStackTrace()
     }
 
-    val sortMode = prefs.getString(WidgetPreferences.getListSortModeKey(appWidgetId), AppsListPreferences.SORT_BY_NAME) ?: AppsListPreferences.SORT_BY_NAME
-    val descending = prefs.getBoolean(WidgetPreferences.getListSortDescendingKey(appWidgetId), false)
+    val sortMode = prefs.getString(WidgetPreferences.getListSortModeKey(appWidgetId), AppsListPreferences.SORT_BY_RAM) ?: AppsListPreferences.SORT_BY_RAM
+    val descending = prefs.getBoolean(WidgetPreferences.getListSortDescendingKey(appWidgetId), true)
     appsList = when (sortMode) {
       "ram" -> {
         if (descending) {

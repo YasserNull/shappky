@@ -34,10 +34,10 @@ fun ListWidgetConfigAppsList(appWidgetId: Int) {
     mutableStateOf(prefs.getBoolean(WidgetPreferences.getListShowProtectedAppsKey(appWidgetId), false))
   }
   var sortMode by remember {
-    mutableStateOf(prefs.getString(WidgetPreferences.getListSortModeKey(appWidgetId), AppsListPreferences.SORT_BY_NAME) ?: AppsListPreferences.SORT_BY_NAME)
+    mutableStateOf(prefs.getString(WidgetPreferences.getListSortModeKey(appWidgetId), AppsListPreferences.SORT_BY_RAM) ?: AppsListPreferences.SORT_BY_RAM)
   }
   var sortDescending by remember {
-    mutableStateOf(prefs.getBoolean(WidgetPreferences.getListSortDescendingKey(appWidgetId), false))
+    mutableStateOf(prefs.getBoolean(WidgetPreferences.getListSortDescendingKey(appWidgetId), true))
   }
   var autoRefreshApps by remember {
     mutableStateOf(prefs.getBoolean(WidgetPreferences.getListAutoRefreshAppsKey(appWidgetId), true))

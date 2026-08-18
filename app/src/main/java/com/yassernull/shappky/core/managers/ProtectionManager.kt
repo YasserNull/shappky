@@ -54,7 +54,7 @@ object ProtectionManager {
   }
 
   fun getGroupEnabled(context: Context, group: String): Boolean = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
-    .getBoolean(KEY_GROUP_PREFIX + group + "_enabled", false)
+    .getBoolean(KEY_GROUP_PREFIX + group + "_enabled", true)
 
   fun getGroupMembers(context: Context, group: String): Set<String> = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
     .getStringSet(KEY_GROUP_PREFIX + group + "_members", null) ?: emptySet()
