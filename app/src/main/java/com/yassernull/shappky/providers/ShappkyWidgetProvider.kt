@@ -141,6 +141,9 @@ class ShappkyWidgetProvider : AppWidgetProvider() {
       killLatch.await()
 
       val freedText = context.getString(R.string.free_up_memory, appManager.formatMemorySize(totalKb))
+      handler.post {
+        Toast.makeText(context, freedText, Toast.LENGTH_SHORT).show()
+      }
       com.yassernull.shappky.utils.NotificationUtils.showTriggerFreedMemoryNotification(context, trigger.name, freedText)
     } else {
       handler.post {
