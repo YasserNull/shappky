@@ -31,8 +31,9 @@ fun WidgetConfigScreen(appWidgetId: Int, onSave: () -> Unit, onDismiss: () -> Un
 
   var selectedTriggerId by remember {
     val saved = prefs.getString(WidgetPreferences.getTriggerIdKey(appWidgetId), "") ?: ""
-    val defaultTriggerId = triggers.firstOrNull { it.rules.isNotEmpty() }?.id ?: ""
-    val validSaved = if (triggers.any { it.id == saved && it.rules.isNotEmpty() }) saved else defaultTriggerId
+    val selectableTriggers = triggers.filter { it.rules.isEmpty() }
+    val defaultTriggerId = selectableTriggers.firstOrNull()?.id ?: ""
+    val validSaved = if (selectableTriggers.any { it.id == saved }) saved else defaultTriggerId
     mutableStateOf(validSaved)
   }
 

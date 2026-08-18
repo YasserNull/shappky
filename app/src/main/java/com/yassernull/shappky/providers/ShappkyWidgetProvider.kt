@@ -181,7 +181,10 @@ class ShappkyWidgetProvider : AppWidgetProvider() {
       val showLabel = prefs.getBoolean(WidgetPreferences.getShowLabelKey(appWidgetId), true)
       if (showLabel) {
         val triggerId = prefs.getString(WidgetPreferences.getTriggerIdKey(appWidgetId), "") ?: ""
-        val triggerName = TriggerManager.getTriggers(context).firstOrNull { it.id == triggerId }?.name ?: ""
+        val widgetTriggers = TriggerManager.getTriggers(context)
+        val triggerName = widgetTriggers.firstOrNull { it.id == triggerId }?.name
+          ?: widgetTriggers.firstOrNull { it.rules.isEmpty() }?.name
+          ?: ""
         views.setViewVisibility(R.id.widget_label, android.view.View.VISIBLE)
         views.setTextViewText(R.id.widget_label, triggerName)
       } else {
@@ -235,7 +238,10 @@ class ShappkyWidgetProvider : AppWidgetProvider() {
       val showLabel = prefs.getBoolean(WidgetPreferences.getShowLabelKey(appWidgetId), true)
       if (showLabel) {
         val triggerId = prefs.getString(WidgetPreferences.getTriggerIdKey(appWidgetId), "") ?: ""
-        val triggerName = TriggerManager.getTriggers(context).firstOrNull { it.id == triggerId }?.name ?: ""
+        val widgetTriggers = TriggerManager.getTriggers(context)
+        val triggerName = widgetTriggers.firstOrNull { it.id == triggerId }?.name
+          ?: widgetTriggers.firstOrNull { it.rules.isEmpty() }?.name
+          ?: ""
         views.setViewVisibility(R.id.widget_label, android.view.View.VISIBLE)
         views.setTextViewText(R.id.widget_label, triggerName)
       } else {
