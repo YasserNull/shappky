@@ -131,13 +131,14 @@ class ShappkyWidgetProvider : AppWidgetProvider() {
 
     if (toKill.isNotEmpty()) {
       val totalKb = toKill.sumOf { it.ramKb }
-      val command = toKill.map { it.packageName }.joinToString("; ") { "am force-stop $it" }
+      val packageNamesToKill = toKill.map { it.packageName }
+      val shouldKillAll = trigger.selectSystemApps || trigger.selectUserApps
       val killLatch = CountDownLatch(1)
 
-      shellManager.runShellCommand(command) {
-        com.yassernull.shappky.core.managers.KillTracker.markKilledAll(toKill.map { it.packageName })
+      appManager.killPackages(packageNamesToKill, {
+        com.yassernull.shappky.core.managers.KillTracker.markKilledAll(packageNamesToKill)
         killLatch.countDown()
-      }
+      }, showToast = false, appendKillAll = shouldKillAll)
       killLatch.await()
 
       val freedText = context.getString(R.string.free_up_memory, appManager.formatMemorySize(totalKb))

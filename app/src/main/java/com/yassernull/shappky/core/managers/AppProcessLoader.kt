@@ -98,7 +98,7 @@ class AppProcessLoader(
         var result = mutableListOf<AppModel>()
         try {
           val hiddenApps = getHiddenApps()
-          val protectedApps = ProtectionManager.getProtectedApps(context)
+          val protectedApps = ProtectionManager.getEffectiveProtectedApps(context)
 
           if (shellManager.isShellCommandReady()) {
             try {
@@ -178,7 +178,7 @@ class AppProcessLoader(
     if (!executor.isShutdown) {
       executor.execute {
         val startTime = System.currentTimeMillis()
-        val protectedApps = ProtectionManager.getProtectedApps(context)
+        val protectedApps = ProtectionManager.getEffectiveProtectedApps(context)
         val allApps = AppModelFilter.buildAllAppsList(context, protectedApps)
         Log.d(TAG, "loadAllApps finished count=${allApps.size}, durationMs=${System.currentTimeMillis() - startTime}")
         handler.post { callback.accept(allApps) }

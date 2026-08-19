@@ -94,7 +94,9 @@ fun ProtectedAppsDialog(
 
   fun matchesCurrentRegex(pkg: String): Boolean = matchesRegexText(regexText, pkg)
 
-  fun isEffectivelyProtected(pkg: String): Boolean = selectedPackages.contains(pkg) || (matchesCurrentRegex(pkg) && !exemptions.contains(pkg))
+  fun isEffectivelyProtected(pkg: String): Boolean = selectedPackages.contains(pkg) ||
+    ProtectionManager.getEnabledGroupProtectedPackages(context).contains(pkg) ||
+    (matchesCurrentRegex(pkg) && !exemptions.contains(pkg))
 
   fun protect(packages: Set<String>) {
     selectedPackages = selectedPackages + packages
@@ -111,14 +113,14 @@ fun ProtectedAppsDialog(
   }
 
   fun toggleGroup(group: String, packages: Set<String>, checked: Boolean) {
-    val members = groupMembers[group] ?: emptySet()
-    val updatedMembers = if (checked) members + packages else emptySet<String>()
+    val storedMembers = groupMembers[group] ?: emptySet()
+    val members = if (checked) storedMembers + packages else storedMembers.ifEmpty { packages }
     if (checked) {
-      protect(updatedMembers)
+      protect(members)
     } else {
       unprotect(members)
     }
-    groupMembers = groupMembers + (group to updatedMembers)
+    groupMembers = groupMembers + (group to if (checked) members else emptySet<String>())
     groupToggles = groupToggles + (group to checked)
   }
 
@@ -135,6 +137,22 @@ fun ProtectedAppsDialog(
     val shellManager = ShellManager(context, handler, executor)
     activeWidgetPackages = context.collectActiveWidgetPackages(shellManager)
     wallpaperPackages = context.collectCurrentWallpaperPackages(shellManager)
+
+    if (wallpaperPackages.isNotEmpty() && (groupToggles["wallpaper"] ?: true)) {
+      selectedPackages = selectedPackages + wallpaperPackages
+    }
+    if (activeWidgetPackages.isNotEmpty() && (groupToggles["widgets"] ?: true)) {
+      selectedPackages = selectedPackages + activeWidgetPackages
+    }
+  }
+
+  LaunchedEffect(allApps.size) {
+    if (allApps.isNotEmpty()) {
+      val persistentPackages = allApps.filter { it.isPersistentApp }.map { it.packageName }
+      if (persistentPackages.isNotEmpty() && (groupToggles["persistent"] ?: true)) {
+        selectedPackages = selectedPackages + persistentPackages
+      }
+    }
   }
 
   val hasLoggedDiagnostics = remember { mutableStateOf(false) }
@@ -227,27 +245,27 @@ fun ProtectedAppsDialog(
                   if (checked) protect(setOf(context.packageName)) else unprotect(setOf(context.packageName))
                 },
                 launcherPackage = launcherPackage,
-                launcherChecked = groupToggles["launcher"] ?: false,
+                launcherChecked = launcherPackage != null && isEffectivelyProtected(launcherPackage),
                 onToggleLauncher = { checked ->
                   launcherPackage?.let { toggleGroup("launcher", setOf(it), checked) }
                 },
                 keyboardPackage = keyboardPackage,
-                keyboardChecked = groupToggles["keyboard"] ?: false,
+                keyboardChecked = keyboardPackage != null && isEffectivelyProtected(keyboardPackage),
                 onToggleKeyboard = { checked ->
                   keyboardPackage?.let { toggleGroup("keyboard", setOf(it), checked) }
                 },
                 persistentPackages = persistentPackages,
-                persistentChecked = groupToggles["persistent"] ?: false,
+                persistentChecked = if (persistentPackages.isNotEmpty()) persistentPackages.all { isEffectivelyProtected(it) } else (groupToggles["persistent"] ?: true),
                 onTogglePersistent = { checked ->
                   toggleGroup("persistent", persistentPackages.toSet(), checked)
                 },
                 wallpaperPackages = wallpaperPackages,
-                wallpaperChecked = groupToggles["wallpaper"] ?: false,
+                wallpaperChecked = if (wallpaperPackages.isNotEmpty()) wallpaperPackages.all { isEffectivelyProtected(it) } else (groupToggles["wallpaper"] ?: true),
                 onToggleWallpaper = { checked ->
                   toggleGroup("wallpaper", wallpaperPackages, checked)
                 },
                 activeWidgetPackages = activeWidgetPackages,
-                widgetsChecked = groupToggles["widgets"] ?: false,
+                widgetsChecked = if (activeWidgetPackages.isNotEmpty()) activeWidgetPackages.all { isEffectivelyProtected(it) } else (groupToggles["widgets"] ?: true),
                 onToggleWidgets = { checked ->
                   scope.launch {
                     val handler = android.os.Handler(android.os.Looper.getMainLooper())
@@ -258,12 +276,12 @@ fun ProtectedAppsDialog(
                   }
                 },
                 androidPackages = androidPackages,
-                androidServicesChecked = groupToggles["android"] ?: false,
+                androidServicesChecked = androidPackages.isNotEmpty() && androidPackages.all { isEffectivelyProtected(it) },
                 onToggleAndroidServices = { checked ->
                   toggleGroup("android", androidPackages.toSet(), checked)
                 },
                 googleAndroidPackages = googleAndroidPackages,
-                googleAndroidServicesChecked = groupToggles["google"] ?: false,
+                googleAndroidServicesChecked = googleAndroidPackages.isNotEmpty() && googleAndroidPackages.all { isEffectivelyProtected(it) },
                 onToggleGoogleServices = { checked ->
                   toggleGroup("google", googleAndroidPackages.toSet(), checked)
                 },

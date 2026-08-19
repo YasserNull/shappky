@@ -14,7 +14,7 @@ object AppModelFilter {
 
   private fun iconFor(packageName: String, loader: () -> Drawable): Drawable = iconCache.get(packageName) ?: loader().also { iconCache.put(packageName, it) }
 
-  private fun matchesAnyRegex(packageName: String, patterns: List<Pair<Regex?, String>>): Boolean {
+  fun matchesAnyRegex(packageName: String, patterns: List<Pair<Regex?, String>>): Boolean {
     for ((regex, raw) in patterns) {
       if (regex != null) {
         if (regex.matches(packageName)) return true

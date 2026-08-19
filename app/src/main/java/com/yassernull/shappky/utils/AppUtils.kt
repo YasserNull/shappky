@@ -36,7 +36,21 @@ fun Context.loadAllApps(callback: (List<AppModel>) -> Unit) {
   if (!executor.isShutdown) {
     executor.execute {
       val pm = packageManager
-      val protectedApps = ProtectionManager.getProtectedApps(this)
+      val protectedApps = ProtectionManager.getEffectiveProtectedApps(this)
+      val exemptions = ProtectionManager.getProtectedAppsExemptions(this)
+      val regexStr = ProtectionManager.getProtectedRegex(this)
+      val patterns = if (regexStr.isNotBlank()) {
+        regexStr.split("|").map { it.trim() }.filter { it.isNotEmpty() }.map { pattern ->
+          try {
+            pattern.replace(".", "\\.").replace("*", ".*").toRegex()
+          } catch (_: Exception) {
+            null
+          } to pattern
+        }
+      } else {
+        emptyList()
+      }
+
       val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
       val allApps = mutableListOf<AppModel>()
       for (appInfo in packages) {
@@ -45,7 +59,9 @@ fun Context.loadAllApps(callback: (List<AppModel>) -> Unit) {
         val isPersistent = appInfo.flags and ApplicationInfo.FLAG_PERSISTENT != 0
         val label = pm.getApplicationLabel(appInfo).toString()
         val pkg = appInfo.packageName
-        val isProtected = pkg == packageName || protectedApps.contains(pkg)
+        val isProtected = pkg == packageName ||
+          protectedApps.contains(pkg) ||
+          (!exemptions.contains(pkg) && com.yassernull.shappky.core.managers.AppModelFilter.matchesAnyRegex(pkg, patterns))
 
         allApps.add(
           AppModel(

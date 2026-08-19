@@ -1,8 +1,10 @@
 package com.yassernull.shappky.utils
 
+import android.app.WallpaperManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.provider.Settings
 import com.yassernull.shappky.core.managers.ShellManager
 import com.yassernull.shappky.data.models.AppModel
@@ -49,17 +51,30 @@ fun getAndroidPackages(allApps: List<AppModel>): List<String> = allApps
   .map { it.packageName }
 
 suspend fun Context.collectCurrentWallpaperPackages(shellManager: ShellManager): Set<String> = withContext(Dispatchers.IO) {
+  val context = this@collectCurrentWallpaperPackages
+  val result = mutableSetOf<String>()
+  try {
+    val wallpaperManager = WallpaperManager.getInstance(context)
+    wallpaperManager.wallpaperInfo?.packageName?.let { result.add(it) }
+    if (Build.VERSION.SDK_INT >= 34) {
+      wallpaperManager.getWallpaperInfo(WallpaperManager.FLAG_LOCK)?.packageName?.let { result.add(it) }
+    }
+  } catch (_: Exception) {
+  }
   try {
     val command = "dumpsys wallpaper | grep \"mWallpaperComponent=\" | head -1 | sed 's/.*ComponentInfo{//' | cut -d'/' -f1"
-    val output = shellManager.runShellCommandAndGetFullOutput(command) ?: return@withContext emptySet<String>()
-    output
-      .split('\n')
-      .map { it.trim() }
-      .filter { it.isNotEmpty() && !it.startsWith("ERROR:") }
-      .toSet()
+    val output = shellManager.runShellCommandAndGetFullOutput(command)
+    if (output != null) {
+      result.addAll(
+        output
+          .split('\n')
+          .map { it.trim() }
+          .filter { it.isNotEmpty() && !it.startsWith("ERROR:") },
+      )
+    }
   } catch (_: Exception) {
-    emptySet()
   }
+  result
 }
 
 suspend fun Context.collectActiveWidgetPackages(shellManager: ShellManager): Set<String> = withContext(Dispatchers.IO) {
