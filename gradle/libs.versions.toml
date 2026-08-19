@@ -14,6 +14,7 @@ kotlin = "2.2.10"
 composeBom = "2026.02.01"
 libsu = "6.0.0"
 shizuku = "13.1.5"
+tasker-plugin = "0.4.10"
 spotless = "7.0.2"
 
 [libraries]
@@ -42,8 +43,9 @@ libsu-service = { group = "com.github.topjohnwu.libsu", name = "service", versio
 libsu-nio = { group = "com.github.topjohnwu.libsu", name = "nio", version.ref = "libsu" }
 shizuku-api = { group = "dev.rikka.shizuku", name = "api", version.ref = "shizuku" }
 shizuku-provider = { group = "dev.rikka.shizuku", name = "provider", version.ref = "shizuku" }
-
+tasker-plugin-library = { module = "com.joaomgcd:taskerpluginlibrary", version.ref = "tasker-plugin" }
 [plugins]
+
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

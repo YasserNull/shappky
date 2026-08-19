@@ -150,7 +150,6 @@ dependencies {
   // shizuku
   implementation(libs.shizuku.api)
   implementation(libs.shizuku.provider)
-
   // Tasker Plugin Library
-  implementation("com.joaomgcd:taskerpluginlibrary:0.4.10")
+  implementation(libs.tasker.plugin.library)
 }
