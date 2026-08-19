@@ -139,8 +139,10 @@
              android:exported="true">
              <intent-filter>
                  <action android:name="com.yassernull.shappky.EXECUTE_TRIGGER" />
-                 <action android:name="com.yassernull.shappky.ENABLE_SERVICE" />
-                 <action android:name="com.yassernull.shappky.DISABLE_SERVICE" />
+                 <action android:name="com.yassernull.shappky.ENABLE_TRIGGER" />
+                 <action android:name="com.yassernull.shappky.DISABLE_TRIGGER" />
+                 <action android:name="com.yassernull.shappky.ENABLE_SHAPPKY_SERVICE" />
+                 <action android:name="com.yassernull.shappky.DISABLE_SHAPPKY_SERVICE" />
              </intent-filter>
          </receiver>
 

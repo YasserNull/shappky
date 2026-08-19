@@ -17,9 +17,10 @@ class ShappkyIntentReceiver : BroadcastReceiver() {
   companion object {
     private const val TAG = "ShappkyIntentReceiver"
     const val ACTION_EXECUTE_TRIGGER = "com.yassernull.shappky.EXECUTE_TRIGGER"
-    const val ACTION_ENABLE_SERVICE = "com.yassernull.shappky.ENABLE_SERVICE"
-    const val ACTION_DISABLE_SERVICE = "com.yassernull.shappky.DISABLE_SERVICE"
-    const val EXTRA_TRIGGER_ID = "TRIGGER_ID"
+    const val ACTION_ENABLE_TRIGGER = "com.yassernull.shappky.ENABLE_TRIGGER"
+    const val ACTION_DISABLE_TRIGGER = "com.yassernull.shappky.DISABLE_TRIGGER"
+    const val ACTION_ENABLE_SERVICE = "com.yassernull.shappky.ENABLE_SHAPPKY_SERVICE"
+    const val ACTION_DISABLE_SERVICE = "com.yassernull.shappky.DISABLE_SHAPPKY_SERVICE"
     const val EXTRA_TRIGGER_NAME = "TRIGGER_NAME"
   }
 
@@ -29,6 +30,14 @@ class ShappkyIntentReceiver : BroadcastReceiver() {
     try {
       when (intent?.action) {
         ACTION_EXECUTE_TRIGGER -> handleExecuteTrigger(context, intent) {
+          pendingResult.finish()
+        }
+        ACTION_ENABLE_TRIGGER -> {
+          handleEnableTrigger(context, intent)
+          pendingResult.finish()
+        }
+        ACTION_DISABLE_TRIGGER -> {
+          handleDisableTrigger(context, intent)
           pendingResult.finish()
         }
         ACTION_ENABLE_SERVICE -> {
@@ -59,21 +68,58 @@ class ShappkyIntentReceiver : BroadcastReceiver() {
     Log.d(TAG, "Shappky Service disabled via Intent")
   }
 
+  private fun handleEnableTrigger(context: Context, intent: Intent) {
+    val triggerName = intent.getStringExtra(EXTRA_TRIGGER_NAME)
+    if (triggerName == null) {
+      Log.e(TAG, "No TRIGGER_NAME provided in intent extras")
+      return
+    }
+
+    val triggers = TriggerManager.getTriggers(context)
+    val trigger = triggers.find { it.name.equals(triggerName, ignoreCase = true) }
+
+    if (trigger == null) {
+      Log.e(TAG, "Trigger not found! Name: $triggerName")
+      return
+    }
+
+    TriggerManager.setTriggerEnabled(context, trigger.id, true)
+    Log.d(TAG, "Trigger '${trigger.name}' enabled via Intent")
+  }
+
+  private fun handleDisableTrigger(context: Context, intent: Intent) {
+    val triggerName = intent.getStringExtra(EXTRA_TRIGGER_NAME)
+    if (triggerName == null) {
+      Log.e(TAG, "No TRIGGER_NAME provided in intent extras")
+      return
+    }
+
+    val triggers = TriggerManager.getTriggers(context)
+    val trigger = triggers.find { it.name.equals(triggerName, ignoreCase = true) }
+
+    if (trigger == null) {
+      Log.e(TAG, "Trigger not found! Name: $triggerName")
+      return
+    }
+
+    TriggerManager.setTriggerEnabled(context, trigger.id, false)
+    Log.d(TAG, "Trigger '${trigger.name}' disabled via Intent")
+  }
+
   private fun handleExecuteTrigger(context: Context, intent: Intent, onDone: () -> Unit) {
-    val triggerId = intent.getStringExtra(EXTRA_TRIGGER_ID)
     val triggerName = intent.getStringExtra(EXTRA_TRIGGER_NAME)
 
-    if (triggerId == null && triggerName == null) {
-      Log.e(TAG, "No TRIGGER_ID or TRIGGER_NAME provided in intent extras")
+    if (triggerName == null) {
+      Log.e(TAG, "No TRIGGER_NAME provided in intent extras")
       onDone()
       return
     }
 
     val triggers = TriggerManager.getTriggers(context)
-    val trigger = triggers.find { it.id == triggerId || (triggerName != null && it.name.equals(triggerName, ignoreCase = true)) }
+    val trigger = triggers.find { it.name.equals(triggerName, ignoreCase = true) }
 
     if (trigger == null) {
-      Log.e(TAG, "Trigger not found! ID: $triggerId, Name: $triggerName")
+      Log.e(TAG, "Trigger not found! Name: $triggerName")
       onDone()
       return
     }
