@@ -51,7 +51,8 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
       if (!packageName.isNullOrEmpty()) {
         val shellManager = getShellManager(context)
         if (shellManager.hasAnyShellPermission()) {
-          shellManager.runShellCommand("am force-stop $packageName") {
+          val command = com.yassernull.shappky.core.managers.AppKillHandler.buildSmartKillCommand(listOf(packageName))
+          shellManager.runShellCommand(command) {
             com.yassernull.shappky.core.managers.KillTracker.markKilled(packageName)
             val localCtx = getLocalizedContext(context)
             val message = localCtx.getString(R.string.free_up_memory, appRam)
