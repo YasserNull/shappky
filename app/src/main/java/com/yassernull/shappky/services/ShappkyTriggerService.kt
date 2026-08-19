@@ -1,7 +1,6 @@
 package com.yassernull.shappky.services
 
 import android.annotation.SuppressLint
-import android.app.ActivityManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -22,11 +21,10 @@ import com.yassernull.shappky.core.domain.evaluator.TriggerRuleEvaluator
 import com.yassernull.shappky.core.domain.executors.TriggerActionExecutor
 import com.yassernull.shappky.core.domain.trackers.AppForegroundTracker
 import com.yassernull.shappky.core.domain.trackers.SystemStateTracker
-import com.yassernull.shappky.core.managers.DisableTriggerManager
-import com.yassernull.shappky.core.managers.EnableTriggerManager
 import com.yassernull.shappky.core.managers.ShellManager
-import com.yassernull.shappky.core.managers.TriggerManager
-import com.yassernull.shappky.core.managers.parseRecentsPackages
+import com.yassernull.shappky.services.trigger.TriggerBackgroundMonitor
+import com.yassernull.shappky.services.trigger.TriggerForegroundMonitor
+import com.yassernull.shappky.services.trigger.TriggerMonitoringState
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -43,27 +41,17 @@ class ShappkyTriggerService : Service() {
   private lateinit var actionExecutor: TriggerActionExecutor
   private lateinit var ruleEvaluator: TriggerRuleEvaluator
 
-  @Volatile
-  private var lastSharedForeground: String? = null
-  private val previousRunningPackages = mutableSetOf<String>()
-  private val previousRecentsPackages = mutableSetOf<String>()
-  private val pendingExitChecks = mutableMapOf<String, Long>()
-
-  @Volatile
-  private var pendingSleepEvent = false
-
-  @Volatile
-  private var pendingWakeEvent = false
+  private val sharedState = TriggerMonitoringState()
 
   private val screenStateReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
       when (intent?.action) {
         Intent.ACTION_SCREEN_OFF -> {
-          pendingSleepEvent = true
+          sharedState.pendingSleepEvent = true
           Log.d(TAG, "SCREEN_OFF received: pendingSleepEvent=true")
         }
         Intent.ACTION_SCREEN_ON -> {
-          pendingWakeEvent = true
+          sharedState.pendingWakeEvent = true
           Log.d(TAG, "SCREEN_ON received: pendingWakeEvent=true")
         }
       }
@@ -81,6 +69,29 @@ class ShappkyTriggerService : Service() {
     ruleEvaluator = TriggerRuleEvaluator(this, actionExecutor, stateTracker, foregroundTracker, shellManager, handler, executor)
     actionExecutor.onServiceStateChanged = { ruleEvaluator.clearCooldowns() }
 
+    TriggerForegroundMonitor(
+      context = this,
+      handler = handler,
+      shellManager = shellManager,
+      stateTracker = stateTracker,
+      foregroundTracker = foregroundTracker,
+      ruleEvaluator = ruleEvaluator,
+      executor = triggerExecutor,
+      sharedState = sharedState,
+      isRunning = { isRunning },
+    ).start()
+
+    TriggerBackgroundMonitor(
+      context = this,
+      handler = handler,
+      shellManager = shellManager,
+      foregroundTracker = foregroundTracker,
+      ruleEvaluator = ruleEvaluator,
+      executor = backgroundExecutor,
+      sharedState = sharedState,
+      isRunning = { isRunning },
+    ).start()
+
     createNotificationChannel()
 
     val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -96,8 +107,6 @@ class ShappkyTriggerService : Service() {
       startForeground(2, notification)
     }
     isRunning = true
-    startTriggerMonitoring()
-    startBackgroundMonitoring()
 
     val screenFilter = IntentFilter().apply {
       addAction(Intent.ACTION_SCREEN_ON)
@@ -109,326 +118,6 @@ class ShappkyTriggerService : Service() {
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     Log.d(TAG, "onStartCommand: ShappkyTriggerService starting sticky")
     return START_STICKY
-  }
-
-  private fun startTriggerMonitoring() {
-    stateTracker.initializeStates()
-
-    triggerExecutor.execute {
-      while (isRunning) {
-        try {
-          val triggers = TriggerManager.getTriggers(this@ShappkyTriggerService)
-          val activeTriggers = triggers.filter { it.isEnabled }
-          val enableRules = EnableTriggerManager.getEnableRules(this@ShappkyTriggerService)
-          val disableRules = DisableTriggerManager.getDisableRules(this@ShappkyTriggerService)
-
-          val isShappkyServiceRunning = ShappkyService.isRunning()
-          val hasTriggerToggleRules = triggers.any { it.enableRules.isNotEmpty() || it.disableRules.isNotEmpty() }
-          val hasWorkToDo = activeTriggers.isNotEmpty() ||
-            hasTriggerToggleRules ||
-            (!isShappkyServiceRunning && enableRules.isNotEmpty()) ||
-            (isShappkyServiceRunning && disableRules.isNotEmpty())
-
-          if (!hasWorkToDo) {
-            Thread.sleep(10000L)
-            continue
-          }
-
-          val scanIntervalMs = MONITOR_SCAN_INTERVAL_MS
-          Log.d(TAG, "startTriggerMonitoring: scanning every ${scanIntervalMs}ms")
-
-          val now = System.currentTimeMillis()
-
-          val oldInteractive = stateTracker.currentInteractive
-          stateTracker.updateCurrentStates()
-
-          var isPhoneSleepTriggered = false
-          var isPhoneWakeTriggered = false
-
-          if (stateTracker.lastInteractiveState != null && stateTracker.lastInteractiveState != stateTracker.currentInteractive) {
-            if (!stateTracker.currentInteractive) {
-              isPhoneSleepTriggered = true
-            } else {
-              isPhoneWakeTriggered = true
-            }
-          }
-
-          if (pendingSleepEvent) {
-            pendingSleepEvent = false
-            isPhoneSleepTriggered = true
-          }
-          if (pendingWakeEvent) {
-            pendingWakeEvent = false
-            isPhoneWakeTriggered = true
-          }
-          if (isPhoneSleepTriggered || isPhoneWakeTriggered) {
-            Log.d(TAG, "startTriggerMonitoring: sleepEvent=$isPhoneSleepTriggered, wakeEvent=$isPhoneWakeTriggered")
-          }
-
-          val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
-          val memoryInfo = ActivityManager.MemoryInfo()
-          activityManager?.getMemoryInfo(memoryInfo)
-          val totalMb = memoryInfo.totalMem / (1024 * 1024)
-          val availMb = memoryInfo.availMem / (1024 * 1024)
-          val usedMb = totalMb - availMb
-
-          // 1. Evaluate Service States and General Rules
-          ruleEvaluator.evaluateTriggerEnableDisableRules(
-            triggers,
-            isPhoneSleepTriggered,
-            isPhoneWakeTriggered,
-            usedMb,
-            now,
-          )
-
-          ruleEvaluator.evaluateServiceStateRules(
-            activeTriggers,
-            enableRules,
-            disableRules,
-            isPhoneSleepTriggered,
-            isPhoneWakeTriggered,
-            usedMb,
-            now,
-          )
-
-          stateTracker.saveCurrentStatesAsLast()
-
-          // 2. Evaluate Foreground Apps
-          val triggerToggleRules = triggers.flatMap { it.enableRules + it.disableRules }
-          val hasInactivityRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_INACTIVITY } } || triggerToggleRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_INACTIVITY } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_INACTIVITY })
-          val hasAutoBgRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_BACKGROUND_STARTED } }
-          val hasAppOpenedRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_OPENED } } || triggerToggleRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_OPENED } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_OPENED })
-          val hasAppResumedRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_RESUMED } } || triggerToggleRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_RESUMED } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_RESUMED }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_RESUMED })
-          val hasAppPausedRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_PAUSED } } || triggerToggleRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_PAUSED } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_PAUSED }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_PAUSED })
-          val hasExitRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_EXITED } } || triggerToggleRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_EXITED } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_EXITED }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_EXITED })
-          val hasKillRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_KILLED } } || triggerToggleRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_KILLED } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_KILLED }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_KILLED })
-
-          Log.d(TAG, "startTriggerMonitoring: triggers=${activeTriggers.size}, interactive=${stateTracker.currentInteractive}, appOpened=$hasAppOpenedRules, appResumed=$hasAppResumedRules, appPaused=$hasAppPausedRules, exit=$hasExitRules, kill=$hasKillRules, inactivity=$hasInactivityRules, autoBg=$hasAutoBgRules")
-
-          var currentForeground: String? = null
-          if (stateTracker.currentInteractive && (hasAppOpenedRules || hasAppResumedRules || hasAppPausedRules || hasInactivityRules || hasAutoBgRules)) {
-            if (shellManager.isShellCommandReady()) {
-              val dumpOutput = shellManager.runShellCommandAndGetFullOutputWithTimeout("dumpsys activity activities", MONITOR_COMMAND_TIMEOUT_MS)
-              if (dumpOutput != null) {
-                currentForeground = foregroundTracker.getForegroundPackage(dumpOutput)
-                val currentForegroundWasKnown = currentForeground != null && foregroundTracker.isKnownPackage(currentForeground)
-                val previouslyForeground = foregroundTracker.updateForegroundApp(currentForeground, now)
-
-                ruleEvaluator.evaluateAppForegroundRules(
-                  activeTriggers,
-                  enableRules,
-                  disableRules,
-                  currentForeground,
-                  previouslyForeground,
-                  currentForegroundWasKnown,
-                )
-
-                ruleEvaluator.evaluateTriggerEnableDisableAppRules(
-                  triggers,
-                  currentForeground,
-                  previouslyForeground,
-                  currentForegroundWasKnown,
-                  emptySet(),
-                  now,
-                )
-
-                // Fast exit detection: when the user leaves a known foreground app,
-                // watch whether its activity/task disappears from the activity dump
-                // (back-exit destroys the task; home-pause keeps it) and confirm exit.
-                val leftApp = previouslyForeground
-                if (leftApp != null && leftApp != currentForeground && (hasExitRules || hasKillRules) && foregroundTracker.isKnownPackage(leftApp)) {
-                  if (!pendingExitChecks.containsKey(leftApp)) {
-                    Log.d(TAG, "startTriggerMonitoring: watching $leftApp for exit (left foreground)")
-                  }
-                  pendingExitChecks.putIfAbsent(leftApp, now)
-                }
-
-                val pendingIterator = pendingExitChecks.entries.iterator()
-                while (pendingIterator.hasNext()) {
-                  val entry = pendingIterator.next()
-                  val pkg = entry.key
-                  val startedWatching = entry.value
-                  val isShappkyKill = com.yassernull.shappky.core.managers.KillTracker.contains(pkg)
-                  if (isShappkyKill || !activityDumpContainsPackage(dumpOutput, pkg)) {
-                    pendingIterator.remove()
-                    Log.d(TAG, "startTriggerMonitoring: exit/kill detected for $pkg (killRecorded=$isShappkyKill, no activity/task record)")
-                    ruleEvaluator.evaluateAppExitRules(activeTriggers, enableRules, disableRules, emptySet(), setOf(pkg))
-                  } else if (now - startedWatching > EXIT_CONFIRM_TIMEOUT_MS) {
-                    pendingIterator.remove()
-                    Log.d(TAG, "startTriggerMonitoring: $pkg still active after ${now - startedWatching}ms (paused, not exited)")
-                  }
-                }
-              }
-            }
-          }
-          lastSharedForeground = currentForeground
-
-          if (isPhoneSleepTriggered) {
-            foregroundTracker.lastForegroundApp?.let { prevApp ->
-              foregroundTracker.markAppAsInactive(prevApp, now)
-              ruleEvaluator.handleSleepAppPausedRules(activeTriggers, enableRules, disableRules, prevApp)
-            }
-            foregroundTracker.lastForegroundApp = null
-          }
-
-          // 3. Background / RAM / Inactivity / exit & kill are evaluated by startBackgroundMonitoring()
-          //    at an interval driven by the triggers' service duration.
-
-          Thread.sleep(scanIntervalMs)
-        } catch (_: InterruptedException) {
-          Log.d(TAG, "startTriggerMonitoring: Monitoring loop interrupted")
-          if (isRunning) {
-            Log.d(TAG, "startTriggerMonitoring: Service still running, restarting scan")
-          } else {
-            Thread.currentThread().interrupt()
-            break
-          }
-        } catch (e: Throwable) {
-          Log.e(TAG, "startTriggerMonitoring: Error in monitoring loop", e)
-          try {
-            Thread.sleep(5000L)
-          } catch (_: Exception) {}
-        }
-      }
-    }
-  }
-
-  private fun startBackgroundMonitoring() {
-    backgroundExecutor.execute {
-      while (isRunning) {
-        try {
-          val triggers = TriggerManager.getTriggers(this@ShappkyTriggerService)
-          val activeTriggers = triggers.filter { it.isEnabled }
-          val enableRules = EnableTriggerManager.getEnableRules(this@ShappkyTriggerService)
-          val disableRules = DisableTriggerManager.getDisableRules(this@ShappkyTriggerService)
-
-          val isShappkyServiceRunning = ShappkyService.isRunning()
-          val triggerToggleRules = triggers.flatMap { it.enableRules + it.disableRules }
-          val hasInactivityRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_INACTIVITY } } || triggerToggleRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_INACTIVITY } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_INACTIVITY })
-          val hasAutoBgRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_BACKGROUND_STARTED } }
-          val hasKillOldestRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.KILL_OLDEST_APP } }
-          val hasManualKillRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_KILLED } } || triggerToggleRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_KILLED } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_KILLED }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_KILLED })
-          val hasExitRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_EXITED } } || triggerToggleRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_EXITED } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_EXITED }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_EXITED })
-          val hasRamExceededRules = activeTriggers.any { it.rules.any { r -> r.type == com.yassernull.shappky.data.models.RuleType.APP_RAM_EXCEEDED } } || triggerToggleRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_RAM_EXCEEDED } || (!isShappkyServiceRunning && enableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_RAM_EXCEEDED }) || (isShappkyServiceRunning && disableRules.any { it.type == com.yassernull.shappky.data.models.RuleType.APP_RAM_EXCEEDED })
-
-          Log.d(TAG, "startBackgroundMonitoring: triggers=${activeTriggers.size}, inactivity=$hasInactivityRules, autoBg=$hasAutoBgRules, killOldest=$hasKillOldestRules, manualKill=$hasManualKillRules, exit=$hasExitRules, ramExceeded=$hasRamExceededRules")
-
-          if (!hasInactivityRules && !hasAutoBgRules && !hasKillOldestRules && !hasManualKillRules && !hasExitRules && !hasRamExceededRules) {
-            Thread.sleep(DEFAULT_BACKGROUND_INTERVAL_MS)
-            continue
-          }
-
-          // Effective scan interval = smallest service duration among active triggers (fallback default)
-          val intervalMs = minServiceDurationOrNull(activeTriggers) ?: DEFAULT_BACKGROUND_INTERVAL_MS
-          val effectiveIntervalMs = if (hasExitRules || hasManualKillRules) {
-            minOf(intervalMs, EXIT_SCAN_INTERVAL_MS)
-          } else {
-            intervalMs
-          }
-          Log.d(TAG, "startBackgroundMonitoring: scan in ${effectiveIntervalMs}ms (inactivity=$hasInactivityRules, autoBg=$hasAutoBgRules, killOldest=$hasKillOldestRules)")
-
-          Thread.sleep(effectiveIntervalMs)
-          if (!isRunning) break
-
-          val now = System.currentTimeMillis()
-          if (shellManager.isShellCommandReady()) {
-            val psOutput = shellManager.runShellCommandAndGetFullOutputWithTimeout(com.yassernull.shappky.core.managers.psAllProcessesCommand(), MONITOR_COMMAND_TIMEOUT_MS)
-            if (psOutput != null) {
-              val packageUsages = com.yassernull.shappky.core.managers.aggregatePsOutputToPackages(psOutput, packageManager)
-              val runningPackages = packageUsages.keys.toMutableSet()
-              val packageRamUsage = packageUsages.mapValues { it.value.ramKb }
-              val currentForeground = lastSharedForeground
-              Log.d(TAG, "startBackgroundMonitoring: running=${runningPackages.size}, previous=${previousRunningPackages.size}, foreground=$currentForeground, added=${runningPackages - previousRunningPackages}")
-
-              foregroundTracker.cleanUpOldForegroundRecords(runningPackages, currentForeground)
-              foregroundTracker.initNewRunningPackages(runningPackages, currentForeground, now)
-
-              // Detect apps the user removed from recents (swipe-kill), even if the process lingers in ps
-              var currentRecentsPackages = emptySet<String>()
-              var swipedFromRecents = emptySet<String>()
-              if (hasManualKillRules || hasExitRules || hasAutoBgRules) {
-                val recentsOutput = shellManager.runShellCommandAndGetFullOutputWithTimeout("dumpsys activity recents", MONITOR_COMMAND_TIMEOUT_MS) ?: ""
-                if (recentsOutput.isBlank() || recentsOutput.startsWith("ERROR")) {
-                  Log.w(TAG, "startBackgroundMonitoring: dumpsys activity recents empty/error, skipping recents diff")
-                } else {
-                  currentRecentsPackages = parseRecentsPackages(recentsOutput, packageManager)
-                  swipedFromRecents = previousRecentsPackages - currentRecentsPackages
-                  Log.d(TAG, "startBackgroundMonitoring: recents now=${currentRecentsPackages.size}, swiped=$swipedFromRecents")
-                  previousRecentsPackages.clear()
-                  previousRecentsPackages.addAll(currentRecentsPackages)
-                }
-              }
-
-              // Check APP_EXITED / APP_KILLED (stopped processes, classified by Shappky kill)
-              val killedPackages = if (previousRunningPackages.isNotEmpty()) previousRunningPackages - runningPackages else emptySet()
-              val trackerKilledNotRunning = com.yassernull.shappky.core.managers.KillTracker.getKilledPackages().filter { !runningPackages.contains(it) }
-              val allStopped = killedPackages + trackerKilledNotRunning
-              if (allStopped.isNotEmpty() || swipedFromRecents.isNotEmpty()) {
-                Log.d(TAG, "startBackgroundMonitoring: stopped=killedDiff=$killedPackages, trackerNotRunning=$trackerKilledNotRunning, swiped=$swipedFromRecents")
-                ruleEvaluator.evaluateAppExitRules(activeTriggers, enableRules, disableRules, allStopped, swipedFromRecents)
-                ruleEvaluator.evaluateTriggerEnableDisableAppRules(
-                  triggers,
-                  currentForeground,
-                  foregroundTracker.lastForegroundApp,
-                  false,
-                  allStopped,
-                  now,
-                )
-              }
-              ruleEvaluator.cleanKilledApps(runningPackages)
-
-              // Check APP_BACKGROUND_STARTED (running apps the user never opened - not present in recents)
-              if (hasAutoBgRules) {
-                ruleEvaluator.evaluateAutoStartedBackgroundRules(
-                  activeTriggers,
-                  runningPackages,
-                  packageRamUsage,
-                  currentRecentsPackages,
-                )
-              }
-              previousRunningPackages.clear()
-              previousRunningPackages.addAll(runningPackages)
-
-              // Process APP_RAM_EXCEEDED
-              ruleEvaluator.evaluateRamExceededRules(activeTriggers, enableRules, disableRules, packageRamUsage)
-
-              // Process Inactivity / KILL_OLDEST_APP rules
-              ruleEvaluator.evaluateInactivityRules(
-                activeTriggers,
-                enableRules,
-                disableRules,
-                runningPackages,
-                currentForeground,
-                packageRamUsage,
-                now,
-              )
-            }
-          }
-        } catch (_: InterruptedException) {
-          Log.d(TAG, "startBackgroundMonitoring: Background monitoring loop interrupted")
-          if (isRunning) {
-            Log.d(TAG, "startBackgroundMonitoring: Service still running, restarting scan")
-          } else {
-            Thread.currentThread().interrupt()
-            break
-          }
-        } catch (e: Throwable) {
-          Log.e(TAG, "startBackgroundMonitoring: Error in background monitoring loop", e)
-          try {
-            Thread.sleep(5000L)
-          } catch (_: Exception) {}
-        }
-      }
-    }
-  }
-
-  private fun minServiceDurationOrNull(triggers: List<com.yassernull.shappky.data.models.TriggerModel>): Long? = triggers.mapNotNull { it.serviceDuration.takeIf { d -> d > 0L } }.minOrNull()
-
-  private fun activityDumpContainsPackage(dump: String, pkg: String): Boolean {
-    val escaped = Regex.escape(pkg)
-    val componentRegex = Regex("$escaped(/[A-Za-z0-9_.$]*)?[\\s,}]")
-    val affinityRegex = Regex("A=$escaped\\s")
-    return componentRegex.containsMatchIn(dump) || affinityRegex.containsMatchIn(dump)
   }
 
   override fun onDestroy() {
@@ -458,11 +147,6 @@ class ShappkyTriggerService : Service() {
   companion object {
     private const val TAG = "ShappkyTriggerService"
     private const val CHANNEL_ID = "ShappkyTriggerChannel"
-    private const val DEFAULT_BACKGROUND_INTERVAL_MS = 50000L
-    private const val MONITOR_SCAN_INTERVAL_MS = 1000L
-    private const val MONITOR_COMMAND_TIMEOUT_MS = 10000L
-    private const val EXIT_SCAN_INTERVAL_MS = 10000L
-    private const val EXIT_CONFIRM_TIMEOUT_MS = 5000L
 
     @Volatile
     private var isRunning = false
