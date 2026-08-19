@@ -280,9 +280,13 @@
     <string name="delete_rule_content_desc">حذف القاعدة</string>
     <string name="tasker_configuration">إعدادات Tasker</string>
     <string name="select_action">اختر الإجراء:</string>
-    <string name="start_shappky_service_action">بدء خدمة شابكي</string>
-    <string name="stop_shappky_service_action">إيقاف خدمة شابكي</string>
-    <string name="execute_specific_trigger_action">تشغيل مشغل معين</string>
+    <string name="tasker_section_service">خدمة شابكي</string>
+    <string name="start_shappky_service_action">تفعيل خدمة شابكي</string>
+    <string name="stop_shappky_service_action">تعطيل خدمة شابكي</string>
+    <string name="tasker_section_triggers">المشغلات</string>
+    <string name="execute_trigger_action">تشغيل مشغل</string>
+    <string name="enable_trigger_action">تفعيل مشغل</string>
+    <string name="disable_trigger_action">تعطيل مشغل</string>
     <string name="select_trigger_label">اختر المشغل:</string>
     <string name="no_triggers_available">لا توجد مشغلات متاحة. الرجاء إنشاء واحد في شابكي أولاً.</string>
     <string name="trigger_name_fallback">المشغل %1$s</string>

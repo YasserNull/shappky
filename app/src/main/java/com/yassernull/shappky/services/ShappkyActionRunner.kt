@@ -99,6 +99,23 @@ class ShappkyActionRunner : TaskerPluginRunnerActionNoOutput<ShappkyActionInput>
           return TaskerPluginResultError(2, context.getString(com.yassernull.shappky.R.string.no_trigger_id_error))
         }
       }
+      "ENABLE_TRIGGER", "DISABLE_TRIGGER" -> {
+        Log.d(TAG, "Setting trigger enabled state from Tasker...")
+        if (triggerId != null) {
+          val trigger = TriggerManager.getTriggers(context).find { it.id == triggerId }
+          if (trigger != null) {
+            val enabled = actionType == "ENABLE_TRIGGER"
+            TriggerManager.setTriggerEnabled(context, triggerId, enabled)
+            Log.d(TAG, "Trigger '${trigger.name}' ${if (enabled) "enabled" else "disabled"} successfully.")
+          } else {
+            Log.e(TAG, "Trigger with ID $triggerId not found in SharedPreferences!")
+            return TaskerPluginResultError(1, context.getString(com.yassernull.shappky.R.string.trigger_not_found_error, triggerId))
+          }
+        } else {
+          Log.e(TAG, "No Trigger ID provided in the Tasker configuration!")
+          return TaskerPluginResultError(2, context.getString(com.yassernull.shappky.R.string.no_trigger_id_error))
+        }
+      }
       else -> {
         Log.w(TAG, "Unknown actionType received: $actionType")
       }

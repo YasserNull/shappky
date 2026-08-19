@@ -52,6 +52,8 @@ fun TaskerConfigContent(
       Text(stringResource(R.string.select_action), style = MaterialTheme.typography.titleMedium)
       Spacer(Modifier.height(8.dp))
 
+      Text(stringResource(R.string.tasker_section_service), style = MaterialTheme.typography.titleSmall)
+      Spacer(Modifier.height(4.dp))
       ActionOption(
         label = stringResource(R.string.start_shappky_service_action),
         type = "START_SERVICE",
@@ -64,22 +66,46 @@ fun TaskerConfigContent(
         currentActionType = actionType,
         onActionTypeChange = onActionTypeChange,
       )
+
+      Spacer(Modifier.height(16.dp))
+      Text(stringResource(R.string.tasker_section_triggers), style = MaterialTheme.typography.titleSmall)
+      Spacer(Modifier.height(4.dp))
       ActionOption(
-        label = stringResource(R.string.execute_specific_trigger_action),
+        label = stringResource(R.string.execute_trigger_action),
         type = "EXECUTE_TRIGGER",
         currentActionType = actionType,
         onActionTypeChange = onActionTypeChange,
       )
+      ActionOption(
+        label = stringResource(R.string.enable_trigger_action),
+        type = "ENABLE_TRIGGER",
+        currentActionType = actionType,
+        onActionTypeChange = onActionTypeChange,
+      )
+      ActionOption(
+        label = stringResource(R.string.disable_trigger_action),
+        type = "DISABLE_TRIGGER",
+        currentActionType = actionType,
+        onActionTypeChange = onActionTypeChange,
+      )
 
-      if (actionType == "EXECUTE_TRIGGER") {
+      if (actionType == "EXECUTE_TRIGGER" || actionType == "ENABLE_TRIGGER" || actionType == "DISABLE_TRIGGER") {
         Spacer(Modifier.height(16.dp))
         Text(stringResource(R.string.select_trigger_label), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
 
-        if (availableTriggers.isEmpty()) {
+        val hasRules = { trigger: TriggerModel ->
+          trigger.rules.isNotEmpty() || trigger.enableRules.isNotEmpty() || trigger.disableRules.isNotEmpty()
+        }
+        val selectableTriggers = when (actionType) {
+          "EXECUTE_TRIGGER" -> availableTriggers.filter { !hasRules(it) }
+          else -> availableTriggers.filter { hasRules(it) }
+        }
+
+        if (selectableTriggers.isEmpty()) {
           Text(stringResource(R.string.no_triggers_available), color = MaterialTheme.colorScheme.error)
         } else {
-          availableTriggers.forEach { trigger ->
+          selectableTriggers.forEach { trigger ->
             Row(
               modifier = Modifier
                 .fillMaxWidth()

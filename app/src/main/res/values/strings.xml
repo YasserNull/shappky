@@ -288,9 +288,13 @@
     <string name="delete_rule_content_desc">Delete rule</string>
     <string name="tasker_configuration">Tasker Configuration</string>
     <string name="select_action">Select Action:</string>
-    <string name="start_shappky_service_action">Start Shappky Service</string>
-    <string name="stop_shappky_service_action">Stop Shappky Service</string>
-    <string name="execute_specific_trigger_action">Execute Specific Trigger</string>
+    <string name="tasker_section_service">Shappky Service</string>
+    <string name="start_shappky_service_action">Enable Shappky Service</string>
+    <string name="stop_shappky_service_action">Disable Shappky Service</string>
+    <string name="tasker_section_triggers">Triggers</string>
+    <string name="execute_trigger_action">Run Trigger</string>
+    <string name="enable_trigger_action">Enable Trigger</string>
+    <string name="disable_trigger_action">Disable Trigger</string>
     <string name="select_trigger_label">Select Trigger:</string>
     <string name="no_triggers_available">No triggers available. Please create one in Shappky first.</string>
     <string name="trigger_name_fallback">Trigger %1$s</string>
