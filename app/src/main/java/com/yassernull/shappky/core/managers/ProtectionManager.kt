@@ -70,6 +70,7 @@ object ProtectionManager {
       .putBoolean(KEY_GROUP_PREFIX + group + "_enabled", enabled)
       .putStringSet(KEY_GROUP_PREFIX + group + "_members", members)
       .apply()
+    groupProtectedCache.remove(context.packageName)
   }
 
   fun isPackageProtected(context: Context, packageName: String): Boolean {
@@ -80,64 +81,6 @@ object ProtectionManager {
   }
 
   fun getEffectiveProtectedApps(context: Context): Set<String> = getProtectedApps(context) + getEnabledGroupProtectedPackages(context)
-
-  fun refreshSpecialProtectedApps(context: Context) {
-    try {
-      val current = getProtectedApps(context).toMutableSet()
-      var changed = false
-
-      if (getGroupEnabled(context, "launcher")) {
-        try {
-          val launcherIntent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
-          context.packageManager.resolveActivity(launcherIntent, PackageManager.MATCH_DEFAULT_ONLY)
-            ?.activityInfo?.packageName
-            ?.let { changed = current.add(it) || changed }
-        } catch (e: Exception) {
-          Log.e(TAG, "Error refreshing default launcher", e)
-        }
-      }
-
-      if (getGroupEnabled(context, "keyboard")) {
-        try {
-          var keyboard = Settings.Secure.getString(context.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
-          if (keyboard != null && keyboard.contains("/")) {
-            changed = current.add(keyboard.split("/")[0]) || changed
-          }
-        } catch (e: Exception) {
-          Log.e(TAG, "Error refreshing default keyboard", e)
-        }
-      }
-
-      if (getGroupEnabled(context, "wallpaper")) {
-        try {
-          val wallpaperManager = WallpaperManager.getInstance(context)
-          wallpaperManager.wallpaperInfo?.packageName?.let { changed = current.add(it) || changed }
-          if (Build.VERSION.SDK_INT >= 34) {
-            wallpaperManager.getWallpaperInfo(WallpaperManager.FLAG_LOCK)?.packageName?.let { changed = current.add(it) || changed }
-          }
-        } catch (e: Exception) {
-          Log.e(TAG, "Error refreshing default wallpaper", e)
-        }
-      }
-
-      if (getGroupEnabled(context, "widgets")) {
-        try {
-          AppWidgetManager.getInstance(context).installedProviders.forEach { provider ->
-            changed = current.add(provider.provider.packageName) || changed
-          }
-        } catch (e: Exception) {
-          Log.e(TAG, "Error refreshing widget providers", e)
-        }
-      }
-
-      if (changed) {
-        saveProtectedApps(context, current)
-        groupProtectedCache.remove(context.packageName)
-      }
-    } catch (e: Exception) {
-      Log.e(TAG, "Error refreshing special protected apps", e)
-    }
-  }
 
   fun getEnabledGroupProtectedPackages(context: Context): Set<String> {
     val now = System.currentTimeMillis()

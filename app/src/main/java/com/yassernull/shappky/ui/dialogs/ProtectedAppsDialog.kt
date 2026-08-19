@@ -95,7 +95,6 @@ fun ProtectedAppsDialog(
   fun matchesCurrentRegex(pkg: String): Boolean = matchesRegexText(regexText, pkg)
 
   fun isEffectivelyProtected(pkg: String): Boolean = selectedPackages.contains(pkg) ||
-    ProtectionManager.getEnabledGroupProtectedPackages(context).contains(pkg) ||
     (matchesCurrentRegex(pkg) && !exemptions.contains(pkg))
 
   fun protect(packages: Set<String>) {
@@ -137,22 +136,6 @@ fun ProtectedAppsDialog(
     val shellManager = ShellManager(context, handler, executor)
     activeWidgetPackages = context.collectActiveWidgetPackages(shellManager)
     wallpaperPackages = context.collectCurrentWallpaperPackages(shellManager)
-
-    if (wallpaperPackages.isNotEmpty() && (groupToggles["wallpaper"] ?: true)) {
-      selectedPackages = selectedPackages + wallpaperPackages
-    }
-    if (activeWidgetPackages.isNotEmpty() && (groupToggles["widgets"] ?: true)) {
-      selectedPackages = selectedPackages + activeWidgetPackages
-    }
-  }
-
-  LaunchedEffect(allApps.size) {
-    if (allApps.isNotEmpty()) {
-      val persistentPackages = allApps.filter { it.isPersistentApp }.map { it.packageName }
-      if (persistentPackages.isNotEmpty() && (groupToggles["persistent"] ?: true)) {
-        selectedPackages = selectedPackages + persistentPackages
-      }
-    }
   }
 
   val hasLoggedDiagnostics = remember { mutableStateOf(false) }
@@ -240,32 +223,32 @@ fun ProtectedAppsDialog(
           LazyColumn {
             item {
               ProtectedAppsSpecialSection(
-                selfChecked = isEffectivelyProtected(context.packageName),
+                selfChecked = selectedPackages.contains(context.packageName),
                 onToggleSelf = { checked ->
                   if (checked) protect(setOf(context.packageName)) else unprotect(setOf(context.packageName))
                 },
                 launcherPackage = launcherPackage,
-                launcherChecked = launcherPackage != null && isEffectivelyProtected(launcherPackage),
+                launcherChecked = launcherPackage != null && selectedPackages.contains(launcherPackage),
                 onToggleLauncher = { checked ->
                   launcherPackage?.let { toggleGroup("launcher", setOf(it), checked) }
                 },
                 keyboardPackage = keyboardPackage,
-                keyboardChecked = keyboardPackage != null && isEffectivelyProtected(keyboardPackage),
+                keyboardChecked = keyboardPackage != null && selectedPackages.contains(keyboardPackage),
                 onToggleKeyboard = { checked ->
                   keyboardPackage?.let { toggleGroup("keyboard", setOf(it), checked) }
                 },
                 persistentPackages = persistentPackages,
-                persistentChecked = if (persistentPackages.isNotEmpty()) persistentPackages.all { isEffectivelyProtected(it) } else (groupToggles["persistent"] ?: true),
+                persistentChecked = groupToggles["persistent"] ?: false,
                 onTogglePersistent = { checked ->
                   toggleGroup("persistent", persistentPackages.toSet(), checked)
                 },
                 wallpaperPackages = wallpaperPackages,
-                wallpaperChecked = if (wallpaperPackages.isNotEmpty()) wallpaperPackages.all { isEffectivelyProtected(it) } else (groupToggles["wallpaper"] ?: true),
+                wallpaperChecked = wallpaperPackages.isNotEmpty() && wallpaperPackages.all { selectedPackages.contains(it) },
                 onToggleWallpaper = { checked ->
                   toggleGroup("wallpaper", wallpaperPackages, checked)
                 },
                 activeWidgetPackages = activeWidgetPackages,
-                widgetsChecked = if (activeWidgetPackages.isNotEmpty()) activeWidgetPackages.all { isEffectivelyProtected(it) } else (groupToggles["widgets"] ?: true),
+                widgetsChecked = groupToggles["widgets"] ?: false,
                 onToggleWidgets = { checked ->
                   scope.launch {
                     val handler = android.os.Handler(android.os.Looper.getMainLooper())
@@ -276,12 +259,12 @@ fun ProtectedAppsDialog(
                   }
                 },
                 androidPackages = androidPackages,
-                androidServicesChecked = androidPackages.isNotEmpty() && androidPackages.all { isEffectivelyProtected(it) },
+                androidServicesChecked = groupToggles["android"] ?: false,
                 onToggleAndroidServices = { checked ->
                   toggleGroup("android", androidPackages.toSet(), checked)
                 },
                 googleAndroidPackages = googleAndroidPackages,
-                googleAndroidServicesChecked = googleAndroidPackages.isNotEmpty() && googleAndroidPackages.all { isEffectivelyProtected(it) },
+                googleAndroidServicesChecked = groupToggles["google"] ?: false,
                 onToggleGoogleServices = { checked ->
                   toggleGroup("google", googleAndroidPackages.toSet(), checked)
                 },
@@ -309,7 +292,7 @@ fun ProtectedAppsDialog(
           onClick = {
             selectedPackages = ProtectionManager.getDefaultProtectedApps(context)
             exemptions = emptySet()
-            groupToggles = groupNames.associateWith { false }
+            groupToggles = groupNames.associateWith { true }
             groupMembers = groupNames.associateWith { emptySet<String>() }
           },
         ) {

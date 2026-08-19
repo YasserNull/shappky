@@ -54,13 +54,11 @@ fun Context.loadAllApps(callback: (List<AppModel>) -> Unit) {
       val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
       val allApps = mutableListOf<AppModel>()
       for (appInfo in packages) {
-        if (appInfo.packageName == packageName) continue
         val isSystem = appInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
         val isPersistent = appInfo.flags and ApplicationInfo.FLAG_PERSISTENT != 0
         val label = pm.getApplicationLabel(appInfo).toString()
         val pkg = appInfo.packageName
-        val isProtected = pkg == packageName ||
-          protectedApps.contains(pkg) ||
+        val isProtected = protectedApps.contains(pkg) ||
           (!exemptions.contains(pkg) && com.yassernull.shappky.core.managers.AppModelFilter.matchesAnyRegex(pkg, patterns))
 
         allApps.add(

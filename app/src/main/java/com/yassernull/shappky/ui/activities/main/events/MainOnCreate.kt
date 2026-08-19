@@ -10,7 +10,6 @@ import com.yassernull.shappky.App
 import com.yassernull.shappky.core.managers.AutoRefreshManager
 import com.yassernull.shappky.core.managers.BackgroundAppManager
 import com.yassernull.shappky.core.managers.PermissionManager
-import com.yassernull.shappky.core.managers.ProtectionManager
 import com.yassernull.shappky.core.managers.RamMonitorManager
 import com.yassernull.shappky.core.managers.ShellManager
 import com.yassernull.shappky.core.managers.TriggerServiceManager
@@ -68,10 +67,6 @@ fun MainActivity.handleOnCreate(savedInstanceState: Bundle?) {
   AppsListLogic.appManager.setShowSystemApps(AppsListLogic.showSystemApps)
   AppsListLogic.appManager.setShowPersistentApps(AppsListLogic.showPersistentApps)
   AppsListLogic.appManager.setShowProtectedApps(AppsListLogic.showProtectedApps)
-
-  Thread {
-    ProtectionManager.refreshSpecialProtectedApps(activity.applicationContext)
-  }.start()
 
   PermissionHandler.setupShizukuPermissionListener(this, AppsListLogic.shellManager)
   AppsListLogic.shellManager.setOnShizukuServiceConnected(
