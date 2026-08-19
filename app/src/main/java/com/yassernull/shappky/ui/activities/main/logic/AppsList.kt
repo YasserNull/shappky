@@ -95,6 +95,7 @@ object AppsListLogic {
   internal var showProtectedApps by mutableStateOf(false)
   internal var appsAutoRefresh = true
   internal lateinit var autoRefreshManager: AutoRefreshManager
+  internal var lastBackgroundAppsLoadTimeMs = 0L
   private const val TAG = "AppsListLogic"
 
   fun onKillSelected(activity: MainActivity) {
@@ -280,6 +281,7 @@ object AppsListLogic {
       }
 
       backgroundLoadRetryCount = 0
+      lastBackgroundAppsLoadTimeMs = System.currentTimeMillis()
       val selectedPackages = appsDataList.filter { it.isSelected }.map { it.packageName }.toSet()
 
       val updatedResult = result.map { app ->

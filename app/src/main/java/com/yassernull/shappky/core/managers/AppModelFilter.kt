@@ -14,6 +14,18 @@ object AppModelFilter {
 
   private fun iconFor(packageName: String, loader: () -> Drawable): Drawable = iconCache.get(packageName) ?: loader().also { iconCache.put(packageName, it) }
 
+  private fun matchesAnyRegex(packageName: String, patterns: List<Pair<Regex?, String>>): Boolean {
+    for ((regex, raw) in patterns) {
+      if (regex != null) {
+        if (regex.matches(packageName)) return true
+      } else {
+        if (raw.endsWith(".*") && packageName.startsWith(raw.removeSuffix(".*"))) return true
+        if (packageName == raw) return true
+      }
+    }
+    return false
+  }
+
   fun buildRunningAppModels(
     runningEntries: Set<String>,
     hiddenApps: Set<String>,
@@ -26,6 +38,20 @@ object AppModelFilter {
     formatMemorySize: (Long) -> String,
   ): List<AppModel> {
     val pm = context.packageManager
+    val exemptions = ProtectionManager.getProtectedAppsExemptions(context)
+    val regexStr = ProtectionManager.getProtectedRegex(context)
+    val patterns = if (regexStr.isNotBlank()) {
+      regexStr.split("|").map { it.trim() }.filter { it.isNotEmpty() }.map { pattern ->
+        try {
+          pattern.replace(".", "\\.").replace("*", ".*").toRegex()
+        } catch (_: Exception) {
+          null
+        } to pattern
+      }
+    } else {
+      emptyList()
+    }
+
     val result = mutableListOf<AppModel>()
     for (packageEntry in runningEntries) {
       val parts = packageEntry.split(":")
@@ -36,7 +62,8 @@ object AppModelFilter {
       try {
         if (hiddenApps.contains(packageName)) continue
 
-        val isProtected = ProtectionManager.isPackageProtected(context, packageName)
+        val isProtected = protectedApps.contains(packageName) ||
+          (!exemptions.contains(packageName) && matchesAnyRegex(packageName, patterns))
 
         val appInfo = pm.getApplicationInfo(packageName, 0)
         val isPersistentApp = appInfo.flags and ApplicationInfo.FLAG_PERSISTENT != 0
@@ -75,13 +102,28 @@ object AppModelFilter {
   ): List<AppModel> {
     val pm = context.packageManager
     val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
+    val exemptions = ProtectionManager.getProtectedAppsExemptions(context)
+    val regexStr = ProtectionManager.getProtectedRegex(context)
+    val patterns = if (regexStr.isNotBlank()) {
+      regexStr.split("|").map { it.trim() }.filter { it.isNotEmpty() }.map { pattern ->
+        try {
+          pattern.replace(".", "\\.").replace("*", ".*").toRegex()
+        } catch (_: Exception) {
+          null
+        } to pattern
+      }
+    } else {
+      emptyList()
+    }
+
     val allApps = mutableListOf<AppModel>()
     for (appInfo in packages) {
       val isSystem = appInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
       val isPersistent = appInfo.flags and ApplicationInfo.FLAG_PERSISTENT != 0
       val label = pm.getApplicationLabel(appInfo).toString()
       val pkg = appInfo.packageName
-      val isProtected = ProtectionManager.isPackageProtected(context, pkg)
+      val isProtected = protectedApps.contains(pkg) ||
+        (!exemptions.contains(pkg) && matchesAnyRegex(pkg, patterns))
 
       allApps.add(
         AppModel(

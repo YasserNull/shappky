@@ -102,13 +102,19 @@ class AppProcessLoader(
 
           if (shellManager.isShellCommandReady()) {
             try {
+              val shellStart = System.currentTimeMillis()
               val fullOutput = shellManager.runShellCommandAndGetFullOutput(psAllProcessesCommand())
+              val shellDurationMs = System.currentTimeMillis() - shellStart
+              Log.d(TAG, "loadBackgroundApps shellCommand durationMs=$shellDurationMs")
               if (fullOutput != null) {
+                val aggregateStart = System.currentTimeMillis()
                 val packageUsageMap = aggregatePsOutputToPackages(fullOutput, context.packageManager, installedPackages)
+                Log.d(TAG, "loadBackgroundApps aggregatePsOutput durationMs=${System.currentTimeMillis() - aggregateStart}")
                 val runningEntries = packageUsageMap.map { (pkg, usage) -> "$pkg:${usage.ramKb}:${usage.cpuPercent}" }.toSet()
                 Log.d(TAG, "loadBackgroundApps psLines=${fullOutput.lines().size}, packages=${packageUsageMap.size}")
                 Log.d(TAG, "loadBackgroundApps aggregated=${packageUsageMap.entries.joinToString { "${it.key}=${it.value.ramKb}KB" }}")
 
+                val buildStart = System.currentTimeMillis()
                 result = AppModelFilter.buildRunningAppModels(
                   runningEntries = runningEntries,
                   hiddenApps = hiddenApps,
@@ -120,6 +126,7 @@ class AppProcessLoader(
                   context = context,
                   formatMemorySize = ::formatMemorySize,
                 ).toMutableList()
+                Log.d(TAG, "loadBackgroundApps buildRunningAppModels durationMs=${System.currentTimeMillis() - buildStart}")
               }
             } catch (e: Exception) {
               Log.e(TAG, "Error getting running apps", e)

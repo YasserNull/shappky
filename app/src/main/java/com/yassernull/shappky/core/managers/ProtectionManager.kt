@@ -132,30 +132,17 @@ object ProtectionManager {
       Log.e(TAG, "Error getting default wallpaper", e)
     }
 
-    // com.android.* and android.* packages
+    // com.android.*, android.*, and Google Android services
     try {
       val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
       for (appInfo in packages) {
         val pkg = appInfo.packageName
-        if (pkg == "android" || pkg.startsWith("com.android.") || pkg.startsWith("android.")) {
+        if (pkg == "android" || pkg.startsWith("com.android.") || pkg.startsWith("android.") || pkg.startsWith("com.google.android.")) {
           defaultSet.add(pkg)
         }
       }
     } catch (e: Exception) {
       Log.e(TAG, "Error listing installed packages for default protection", e)
-    }
-
-    // Google Android services
-    try {
-      val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
-      for (appInfo in packages) {
-        val pkg = appInfo.packageName
-        if (pkg.startsWith("com.google.android.") || pkg.startsWith("com.google.android")) {
-          defaultSet.add(pkg)
-        }
-      }
-    } catch (e: Exception) {
-      Log.e(TAG, "Error listing Google services for default protection", e)
     }
 
     return defaultSet

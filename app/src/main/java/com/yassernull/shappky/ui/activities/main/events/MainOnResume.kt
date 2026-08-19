@@ -53,7 +53,11 @@ fun MainActivity.handleOnResume() {
   AppsListLogic.setupAutoRefresh(this)
 
   AppsListLogic.updatePermissionUi(this, forceRefresh = settingsChanged, appsAutoRefresh = AppsListLogic.appsAutoRefresh)
-  AppsRamUsageLogic.refreshAppsRamUsage(this)
+
+  val timeSinceLastLoad = System.currentTimeMillis() - AppsListLogic.lastBackgroundAppsLoadTimeMs
+  if (timeSinceLastLoad > 3000) {
+    AppsRamUsageLogic.refreshAppsRamUsage(this)
+  }
 
   applySystemBars()
 }
