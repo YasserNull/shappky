@@ -76,19 +76,6 @@ fun ProtectedAppsSpecialSection(
     onCheckedChange = onToggleKeyboard,
   )
 
-  val persistentText = stringResource(R.string.persistent_apps)
-  SpecialCheckboxRow(
-    text = persistentText,
-    checked = persistentChecked,
-    onCheckedChange = { checked ->
-      if (persistentPackages.isNotEmpty()) {
-        onTogglePersistent(checked)
-      } else {
-        Toast.makeText(context, context.getString(R.string.not_found_format, persistentText), Toast.LENGTH_SHORT).show()
-      }
-    },
-  )
-
   SpecialCheckboxRow(
     text = stringResource(R.string.widgets),
     checked = widgetsChecked,
@@ -105,6 +92,19 @@ fun ProtectedAppsSpecialSection(
     text = stringResource(R.string.google_android_services),
     checked = googleAndroidServicesChecked,
     onCheckedChange = onToggleGoogleServices,
+  )
+
+  val persistentText = stringResource(R.string.persistent_apps)
+  SpecialCheckboxRow(
+    text = persistentText,
+    checked = persistentChecked,
+    onCheckedChange = { checked ->
+      if (persistentPackages.isNotEmpty()) {
+        onTogglePersistent(checked)
+      } else {
+        Toast.makeText(context, context.getString(R.string.not_found_format, persistentText), Toast.LENGTH_SHORT).show()
+      }
+    },
   )
 
   OutlinedTextField(
