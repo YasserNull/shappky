@@ -94,8 +94,8 @@ class AppKillHandler(
         val truncatedPkg = pkg.take(15)
         val escapedTruncatedPkg = truncatedPkg.replace(".", "\\.")
         "am kill " + pkg +
-          "; sleep 0.2; if " + ShellManager.TOYBOX_PATH + " pidof " + pkg + " > /dev/null 2>&1 || " + ShellManager.TOYBOX_PATH + " pidof " + truncatedPkg + " > /dev/null 2>&1; then am force-stop " + pkg + "; sleep 0.2; fi" +
-          "; pids=${'$'}(" + ShellManager.TOYBOX_PATH + " ps -A -o pid,name | grep -oE '[0-9]+ (" + escapedPkg + "|" + escapedTruncatedPkg + ")([^A-Za-z0-9]|\$)' | awk '{print ${'$'}1}'); if [ ! -z \"${'$'}pids\" ]; then kill -9 ${'$'}pids 2>/dev/null; fi"
+          "; if " + ShellManager.TOYBOX_PATH + " pidof " + pkg + " > /dev/null 2>&1 || " + ShellManager.TOYBOX_PATH + " pidof " + truncatedPkg + " > /dev/null 2>&1; then am force-stop " + pkg + "; fi" +
+          "; pids=${'$'}(" + ShellManager.TOYBOX_PATH + " ps -A -o pid,name | " + ShellManager.TOYBOX_PATH + " grep -oE '[0-9]+ (" + escapedPkg + "|" + escapedTruncatedPkg + ")([^A-Za-z0-9]|\$)' | " + ShellManager.TOYBOX_PATH + " awk '{print ${'$'}1}'); if [ ! -z \"${'$'}pids\" ]; then kill -9 ${'$'}pids 2>/dev/null; fi"
       }
       return if (appendKillAll) perPackage + "; am kill-all" else perPackage
     }
