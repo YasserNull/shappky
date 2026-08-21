@@ -148,13 +148,13 @@ class AppProcessLoader(
               .thenBy { it.appName.lowercase(Locale.getDefault()) },
           )
         } catch (t: Throwable) {
-          Log.e(TAG, "Fatal error in loadBackgroundApps background thread", t)
+          Log.e(TAG, "loadAllApps background thread", t)
         } finally {
           isCurrentlyLoadingApps = false
           handler.post {
             Log.d(
               TAG,
-              "loadBackgroundApps finished resultSize=${result.size}, durationMs=${System.currentTimeMillis() - startTime}",
+              "loadAllApps finished resultSize=${result.size}, durationMs=${System.currentTimeMillis() - startTime}",
             )
             currentAppsList.clear()
             currentAppsList.addAll(result)
@@ -241,12 +241,7 @@ class AppProcessLoader(
                 Log.w(TAG, "loadAppDetailedInfo ps returned no output, falling back to package name grep")
               }
             }
-            if (fullOutput == null) {
-              val escapedPkg = app.packageName.replace(".", "\\.")
-              fullOutput = shellManager.runShellCommandAndGetFullOutput(
-                psAllProcessesCommand() + " | grep '\\.' | grep -v '[-@]' | grep -E '" + escapedPkg + "([^A-Za-z0-9]|\$)'",
-              )
-            }
+
             var processes = mutableListOf<com.yassernull.shappky.data.models.ProcessInfo>()
             var mainPid = "-"
             val mainUser = appUid?.toLongOrNull()?.let { uidToAndroidUserName(it) } ?: "-"
