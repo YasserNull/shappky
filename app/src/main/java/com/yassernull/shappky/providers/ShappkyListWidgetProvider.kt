@@ -37,7 +37,7 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
 
   override fun onDisabled(context: Context) {
     super.onDisabled(context)
-    stopAutoRefresh()
+    stopAutoRefresh(context)
   }
 
   override fun onReceive(context: Context, intent: Intent) {
@@ -90,7 +90,7 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
     private val shellExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private var shellManager: ShellManager? = null
     private const val REFRESH_ALARM_REQUEST_CODE = 4071
-    private const val MIN_WATCHDOG_INTERVAL_MS = 60_000L
+    private const val MIN_WATCHDOG_INTERVAL_MS = 1_000L
 
     private fun getShellManager(context: Context): ShellManager = shellManager ?: ShellManager(context.applicationContext, handler, shellExecutor).also { shellManager = it }
 
@@ -205,7 +205,9 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
     fun stopAutoRefresh(context: Context? = null) {
       refreshRunnable?.let { handler.removeCallbacks(it) }
       refreshRunnable = null
-      context?.applicationContext?.let { cancelWatchdogRefresh(it) }
+      context?.applicationContext?.let {
+        cancelWatchdogRefresh(it)
+      }
     }
 
     private fun scheduleWatchdogRefresh(context: Context, refreshIntervalMs: Long) {
@@ -213,10 +215,28 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
       val triggerAt = SystemClock.elapsedRealtime() + refreshIntervalMs.coerceAtLeast(MIN_WATCHDOG_INTERVAL_MS)
       val pendingIntent = createWatchdogPendingIntent(context)
 
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        alarmManager.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pendingIntent)
-      } else {
-        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pendingIntent)
+      try {
+        when {
+          Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            if (alarmManager.canScheduleExactAlarms()) {
+              alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pendingIntent)
+            } else {
+              alarmManager.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pendingIntent)
+            }
+          }
+          Build.VERSION.SDK_INT in Build.VERSION_CODES.M until Build.VERSION_CODES.S -> {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pendingIntent)
+          }
+          else -> {
+            alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pendingIntent)
+          }
+        }
+      } catch (_: SecurityException) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+          alarmManager.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pendingIntent)
+        } else {
+          alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pendingIntent)
+        }
       }
     }
 
