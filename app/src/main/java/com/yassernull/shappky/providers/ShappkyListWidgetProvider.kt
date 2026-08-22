@@ -1,6 +1,7 @@
 package com.yassernull.shappky.providers
 
 import android.app.ActivityManager
+import android.app.AlarmManager
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -9,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.SystemClock
 import android.widget.RemoteViews
 import android.widget.Toast
 import com.yassernull.shappky.App
@@ -87,19 +89,22 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
 
     private val shellExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private var shellManager: ShellManager? = null
+    private const val REFRESH_ALARM_REQUEST_CODE = 4071
+    private const val MIN_WATCHDOG_INTERVAL_MS = 60_000L
 
     private fun getShellManager(context: Context): ShellManager = shellManager ?: ShellManager(context.applicationContext, handler, shellExecutor).also { shellManager = it }
 
     fun startAutoRefresh(context: Context) {
-      val appWidgetManager = AppWidgetManager.getInstance(context)
-      val componentName = ComponentName(context, ShappkyListWidgetProvider::class.java)
+      val appContext = context.applicationContext
+      val appWidgetManager = AppWidgetManager.getInstance(appContext)
+      val componentName = ComponentName(appContext, ShappkyListWidgetProvider::class.java)
       val appWidgetIds = appWidgetManager.getAppWidgetIds(componentName)
       if (appWidgetIds.isEmpty()) {
-        stopAutoRefresh()
+        stopAutoRefresh(appContext)
         return
       }
 
-      val prefs = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+      val prefs = appContext.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
       var isRefreshEnabled = false
       var minIntervalMs = Long.MAX_VALUE
 
@@ -125,24 +130,25 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
       }
 
       if (!isRefreshEnabled) {
-        stopAutoRefresh()
+        stopAutoRefresh(appContext)
         return
       }
 
       val resolvedIntervalMs = minIntervalMs.coerceAtLeast(1000L)
+      scheduleWatchdogRefresh(appContext, resolvedIntervalMs)
 
       refreshRunnable?.let { handler.removeCallbacks(it) }
 
       refreshRunnable = object : Runnable {
         override fun run() {
-          val innerComponentName = ComponentName(context, ShappkyListWidgetProvider::class.java)
+          val innerComponentName = ComponentName(appContext, ShappkyListWidgetProvider::class.java)
           val innerWidgetIds = appWidgetManager.getAppWidgetIds(innerComponentName)
           if (innerWidgetIds.isEmpty()) {
-            stopAutoRefresh()
+            stopAutoRefresh(appContext)
             return
           }
 
-          val innerPrefs = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+          val innerPrefs = appContext.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
           var innerRefreshEnabled = false
           var innerMinInterval = Long.MAX_VALUE
 
@@ -168,7 +174,9 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
           }
 
           if (innerRefreshEnabled) {
-            val pm = context.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+            scheduleWatchdogRefresh(appContext, innerMinInterval.coerceAtLeast(1000L))
+
+            val pm = appContext.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
             val isInteractive = pm.isInteractive
             val isAppInForeground = App.isAppInForeground
 
@@ -181,22 +189,52 @@ class ShappkyListWidgetProvider : AppWidgetProvider() {
                   appWidgetManager.notifyAppWidgetViewDataChanged(id, R.id.widget_list_view)
                 }
                 if (ramBarRefresh || autoRefresh) {
-                  updateAppWidget(context, appWidgetManager, id)
+                  updateAppWidget(appContext, appWidgetManager, id)
                 }
               }
             }
             handler.postDelayed(this, innerMinInterval.coerceAtLeast(1000L))
           } else {
-            stopAutoRefresh()
+            stopAutoRefresh(appContext)
           }
         }
       }
       handler.postDelayed(refreshRunnable!!, resolvedIntervalMs)
     }
 
-    fun stopAutoRefresh() {
+    fun stopAutoRefresh(context: Context? = null) {
       refreshRunnable?.let { handler.removeCallbacks(it) }
       refreshRunnable = null
+      context?.applicationContext?.let { cancelWatchdogRefresh(it) }
+    }
+
+    private fun scheduleWatchdogRefresh(context: Context, refreshIntervalMs: Long) {
+      val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
+      val triggerAt = SystemClock.elapsedRealtime() + refreshIntervalMs.coerceAtLeast(MIN_WATCHDOG_INTERVAL_MS)
+      val pendingIntent = createWatchdogPendingIntent(context)
+
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        alarmManager.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pendingIntent)
+      } else {
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pendingIntent)
+      }
+    }
+
+    private fun cancelWatchdogRefresh(context: Context) {
+      val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
+      alarmManager.cancel(createWatchdogPendingIntent(context))
+    }
+
+    private fun createWatchdogPendingIntent(context: Context): PendingIntent {
+      val intent = Intent(context, ShappkyListWidgetProvider::class.java).apply {
+        action = ACTION_REFRESH
+      }
+      return PendingIntent.getBroadcast(
+        context,
+        REFRESH_ALARM_REQUEST_CODE,
+        intent,
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+      )
     }
 
     fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {

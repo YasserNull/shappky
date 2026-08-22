@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.yassernull.shappky.core.managers.TriggerServiceManager
+import com.yassernull.shappky.providers.ShappkyListWidgetProvider
+import com.yassernull.shappky.utils.updateAllWidgets
 
 class BootReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
@@ -14,6 +16,8 @@ class BootReceiver : BroadcastReceiver() {
       intent.action == Intent.ACTION_MY_PACKAGE_REPLACED
     ) {
       TriggerServiceManager.updateTriggerServiceState(context)
+      context.updateAllWidgets()
+      ShappkyListWidgetProvider.startAutoRefresh(context)
     }
   }
 }
