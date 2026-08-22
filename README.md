@@ -42,6 +42,8 @@ Triggers come in two types:
 1. **Profile trigger**: This trigger must be executed manually, allowing you to select a specific group of apps.
 2. **Service trigger**: This lets you create and customize a background service using available rules, with automatic enable/disable options based on those rules.
 
+![triggers](docs/images/triggers.jpg)
+
 ## Intent & Tasker Integration
 
 ### Intent
