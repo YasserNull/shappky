@@ -80,6 +80,38 @@ fun ProtectedAppsDialog(
   var isMenuExpanded by remember { mutableStateOf(false) }
 
   val androidPackages = remember(allApps.size) { getAndroidPackages(allApps) }
+  val groupProtectedPackages = remember(
+    groupToggles,
+    launcherPackage,
+    keyboardPackage,
+    wallpaperPackages,
+    activeWidgetPackages,
+    allApps.size,
+  ) {
+    buildSet {
+      if (groupToggles["launcher"] == true) {
+        launcherPackage?.let(::add)
+      }
+      if (groupToggles["keyboard"] == true) {
+        keyboardPackage?.let(::add)
+      }
+      if (groupToggles["wallpaper"] == true) {
+        addAll(wallpaperPackages)
+      }
+      if (groupToggles["widgets"] == true) {
+        addAll(activeWidgetPackages)
+      }
+      if (groupToggles["persistent"] == true) {
+        addAll(allApps.filter { it.isPersistentApp }.map { it.packageName })
+      }
+      if (groupToggles["android"] == true) {
+        addAll(androidPackages)
+      }
+      if (groupToggles["google"] == true) {
+        addAll(allApps.map { it.packageName }.filter { it.startsWith("com.google.android") })
+      }
+    }
+  }
 
   fun matchesRegexText(regexText: String, pkg: String): Boolean {
     if (regexText.isBlank()) return false
@@ -95,6 +127,7 @@ fun ProtectedAppsDialog(
   fun matchesCurrentRegex(pkg: String): Boolean = matchesRegexText(regexText, pkg)
 
   fun isEffectivelyProtected(pkg: String): Boolean = selectedPackages.contains(pkg) ||
+    groupProtectedPackages.contains(pkg) ||
     (matchesCurrentRegex(pkg) && !exemptions.contains(pkg))
 
   fun protect(packages: Set<String>) {
@@ -243,7 +276,7 @@ fun ProtectedAppsDialog(
                   toggleGroup("persistent", persistentPackages.toSet(), checked)
                 },
                 wallpaperPackages = wallpaperPackages,
-                wallpaperChecked = wallpaperPackages.isNotEmpty() && wallpaperPackages.all { selectedPackages.contains(it) },
+                wallpaperChecked = groupToggles["wallpaper"] ?: true,
                 onToggleWallpaper = { checked ->
                   toggleGroup("wallpaper", wallpaperPackages, checked)
                 },
