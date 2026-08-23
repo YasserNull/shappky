@@ -47,36 +47,6 @@ class AppProcessLoader(
     else -> String.format(java.util.Locale.US, "%.2f GB", kb / (1024f * 1024f))
   }
 
-  fun getActiveWidgetPackages(): Set<String> {
-    if (!shellManager.isShellCommandReady()) return emptySet()
-    val activePackages = mutableSetOf<String>()
-    try {
-      val output = shellManager.runShellCommandAndGetFullOutput("dumpsys appwidget") ?: ""
-      val regex = Regex("provider=ComponentInfo\\{([^/]+)/")
-      var inAppWidgetIds = false
-      for (line in output.split('\n')) {
-        val trimmed = line.trim()
-        if (trimmed == "AppWidgetIds:") {
-          inAppWidgetIds = true
-          continue
-        } else if (line.isNotEmpty() && !line.startsWith(" ") && !line.startsWith("\t")) {
-          if (inAppWidgetIds && !line.contains("AppWidgetIds")) {
-            inAppWidgetIds = false
-          }
-        }
-        if (inAppWidgetIds) {
-          val match = regex.find(line)
-          if (match != null) {
-            activePackages.add(match.groupValues[1])
-          }
-        }
-      }
-    } catch (e: Exception) {
-      Log.e(TAG, "Error getting active widget packages", e)
-    }
-    return activePackages
-  }
-
   fun loadBackgroundApps(callback: Consumer<List<AppModel>>?) {
     if (callback != null) {
       synchronized(pendingCallbacks) {

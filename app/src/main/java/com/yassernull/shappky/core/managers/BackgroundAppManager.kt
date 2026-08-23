@@ -17,8 +17,6 @@ class BackgroundAppManager(
 
   fun formatMemorySize(kb: Long): String = loader.formatMemorySize(kb)
 
-  fun getActiveWidgetPackages(): Set<String> = loader.getActiveWidgetPackages()
-
   fun loadBackgroundApps(callback: Consumer<List<AppModel>>?) {
     loader.loadBackgroundApps(callback)
   }
