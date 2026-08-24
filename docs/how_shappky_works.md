@@ -75,14 +75,16 @@ To ensure system integrity and uninterrupted user experience, Shappky automatica
 
 1. **Shappky Self-Protection:** Prevents self-termination.
 2. **Current Launcher:** Prevents home screen redraws and reloads.
-3. **Current Background Service:** Ensures core app functionality remains intact.
-4. **Current Input Method (IME):** Prevents keyboard crashes.
-5. **Active Widgets:** Scans currently active widget IDs via:
+3. **Current Background App:** To ensure that the app displaying the background does not stop, we get the app package via the command:
    ```bash
-   dumpsys appwidget
+   dumpsys wallpaper | grep \"mWallpaperComponent=\" | head -1 | sed 's/.*ComponentInfo{//' | cut -d'/' -f1
    ```
-   *(under the `AppWidgetIds` section)*
-6. **Android System Services:** Prevents OS instability.
+4. **Current Input Method (IME):** Prevents keyboard crashes.
+5. **Active Widgets:** "To ensure that the used screen elements do not stop, we obtain the list of applications via the command:
+   ```bash
+   dumpsys appwidget | awk '/^Widgets:/{flag=1; next} flag && !/^[A-Z]/{print}' | grep \"cmp:ComponentInfo\" | sed 's/.*cmp:ComponentInfo{//' | cut -d'/' -f1 | sort -u
+   ```
+6. **Android Services:** Prevents OS instability.
 7. **Google Play Services:** Prevents crashes on Google-supported systems.
 8. **Persistent Applications:** Skipped since killing them is redundant (they immediately restart).
 
@@ -120,3 +122,42 @@ When the user initiates a bulk cleanup action ("Select All -> Kill"), Shappky te
 ```bash
 am kill-all
 ```
+It is a soft kill for all background apps to free memory without causing any damage to the system.
+
+---
+
+## Additional Information About Shappky Service and Rules
+
+Shappky service executes the `ps` command to fetch the list of active processes:
+
+```bash
+toybox ps -A -o %cpu,pid,user,rss,name,uid
+```
+
+And executes the following command to fetch apps present in the "Recent Apps" screen:
+
+```bash
+dumpsys activity recents
+```
+
+The purpose of this is to skip apps that the user has used recently and not kill them. Additionally, the **"kill app when it auto-runs in background"** rule also relies on `dumpsys activity recents`; it compares the current list with the previous list to distinguish between the app that the user launched manually and the app that started running on its own automatically.
+
+As for the basic detection of app states such as **entering**, **exiting**, or **resuming** an app, it is done by executing:
+
+```bash
+dumpsys activity activities
+```
+
+Then reading app packages from the values of the following fields:
+
+| Pattern | Purpose |
+|---------|---------|
+| `ResumedActivity` / `mResumedActivity` / `topResumedActivity` | Identifying the app currently present in the foreground |
+| `mCurrentFocus` / `mFocusedApp` / `mFocusedWindow` | Fallback option for identifying the focused app |
+
+Knowing the app currently present in the foreground enables Shappky to apply trigger rules related to app lifecycle (App Lifecycle), such as:
+
+- **`APP_OPENED`:** Executing an action when a specific app is opened.
+- **`APP_RESUMED`:** Executing an action when an app returns to the foreground.
+- **`APP_PAUSED`:** Executing an action when switching from one app to another.
+- **`APP_EXITED`:** Executing an action when an app leaves the foreground completely.
