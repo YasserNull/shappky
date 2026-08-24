@@ -1,7 +1,6 @@
 package com.yassernull.shappky.core.managers
 
 import android.app.WallpaperManager
-import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -130,13 +129,7 @@ object ProtectionManager {
     }
 
     if (getGroupEnabled(context, "widgets")) {
-      try {
-        AppWidgetManager.getInstance(context).installedProviders.forEach { provider ->
-          result.add(provider.provider.packageName)
-        }
-      } catch (e: Exception) {
-        Log.e(TAG, "Error listing widget providers", e)
-      }
+      result.addAll(getGroupMembers(context, "widgets"))
     }
 
     val persistentEnabled = getGroupEnabled(context, "persistent")
@@ -216,30 +209,6 @@ object ProtectionManager {
       }
     } catch (e: Exception) {
       Log.e(TAG, "Error getting default wallpaper", e)
-    }
-
-    // com.android.*, android.*, Google Android services, and persistent apps
-    try {
-      val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
-      for (appInfo in packages) {
-        val pkg = appInfo.packageName
-        val isPersistent = appInfo.flags and ApplicationInfo.FLAG_PERSISTENT != 0
-        if (pkg == "android" || pkg.startsWith("com.android.") || pkg.startsWith("android.") || pkg.startsWith("com.google.android.") || isPersistent) {
-          defaultSet.add(pkg)
-        }
-      }
-    } catch (e: Exception) {
-      Log.e(TAG, "Error listing installed packages for default protection", e)
-    }
-
-    // Active widget provider apps
-    try {
-      val providers = AppWidgetManager.getInstance(context).installedProviders
-      for (provider in providers) {
-        defaultSet.add(provider.provider.packageName)
-      }
-    } catch (e: Exception) {
-      Log.e(TAG, "Error listing widget providers for default protection", e)
     }
 
     return defaultSet
