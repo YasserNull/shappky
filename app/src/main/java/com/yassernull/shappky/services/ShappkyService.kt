@@ -113,7 +113,7 @@ class ShappkyService : Service() {
 
     val protectedApps = com.yassernull.shappky.core.managers.ProtectionManager.getProtectedApps(this)
 
-    val dumpOutput = shellManager.runShellCommandAndGetFullOutput("dumpsys activity activities") ?: return
+    val dumpOutput = shellManager.runShellCommandAndGetFullOutput("dumpsys activity recents") ?: return
     val psOutput =
       shellManager.runShellCommandAndGetFullOutput(com.yassernull.shappky.core.managers.psAllProcessesCommand())
         ?: return
