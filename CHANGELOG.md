@@ -5,6 +5,7 @@
 - Changed app package name from `com.yn.shappy` to `com.yassernull.shappky`.
 - Raised minimum supported Android version from 6.0 to 7.0 due to Shizuku library updates.
 - Migrated codebase and tech stack from XML & Java to Kotlin & Jetpack Compose.
+- The app now builds multiple APK files per architecture: Universal, arm64-v8a, armeabi-v7a, x86, and x86_64.
 
 ## User Interface
 Numerous UI improvements and visual enhancements, including:
