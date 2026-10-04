@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    简体中文翻译 (values-zh-rCN)
+    上游项目: https://github.com/YasserNull/shappky
+    基于 app/src/main/res/values/strings.xml (v2.0.0) 翻译
+    格式化占位符与原文件一一对应，请勿改动数量与顺序
+-->
+<resources>
+    <string name="app_name">Shappky</string>
+    <string name="app_name_en">Shappky</string>
+    <string name="app_name_ar">شابكي</string>
+
+    <!-- Settings -->
+    <string name="force_kill_protected_title">要结束这个应用吗？</string>
+    <string name="force_kill_protected_message">该应用在保护名单中，仍要强制停止吗？</string>
+    <string name="yes">是</string>
+    <string name="settings">设置</string>
+    <string name="show_user_apps">显示用户应用</string>
+    <string name="show_user_apps_summary">在列表中显示用户自行安装的应用</string>
+    <string name="show_system_apps">显示系统应用</string>
+    <string name="show_system_apps_summary">在列表中显示系统应用</string>
+    <string name="show_persistent_apps">显示常驻应用</string>
+    <string name="show_persistent_apps_summary">在列表中显示拒绝被停止的常驻应用</string>
+    <string name="show_protected_apps">显示受保护应用</string>
+    <string name="show_protected_apps_summary">在列表中显示受保护的应用</string>
+    <string name="apps_auto_refresh">应用列表自动刷新</string>
+    <string name="apps_auto_refresh_interval_title">应用列表刷新间隔</string>
+    <string name="protected_apps_list_title">保护名单</string>
+    <string name="protected_apps_list_summary">选择在应用层面豁免保护的应用</string>
+    <string name="launcher">桌面</string>
+    <string name="keyboard">输入法</string>
+    <string name="wallpaper">壁纸</string>
+    <string name="widgets">小组件</string>
+    <string name="android_services">Android 服务</string>
+    <string name="google_android_services">Google Android 服务</string>
+    <string name="auto_background_apps">自动运行的后台应用</string>
+    <string name="ram_usage_bar_refresh_ms">内存占用条刷新</string>
+    <string name="ram_usage_bar_refresh_interval_title">内存占用条刷新间隔</string>
+    <string name="refresh_interval_value">%1$d 毫秒</string>
+    <string name="refresh_interval_sec">%1$d 秒</string>
+    <string name="refresh_interval_min">%1$d 分钟</string>
+    <string name="refresh_interval_ms">刷新间隔（毫秒）</string>
+    <string name="min_interval_warning">最小间隔为 %1$d 毫秒</string>
+    <string name="reset">重置</string>
+    <string-array name="theme_options">
+        <item>深色</item>
+        <item>白色</item>
+        <item>黑色</item>
+    </string-array>
+    <string name="theme">主题</string>
+    <string name="theme_summary">更改应用主题</string>
+    <string name="theme_dialog_title">选择主题</string>
+    <string name="language">语言</string>
+    <string name="language_summary">更改应用语言</string>
+    <string name="language_dialog_title">选择语言</string>
+    <string-array name="language_options">
+        <item>跟随系统</item>
+        <item>英语</item>
+        <item>العربية</item>
+    </string-array>
+    <string name="dynamic_colors">动态取色</string>
+    <string name="dynamic_colors_summary">使用 Material You 取色</string>
+    <string name="permission_mode">权限模式</string>
+    <string name="permission_mode_summary">选择 Shizuku 或 Root</string>
+    <string name="permission_mode_dialog_title">选择权限模式</string>
+    <string name="permission_mode_root">Root</string>
+    <string name="permission_mode_shizuku">Shizuku</string>
+    <string name="permission_denied">权限被拒绝</string>
+    <string name="running_apps_default">运行中的应用：</string>
+    <string name="running_apps_count">运行中的应用：%1$d</string>
+    <string name="ram_usage">内存占用：%1$sMB / %2$sMB</string>
+    <string name="ram_usage_unknown">内存占用：--</string>
+    <string name="sort_apps">排序</string>
+    <string name="sort_apps_title">排序方式</string>
+    <string name="sort_by_name">名称</string>
+    <string name="sort_by_ram_usage">内存占用</string>
+    <string name="sort_by_cpu_usage">CPU 占用</string>
+    <string name="sort_by_type">类型</string>
+    <string name="sort_descending">降序</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="save">保存</string>
+    <string name="search_apps">搜索应用</string>
+    <string name="apps_filter">从列表隐藏应用</string>
+    <string name="filter_dialog_title">选择要隐藏的应用</string>
+    <string name="donate">赞助</string>
+    <string name="donate_summary">支持开发者</string>
+    <string name="source_code">源代码</string>
+    <string name="source_code_summary">打开项目仓库</string>
+    <string name="refresh">刷新</string>
+    <string name="more">更多</string>
+    <string name="select_all">全选</string>
+    <string name="unselect_all">取消全选</string>
+    <string name="force_stop">强制停止</string>
+    <string name="force_stop_selected">强制停止所选</string>
+    <string name="selected">已选择</string>
+    <string name="back">返回</string>
+    <string name="full_screen">全屏</string>
+    <string name="full_screen_summary">隐藏状态栏并使用全屏显示</string>
+    <string name="shappky_service">Shappky 服务</string>
+    <string name="shappky_service_running">运行中…</string>
+    <string name="shappky_service_notification_text">正在结束后台应用…</string>
+    <string name="ram_freed_from_pkg">已从 %2$s 释放 %1$s</string>
+    <string name="shappky_service_channel">Shappky 前台服务</string>
+    <string name="shell_permission_required">需要 Shizuku/Root 权限</string>
+    <string name="no_apps_to_kill">没有可结束的应用</string>
+    <string name="service_stopped">Shappky 服务已停止</string>
+    <string name="free_up_memory">释放 %1$s</string>
+    <string name="error_getting_running_apps">获取运行中应用出错：%1$s</string>
+    <string name="restart_required_title">需要重启应用</string>
+    <string name="restart_required_message">请重启应用以使该更改生效。</string>
+    <string name="restart_now">重启</string>
+    <string name="restart_later">稍后</string>
+
+    <!-- Triggers -->
+    <string name="triggers">触发器</string>
+    <string name="add_trigger">添加触发器</string>
+    <string name="edit_trigger">编辑触发器</string>
+    <string name="trigger_name">触发器名称</string>
+    <string name="select_apps">选择应用</string>
+    <string name="user_apps">用户应用</string>
+    <string name="system_apps">系统应用</string>
+    <string name="persistent_apps">常驻应用</string>
+    <string name="protected_apps">受保护应用</string>
+    <string name="exclude_apps">排除应用</string>
+    <string name="manually_select_apps">手动选择应用</string>
+    <string name="triggers_empty">尚未添加触发器</string>
+    <string name="delete_trigger">删除触发器</string>
+    <string name="delete_trigger_confirm_message">确定要删除这个触发器吗？</string>
+    <string name="delete">删除</string>
+    <string name="trigger_executed">已执行触发器：%1$s</string>
+    <string name="trigger_name_empty">请输入触发器名称</string>
+    <string name="default_trigger_name">触发器 %1$d</string>
+
+    <!-- Rules -->
+    <string name="rules">规则</string>
+    <string name="add_rule">添加规则</string>
+    <string name="rule_app_opened">打开某个应用时</string>
+    <string name="rule_ram_limit">内存达到阈值时</string>
+    <string name="rule_app_ram_exceeded">某个应用占用内存超限时</string>
+    <string name="rule_phone_sleep">手机进入睡眠时</string>
+    <string name="rule_phone_wake">手机从睡眠中唤醒时</string>
+    <string name="rule_specific_time">在指定时间</string>
+
+    <string name="select_condition">选择条件</string>
+    <string name="ram_limit_mb">内存阈值（MB）</string>
+    <string name="duration_minutes">时长（分钟）</string>
+    <string name="rule_summary_app_opened">打开时：%1$s</string>
+    <string name="rule_summary_ram_limit">内存达到 %1$s MB 时</string>
+    <string name="rule_summary_app_ram">%1$s 超过 %2$s MB 时</string>
+    <string name="rule_summary_phone_sleep">睡眠 %1$d 分钟后</string>
+    <string name="rule_summary_phone_sleep_immediate">手机进入睡眠时</string>
+    <string name="rule_summary_phone_wake">手机唤醒时</string>
+    <string name="rule_summary_specific_time">每天 %1$02d:%2$02d</string>
+    <string name="rules_empty">尚未添加规则</string>
+
+    <!-- Enable/Disable Rules -->
+    <string name="enable_rules_title">启用规则</string>
+    <string name="add_enable_rule">添加启用规则</string>
+    <string name="no_enable_rules">未添加启用规则</string>
+    <string name="shappky_service_enabled_notification_text">Shappky 服务已自动启用。</string>
+    <string name="disable_rules_title">停用规则</string>
+    <string name="add_disable_rule">添加停用规则</string>
+    <string name="no_disable_rules">未添加停用规则</string>
+    <string name="shappky_service_disabled_notification_text">Shappky 服务已自动停用。</string>
+    <string name="trigger_enabled_notification_text">触发器已自动启用。</string>
+    <string name="trigger_disabled_notification_text">触发器已自动停用。</string>
+
+    <!-- New Rules -->
+    <string name="rule_app_inactivity">在无活动一段时间后</string>
+    <string name="rule_service_state">服务状态变化时</string>
+    <string name="rule_kill_oldest">自动结束列表中最早的应用</string>
+    <string name="rule_app_resumed">应用回到前台时</string>
+    <string name="rule_app_paused">应用被暂停时</string>
+    <string name="rule_app_exited">退出应用时</string>
+    <string name="rule_app_killed">结束应用时</string>
+    <string name="rule_auto_background_started">应用自动在后台启动时结束它</string>
+
+    <string name="inactivity_duration">无活动时长（分钟）</string>
+    <string name="select_services">选择服务</string>
+
+    <string name="service_wifi">WiFi</string>
+    <string name="service_bluetooth">蓝牙</string>
+    <string name="service_mobile_data">移动数据</string>
+    <string name="service_airplane_mode">飞行模式</string>
+    <string name="service_gps">GPS/定位</string>
+    <string name="service_hotspot">热点</string>
+    <string name="service_dnd">勿扰模式</string>
+    <string name="service_nfc">NFC</string>
+
+    <string name="rule_summary_app_inactivity">%1$s 无活动 %2$d 分钟后结束</string>
+    <string name="rule_summary_service_state">服务状态变化时结束：%1$s</string>
+    <string name="rule_summary_kill_oldest">自动结束最早的应用：%1$d 分钟</string>
+    <string name="rule_summary_app_resumed">回到前台：%1$s</string>
+    <string name="rule_summary_app_exited">退出时：%1$s</string>
+    <string name="rule_summary_app_killed">被 Shappky 结束时：%1$s</string>
+    <string name="rule_summary_app_paused">暂停时：%1$s</string>
+    <string name="rule_summary_auto_background_started">应用自动在后台启动时结束它</string>
+
+    <string name="service_active">已开启</string>
+    <string name="service_inactive">未开启</string>
+
+    <string name="customize_service">自定义服务</string>
+    <string name="customize_service_summary">自定义 Shappky 服务</string>
+    <string name="service_execution">执行方式</string>
+    <string name="kill_when_reach_ram_limit">内存达到阈值时结束</string>
+    <string name="service_duration">服务运行时长</string>
+    <string name="duration_5s">5 秒</string>
+    <string name="duration_10s">10 秒</string>
+    <string name="duration_15s">15 秒</string>
+    <string name="duration_30s">30 秒</string>
+    <string name="duration_1m">1 分钟</string>
+    <string name="duration_2m">2 分钟</string>
+    <string name="duration_5m">5 分钟</string>
+    <string name="duration_10m">10 分钟</string>
+    <string name="duration_15m">15 分钟</string>
+    <string name="duration_30m">30 分钟</string>
+    <string name="service_kill_all_on_ram_limit">内存达到指定阈值时结束全部应用</string>
+    <string name="service_kill_app_on_ram_limit">应用内存达到指定阈值时结束它</string>
+    <string name="ram_limit_enabled_summary">阈值：%1$s MB</string>
+
+    <!-- Settings Categories -->
+    <string name="settings_permissions">权限</string>
+    <string name="settings_service">服务设置</string>
+    <string name="settings_ram_usage_bar">内存占用条</string>
+    <string name="settings_apps_list">应用列表</string>
+    <string name="settings_about">关于</string>
+    <string name="triggers_summary">管理自动后台触发器</string>
+
+    <!-- Settings Backup -->
+    <string name="settings_backup">备份与恢复</string>
+    <string name="export_settings">导出设置</string>
+    <string name="export_settings_summary">将所有应用设置保存到文件</string>
+    <string name="import_settings">导入设置</string>
+    <string name="import_settings_summary">从文件恢复设置</string>
+    <string name="export_settings_success">设置导出成功</string>
+    <string name="export_settings_failed">设置导出失败</string>
+    <string name="import_settings_success">设置导入成功</string>
+    <string name="import_settings_failed">设置导入失败</string>
+
+    <!-- App Info Dialog -->
+    <string name="hide_app">隐藏应用</string>
+    <string name="protect_app">保护应用</string>
+
+    <!-- Widget Config -->
+    <string name="widget_settings">小组件设置</string>
+    <string name="widget_bg_size">背景尺寸：%1$d dp</string>
+    <string name="widget_select_trigger">选择触发器</string>
+    <string name="widget_icon_color">图标颜色</string>
+    <string name="widget_bg_color">背景颜色</string>
+    <string name="widget_show_trigger_name">显示触发器名称</string>
+    <string name="widget_no_triggers_warning">没有可用的手动触发器。请先添加一个不带规则的触发器，再配置小组件。</string>
+    <string name="widget_select_color">选择颜色</string>
+    <string name="widget_brightness">亮度</string>
+    <string name="widget_opacity">不透明度</string>
+    <string name="widget_select">选择</string>
+    <string name="widget_list_title">Shappky 应用列表</string>
+    <string name="widget_list_auto_bg">自动背景颜色</string>
+    <string name="widget_list_ram_bar">内存占用条</string>
+    <string name="widget_list_apps_title">应用列表</string>
+    <string name="disable_battery_optimization_title">忽略电池优化</string>
+    <string name="disable_battery_optimization_summary">关闭省电限制，确保小组件能在后台持续工作并刷新</string>
+    <string name="battery_optimization_already_disabled">该应用的电池优化已关闭</string>
+    <string name="trigger_service_active">Shappky 触发器服务已开启</string>
+    <string name="trigger_channel_name">Shappky 触发器</string>
+    <string name="trigger_channel_desc">Shappky 触发器内存清理相关通知</string>
+    <string name="shappky_trigger">Shappky - 触发器</string>
+    <string name="please_select_trigger">请在设置中选择一个触发器</string>
+
+    <!-- Hardcoded strings fixes -->
+    <string name="filter_content_desc">筛选</string>
+    <string name="regex_pattern_label">正则表达式</string>
+    <string name="not_found_format">%1$s：未找到</string>
+    <string name="pid_label">PID</string>
+    <string name="user_label">用户</string>
+    <string name="is_foreground_label">是否前台</string>
+    <string name="is_persistent_label">是否常驻</string>
+    <string name="cpu_usage_label">CPU 占用</string>
+    <string name="threads_label">线程数</string>
+    <string name="total_ram_usage_label">总内存占用</string>
+    <string name="all_app_processes">全部应用进程</string>
+    <string name="close">关闭</string>
+    <string name="no">否</string>
+    <string name="pid_format">PID：%1$s</string>
+    <string name="run_content_desc">运行</string>
+    <string name="add_content_desc">添加</string>
+    <string name="delete_rule_content_desc">删除规则</string>
+    <string name="tasker_configuration">Tasker 配置</string>
+    <string name="select_action">选择操作：</string>
+    <string name="tasker_section_service">Shappky 服务</string>
+    <string name="start_shappky_service_action">启用 Shappky 服务</string>
+    <string name="stop_shappky_service_action">停用 Shappky 服务</string>
+    <string name="tasker_section_triggers">触发器</string>
+    <string name="execute_trigger_action">执行触发器</string>
+    <string name="enable_trigger_action">启用触发器</string>
+    <string name="disable_trigger_action">停用触发器</string>
+    <string name="select_trigger_label">选择触发器：</string>
+    <string name="no_triggers_available">没有可用的触发器，请先在 Shappky 中创建一个。</string>
+    <string name="trigger_name_fallback">触发器 %1$s</string>
+    <string name="failed_to_start_service">启动服务失败：%1$s</string>
+    <string name="failed_to_stop_service">停止服务失败：%1$s</string>
+    <string name="no_shell_permission_error">未获得 shell（Root/Shizuku）权限</string>
+    <string name="trigger_not_found_error">未找到 ID 为 %1$s 的触发器</string>
+    <string name="no_trigger_id_error">未提供触发器 ID</string>
+
+</resources>
