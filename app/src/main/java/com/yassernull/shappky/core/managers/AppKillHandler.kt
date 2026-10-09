@@ -12,7 +12,7 @@ class AppKillHandler(
 ) {
   fun killPackages(
     packageNames: List<String>?,
-    onComplete: Runnable?,
+    onComplete: ((Boolean) -> Unit)?,
     showToast: Boolean = true,
     appendKillAll: Boolean = false,
     getAppRamKb: ((String) -> Long)? = null, // kept for signature compatibility
@@ -20,19 +20,19 @@ class AppKillHandler(
   ) {
     if (!shellManager.hasAnyShellPermission()) {
       shellManager.checkShellPermissions()
-      onComplete?.let { handler.post(it) }
+      onComplete?.let { handler.post { it(false) } }
       return
     }
 
     if (packageNames.isNullOrEmpty()) {
-      onComplete?.let { handler.post(it) }
+      onComplete?.let { handler.post { it(false) } }
       return
     }
 
     val safePackageNames = packageNames.filter { !ProtectionManager.isPackageProtected(context, it) }
 
     if (safePackageNames.isEmpty()) {
-      onComplete?.let { handler.post(it) }
+      onComplete?.let { handler.post { it(false) } }
       return
     }
 
@@ -63,13 +63,13 @@ class AppKillHandler(
           handler.post { Toast.makeText(context, context.getString(R.string.failed_to_stop_apps), Toast.LENGTH_LONG).show() }
         }
       }
-      onComplete?.let { handler.post(it) }
+      onComplete?.let { handler.post { it(totalFreedKb > 0) } }
     }.start()
   }
 
   fun killApp(
     packageName: String?,
-    onComplete: Runnable?,
+    onComplete: ((Boolean) -> Unit)?,
     forceKill: Boolean = false,
     appendKillAll: Boolean = false,
     getAppRamKb: ((String) -> Long)? = null, // kept for signature compatibility
@@ -77,17 +77,17 @@ class AppKillHandler(
   ) {
     if (!shellManager.hasAnyShellPermission()) {
       shellManager.checkShellPermissions()
-      onComplete?.let { handler.post(it) }
+      onComplete?.let { handler.post { it(false) } }
       return
     }
     if (packageName.isNullOrEmpty()) {
-      onComplete?.let { handler.post(it) }
+      onComplete?.let { handler.post { it(false) } }
       return
     }
 
     if (!forceKill) {
       if (ProtectionManager.isPackageProtected(context, packageName)) {
-        onComplete?.let { handler.post(it) }
+        onComplete?.let { handler.post { it(false) } }
         return
       }
     }
@@ -117,7 +117,7 @@ class AppKillHandler(
       } else {
         handler.post { Toast.makeText(context, context.getString(R.string.failed_to_stop_apps), Toast.LENGTH_LONG).show() }
       }
-      onComplete?.let { handler.post(it) }
+      onComplete?.let { handler.post { it(totalFreedKb > 0) } }
     }.start()
   }
 

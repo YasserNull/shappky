@@ -79,6 +79,8 @@ object AppsListLogic {
   internal lateinit var ramMonitor: RamMonitorManager
 
   internal val appsDataList = mutableStateListOf<AppModel>()
+  internal val recentlyKilledApps = mutableSetOf<String>()
+  internal var lastKillTimeMs = 0L
   internal var ramState by mutableStateOf(RamState())
   internal var isLoadingBackgroundApps by mutableStateOf(false)
   internal var hasPermission by mutableStateOf(false)
@@ -107,7 +109,12 @@ object AppsListLogic {
 
     appManager.killPackages(
       packagesToKill,
-      Runnable {
+      { success ->
+        if (success) {
+          appsDataList.removeAll { it.packageName in packagesToKill }
+          recentlyKilledApps.addAll(packagesToKill)
+          lastKillTimeMs = System.currentTimeMillis()
+        }
         loadBackgroundApps(activity, showRefreshIndicator = true, appsAutoRefresh = false) { forceMenuVisibilityUpdate(activity) }
       },
       showToast = true,
@@ -128,7 +135,12 @@ object AppsListLogic {
   ) {
     appManager.killApp(
       app.packageName,
-      Runnable {
+      { success ->
+        if (success) {
+          appsDataList.removeAll { it.packageName == app.packageName }
+          recentlyKilledApps.add(app.packageName)
+          lastKillTimeMs = System.currentTimeMillis()
+        }
         loadBackgroundApps(activity, true, appsAutoRefresh) { forceMenuVisibilityUpdate(activity) }
       },
       force,
@@ -282,9 +294,15 @@ object AppsListLogic {
 
       backgroundLoadRetryCount = 0
       lastBackgroundAppsLoadTimeMs = System.currentTimeMillis()
+
+      if (System.currentTimeMillis() - lastKillTimeMs > 3000) {
+        recentlyKilledApps.clear()
+      }
+
+      val filteredResult = result.filter { it.packageName !in recentlyKilledApps }
       val selectedPackages = appsDataList.filter { it.isSelected }.map { it.packageName }.toSet()
 
-      val updatedResult = result.map { app ->
+      val updatedResult = filteredResult.map { app ->
         if (selectedPackages.contains(app.packageName)) {
           app.copy(isSelected = true)
         } else {

@@ -39,7 +39,7 @@ class BackgroundAppManager(
     loader.saveHiddenApps(hiddenApps)
   }
 
-  fun killPackages(packageNames: List<String>?, onComplete: Runnable?, showToast: Boolean = true, appendKillAll: Boolean = false) {
+  fun killPackages(packageNames: List<String>?, onComplete: ((Boolean) -> Unit)?, showToast: Boolean = true, appendKillAll: Boolean = false) {
     killHandler.killPackages(
       packageNames = packageNames,
       onComplete = onComplete,
@@ -50,7 +50,7 @@ class BackgroundAppManager(
     )
   }
 
-  fun killApp(packageName: String?, onComplete: Runnable?, forceKill: Boolean = false, appendKillAll: Boolean = false) {
+  fun killApp(packageName: String?, onComplete: ((Boolean) -> Unit)?, forceKill: Boolean = false, appendKillAll: Boolean = false) {
     killHandler.killApp(
       packageName = packageName,
       onComplete = onComplete,
