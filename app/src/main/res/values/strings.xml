@@ -50,11 +50,13 @@
         <item>System Default</item>
         <item>English</item>
         <item>العربية</item>
+        <item>中文</item>
     </string-array>
     <string-array name="language_values" translatable="false">
         <item>system</item>
-        <item>ar</item>
         <item>en</item>
+        <item>ar</item>
+        <item>zh-CN</item>
     </string-array>
     <string name="dynamic_colors">Dynamic colors</string>
     <string name="dynamic_colors_summary">Use Material You colors</string>

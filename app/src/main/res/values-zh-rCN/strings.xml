@@ -55,8 +55,9 @@
     <string name="language_dialog_title">选择语言</string>
     <string-array name="language_options">
         <item>跟随系统</item>
-        <item>英语</item>
+        <item>English</item>
         <item>العربية</item>
+        <item>中文</item>
     </string-array>
     <string name="dynamic_colors">动态取色</string>
     <string name="dynamic_colors_summary">使用 Material You 取色</string>
@@ -303,4 +304,6 @@
     <string name="trigger_not_found_error">未找到 ID 为 %1$s 的触发器</string>
     <string name="no_trigger_id_error">未提供触发器 ID</string>
 
+    <string name="regex_placeholder"></string>
+    <string name="failed_to_stop_apps">未能停止应用</string>
 </resources>

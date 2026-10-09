@@ -49,6 +49,7 @@
         <item>افتراضي النظام</item>
         <item>English</item>
         <item>العربية</item>
+        <item>中文</item>
     </string-array>
     <string name="dynamic_colors">الألوان الديناميكية</string>
     <string name="dynamic_colors_summary">استخدام ألوان خلفية الجهاز</string>
