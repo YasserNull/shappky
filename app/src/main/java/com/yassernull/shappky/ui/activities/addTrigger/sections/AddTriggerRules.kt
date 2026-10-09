@@ -2,6 +2,7 @@ package com.yassernull.shappky.ui.activities.addTrigger.sections
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -207,7 +208,7 @@ fun RulesSection(
           RuleType.APP_OPENED -> Icons.Filled.Apps
           RuleType.APP_RESUMED -> Icons.Filled.Apps
           RuleType.APP_PAUSED -> Icons.Filled.Pause
-          RuleType.APP_EXITED -> Icons.Filled.ExitToApp
+          RuleType.APP_EXITED -> Icons.AutoMirrored.Filled.ExitToApp
           RuleType.APP_KILLED -> Icons.Filled.Close
           RuleType.RAM_LIMIT_REACHED -> Icons.Filled.Speed
           RuleType.APP_RAM_EXCEEDED -> Icons.Filled.SdStorage

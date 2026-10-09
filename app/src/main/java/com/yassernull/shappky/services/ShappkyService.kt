@@ -114,6 +114,7 @@ class ShappkyService : Service() {
     val protectedApps = com.yassernull.shappky.core.managers.ProtectionManager.getProtectedApps(this)
 
     val dumpOutput = shellManager.runShellCommandAndGetFullOutput("dumpsys activity recents") ?: return
+    val recentsPackages = com.yassernull.shappky.core.managers.parseRecentsPackages(dumpOutput, packageManager)
     val psOutput =
       shellManager.runShellCommandAndGetFullOutput(com.yassernull.shappky.core.managers.psAllProcessesCommand())
         ?: return
@@ -129,7 +130,7 @@ class ShappkyService : Service() {
       try {
         if (
           isProtected(pkg, protectedApps) ||
-          dumpOutput.contains(pkg)
+          recentsPackages.contains(pkg)
         ) {
           return@filter false
         }

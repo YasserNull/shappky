@@ -152,4 +152,6 @@ dependencies {
   implementation(libs.shizuku.provider)
   // Tasker Plugin Library
   implementation(libs.tasker.plugin.library)
+
+  testImplementation("junit:junit:4.13.2")
 }

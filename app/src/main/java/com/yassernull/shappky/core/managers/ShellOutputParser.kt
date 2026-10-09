@@ -5,7 +5,6 @@ import android.os.Process
 import java.io.BufferedReader
 import java.io.StringReader
 import java.util.Locale
-import java.util.regex.Pattern
 
 const val PS_ALL_PROCESSES_COMMAND = "ps -A -o %cpu,pid,user,rss,name,uid"
 
@@ -90,7 +89,7 @@ fun uidToAndroidUserName(uid: Long): String = when (uid) {
 
 fun isProcessOfPackage(processName: String, packageName: String): Boolean {
   if (!packageName.contains(".")) return false
-  return Regex("^" + Pattern.quote(packageName) + "(?![A-Za-z0-9]).*$").matches(processName)
+  return processName == packageName || processName.startsWith("$packageName:")
 }
 
 fun parseRecentsPackages(output: String, pm: PackageManager): Set<String> {
@@ -175,12 +174,12 @@ private fun resolvePackageForEntry(
       }
     }
   }
-  val byUidPrefix = packagesForUid?.firstOrNull { pkg -> pkg.contains(".") && entry.name.startsWith(pkg) }
+  val byUidPrefix = packagesForUid?.firstOrNull { pkg -> pkg.contains(".") && isProcessOfPackage(entry.name, pkg) }
   val byName = resolvePackageForName(entry.name, installedPackages)
   return when {
     byUidPrefix != null -> byUidPrefix
     byName != null -> byName
-    else -> packagesForUid?.firstOrNull()
+    else -> packagesForUid?.minByOrNull { it.length }
   }
 }
 
@@ -188,6 +187,6 @@ private fun resolvePackageForName(name: String, installedPackages: Set<String>):
   val base = name.substringBefore(":")
   if (base in installedPackages) return base
   return installedPackages.firstOrNull { pkg ->
-    pkg.contains(".") && name.length >= pkg.length + 1 && name.startsWith(pkg) && !name[pkg.length].isLetterOrDigit()
+    pkg.contains(".") && name.startsWith("$pkg:")
   }
 }
