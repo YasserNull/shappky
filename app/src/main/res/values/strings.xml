@@ -304,4 +304,5 @@
     <string name="trigger_not_found_error">Trigger with ID %1$s not found</string>
     <string name="no_trigger_id_error">No Trigger ID provided</string>
 
+    <string name="failed_to_stop_apps">Failed to stop apps</string>
 </resources>
