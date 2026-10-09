@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Shappky</string>
+    <string name="app_name_en">Shappky</string>
+    <string name="app_name_ar">شابكي</string>
+
+    <!-- Settings -->
+    <string name="force_kill_protected_title">Вы хотите закрыть это приложение?</string>
+    <string name="force_kill_protected_message">Это приложение находится в списке защищенных, вы хотите принудительно остановить его?</string>
+    <string name="yes">Да</string>
+    <string name="settings">Настройки</string>
+    <string name="show_user_apps">Показывать пользовательские приложения</string>
+    <string name="show_user_apps_summary">Показывать установленные пользователем приложения в списке</string>
+    <string name="show_system_apps">Показывать системные приложения</string>
+    <string name="show_system_apps_summary">Отображать системные приложения в списке</string>
+    <string name="show_persistent_apps">Показывать постоянные приложения</string>
+    <string name="show_persistent_apps_summary">Показывать постоянные приложения, которые отказываются останавливаться, в списке</string>
+    <string name="show_protected_apps">Показывать защищенные приложения</string>
+    <string name="show_protected_apps_summary">Показывать защищенные приложения в списке</string>
+    <string name="apps_auto_refresh">Автообновление приложений</string>
+    <string name="apps_auto_refresh_interval_title">Интервал автообновления приложений</string>
+    <string name="protected_apps_list_title">Список защищенных приложений</string>
+    <string name="protected_apps_list_summary">Выберите защищенные приложения для обхода на уровне приложения</string>
+    <string name="launcher">Лаунчер</string>
+    <string name="keyboard">Клавиатура</string>
+    <string name="wallpaper">Обои</string>
+    <string name="widgets">Виджеты</string>
+    <string name="android_services">Сервисы Android</string>
+    <string name="google_android_services">Сервисы Google Android</string>
+    <string name="auto_background_apps">Автозапуск фоновых приложений</string>
+    <string name="ram_usage_bar_refresh_ms">Обновление панели использования ОЗУ</string>
+    <string name="ram_usage_bar_refresh_interval_title">Интервал обновления панели использования ОЗУ</string>
+    <string name="refresh_interval_value">%1$d мс</string>
+    <string name="refresh_interval_sec">%1$d с</string>
+    <string name="refresh_interval_min">%1$d мин</string>
+    <string name="refresh_interval_ms">Интервал обновления (мс)</string>
+    <string name="min_interval_warning">Минимальный интервал %1$d мс</string>
+    <string name="reset">Сбросить</string>
+    <string-array name="theme_options">
+        <item>Темная</item>
+        <item>Светлая</item>
+        <item>Черная</item>
+    </string-array>
+    <string name="theme">Тема</string>
+    <string name="theme_summary">Изменить тему приложения</string>
+    <string name="theme_dialog_title">Выберите тему</string>
+    <string name="language">Язык</string>
+    <string name="language_summary">Изменить язык приложения</string>
+    <string name="language_dialog_title">Выберите язык</string>
+    <string-array name="language_options">
+        <item>По умолчанию</item>
+        <item>English</item>
+        <item>العربية</item>
+        <item>中文</item>
+        <item>Русский</item>
+        <item>हिन्दी</item>
+        <item>Deutsch</item>
+        <item>Français</item>
+    </string-array>
+    <string-array name="language_values" translatable="false">
+        <item>system</item>
+        <item>en</item>
+        <item>ar</item>
+        <item>zh-CN</item>
+        <item>ru</item>
+        <item>hi</item>
+        <item>de</item>
+        <item>fr</item>
+    </string-array>
+    <string name="dynamic_colors">Динамические цвета</string>
+    <string name="dynamic_colors_summary">Использовать цвета Material You</string>
+    <string name="permission_mode">Режим разрешений</string>
+    <string name="permission_mode_summary">Выберите Shizuku или Root</string>
+    <string name="permission_mode_dialog_title">Выберите режим разрешений</string>
+    <string name="permission_mode_root">Root</string>
+    <string name="permission_mode_shizuku">Shizuku</string>
+    <string name="permission_denied">В разрешении отказано</string>
+    <string name="running_apps_default">Запущенные приложения:</string>
+    <string name="running_apps_count">Запущенные приложения: %1$d</string>
+    <string name="ram_usage">Использование ОЗУ: %1$s МБ / %2$s МБ</string>
+    <string name="ram_usage_unknown">Использование ОЗУ: --</string>
+    <string name="sort_apps">Сортировка приложений</string>
+    <string name="sort_apps_title">Сортировать приложения по</string>
+    <string name="sort_by_name">Имени</string>
+    <string name="sort_by_ram_usage">Использованию ОЗУ</string>
+    <string name="sort_by_cpu_usage">Использованию ЦП</string>
+    <string name="sort_by_type">Типу</string>
+    <string name="sort_descending">По убыванию</string>
+    <string name="ok">ОК</string>
+    <string name="cancel">Отмена</string>
+    <string name="save">Сохранить</string>
+    <string name="search_apps">Поиск приложений</string>
+    <string name="apps_filter">Скрыть приложения из списка</string>
+    <string name="filter_dialog_title">Выберите приложения, которые вы хотите скрыть</string>
+    <string name="donate">Пожертвовать</string>
+    <string name="donate_summary">Поддержать разработчика</string>
+    <string name="donate_url" translatable="false">https://ko-fi.com/yassernull</string>
+    <string name="source_code">Исходный код</string>
+    <string name="source_code_summary">Открыть репозиторий проекта</string>
+    <string name="source_code_url" translatable="false">https://github.com/YasserNull/shappky</string>
+    <string name="refresh">Обновить</string>
+    <string name="more">Еще</string>
+    <string name="select_all">Выбрать все</string>
+    <string name="unselect_all">Снять выделение</string>
+    <string name="force_stop">Остановить принудительно</string>
+    <string name="force_stop_selected">Остановить выбранные</string>
+    <string name="selected">Выбрано</string>
+    <string name="back">Назад</string>
+    <string name="full_screen">Полный экран</string>
+    <string name="full_screen_summary">Скрыть строку состояния и использовать весь экран</string>
+    <string name="shappky_service">Служба Shappky</string>
+    <string name="shappky_service_running">Работает...</string>
+    <string name="shappky_service_notification_text">Закрытие фоновых приложений...</string>
+    <string name="ram_freed_from_pkg">Освобождено %1$s от %2$s</string>
+    <string name="shappky_service_channel">Служба Shappky (на переднем плане)</string>
+    <string name="shell_permission_required">Требуются права Shizuku/Root</string>
+    <string name="no_apps_to_kill">Нет приложений для закрытия</string>
+    <string name="service_stopped">Служба Shappky остановлена</string>
+    <string name="free_up_memory">Освободить %1$s</string>
+    <string name="error_getting_running_apps">Ошибка при получении запущенных приложений: %1$s</string>
+    <string name="restart_required_title">Требуется перезапуск</string>
+    <string name="restart_required_message">Пожалуйста, перезапустите приложение, чтобы применить изменения.</string>
+    <string name="restart_now">Перезапустить</string>
+    <string name="restart_later">Позже</string>
+
+    <!-- Triggers -->
+    <string name="triggers">Триггеры</string>
+    <string name="add_trigger">Добавить триггер</string>
+    <string name="edit_trigger">Изменить триггер</string>
+    <string name="trigger_name">Название триггера</string>
+    <string name="select_apps">Выбрать приложения</string>
+    <string name="user_apps">Пользовательские приложения</string>
+    <string name="system_apps">Системные приложения</string>
+    <string name="persistent_apps">Постоянные приложения</string>
+    <string name="protected_apps">Защищенные приложения</string>
+    <string name="exclude_apps">Исключить приложения</string>
+    <string name="manually_select_apps">Выбрать приложения вручную</string>
+    <string name="triggers_empty">Триггеры пока не добавлены</string>
+    <string name="delete_trigger">Удалить триггер</string>
+    <string name="delete_trigger_confirm_message">Вы уверены, что хотите удалить этот триггер?</string>
+    <string name="delete">Удалить</string>
+    <string name="trigger_executed">Триггер выполнен: %1$s</string>
+    <string name="trigger_name_empty">Пожалуйста, введите название триггера</string>
+    <string name="default_trigger_name">Триггер %1$d</string>
+
+    <!-- Rules -->
+    <string name="rules">Правила</string>
+    <string name="add_rule">Добавить правило</string>
+    <string name="rule_app_opened">При открытии приложения</string>
+    <string name="rule_ram_limit">Когда ОЗУ достигает предела</string>
+    <string name="rule_app_ram_exceeded">Когда приложение потребляет лимит ОЗУ</string>
+    <string name="rule_phone_sleep">Когда телефон переходит в спящий режим</string>
+    <string name="rule_phone_wake">Когда телефон выходит из спящего режима</string>
+    <string name="rule_specific_time">В определенное время</string>
+
+    <string name="select_condition">Выберите условие</string>
+    <string name="ram_limit_mb">Лимит ОЗУ (МБ)</string>
+    <string name="duration_minutes">Продолжительность (минут)</string>
+    <string name="rule_summary_app_opened">При открытии: %1$s</string>
+    <string name="rule_summary_ram_limit">Когда ОЗУ достигает %1$s МБ</string>
+    <string name="rule_summary_app_ram">Когда %1$s превышает %2$s МБ</string>
+    <string name="rule_summary_phone_sleep">После сна: %1$d мин</string>
+    <string name="rule_summary_phone_sleep_immediate">Когда телефон засыпает</string>
+    <string name="rule_summary_phone_wake">Когда телефон просыпается</string>
+    <string name="rule_summary_specific_time">В %1$02d:%2$02d</string>
+    <string name="rules_empty">Правила пока не добавлены</string>
+
+    <!-- Enable/Disable Rules -->
+    <string name="enable_rules_title">Включить правила</string>
+    <string name="add_enable_rule">Добавить правило включения</string>
+    <string name="no_enable_rules">Правила включения не добавлены</string>
+    <string name="shappky_service_enabled_notification_text">Служба Shappky была автоматически включена.</string>
+    <string name="disable_rules_title">Отключить правила</string>
+    <string name="add_disable_rule">Добавить правило отключения</string>
+    <string name="no_disable_rules">Правила отключения не добавлены</string>
+    <string name="shappky_service_disabled_notification_text">Служба Shappky была автоматически отключена.</string>
+    <string name="trigger_enabled_notification_text">Триггер был автоматически включен.</string>
+    <string name="trigger_disabled_notification_text">Триггер был автоматически отключен.</string>
+
+    <!-- New Rules -->
+    <string name="rule_app_inactivity">после периода неактивности</string>
+    <string name="rule_service_state">При изменении состояния службы</string>
+    <string name="rule_kill_oldest">Автоматически закрывать самое старое приложение в списке</string>
+    <string name="rule_app_resumed">При возобновлении приложения</string>
+    <string name="rule_app_paused">При приостановке приложения</string>
+    <string name="rule_app_exited">При выходе из приложения</string>
+    <string name="rule_app_killed">При закрытии приложения</string>
+    <string name="rule_auto_background_started">Закрыть приложение при автозапуске в фоновом режиме</string>
+
+    <string name="inactivity_duration">Продолжительность бездействия (минут)</string>
+    <string name="select_services">Выберите службы</string>
+
+    <string name="service_wifi">Wi-Fi</string>
+    <string name="service_bluetooth">Bluetooth</string>
+    <string name="service_mobile_data">Мобильные данные</string>
+    <string name="service_airplane_mode">Режим полета</string>
+    <string name="service_gps">GPS/Местоположение</string>
+    <string name="service_hotspot">Точка доступа</string>
+    <string name="service_dnd">Не беспокоить</string>
+    <string name="service_nfc">NFC</string>
+
+    <string name="rule_summary_app_inactivity">Закрыть %1$s после %2$d мин бездействия</string>
+    <string name="rule_summary_service_state">Закрыть при изменении службы: %1$s</string>
+    <string name="rule_summary_kill_oldest">Автоматически закрывать самое старое: %1$d мин</string>
+    <string name="rule_summary_app_resumed">При возобновлении: %1$s</string>
+    <string name="rule_summary_app_exited">При выходе: %1$s</string>
+    <string name="rule_summary_app_killed">При закрытии через Shappky: %1$s</string>
+    <string name="rule_summary_app_paused">При приостановке: %1$s</string>
+    <string name="rule_summary_auto_background_started">Закрыть приложение при автозапуске в фоновом режиме</string>
+
+    <string name="service_active">Активна</string>
+    <string name="service_inactive">Неактивна</string>
+
+    <string name="customize_service">Настроить службу</string>
+    <string name="customize_service_summary">Настроить службу Shappky</string>
+    <string name="service_execution">Выполнение</string>
+    <string name="kill_when_reach_ram_limit">Закрывать при достижении предела ОЗУ</string>
+    <string name="service_duration">Продолжительность работы службы</string>
+    <string name="duration_5s">5 секунд</string>
+    <string name="duration_10s">10 секунд</string>
+    <string name="duration_15s">15 секунд</string>
+    <string name="duration_30s">30 секунд</string>
+    <string name="duration_1m">1 минута</string>
+    <string name="duration_2m">2 минуты</string>
+    <string name="duration_5m">5 минут</string>
+    <string name="duration_10m">10 минут</string>
+    <string name="duration_15m">15 минут</string>
+    <string name="duration_30m">30 минут</string>
+    <string name="service_kill_all_on_ram_limit">Закрывать все приложения при достижении определенного предела ОЗУ</string>
+    <string name="service_kill_app_on_ram_limit">Закрывать приложение при достижении определенного предела ОЗУ</string>
+    <string name="ram_limit_enabled_summary">Порог: %1$s МБ</string>
+
+    <!-- Settings Categories -->
+    <string name="settings_permissions">Разрешения</string>
+    <string name="settings_service">Настройки службы</string>
+    <string name="settings_ram_usage_bar">Панель использования ОЗУ</string>
+    <string name="settings_apps_list">Список приложений</string>
+    <string name="settings_about">О приложении</string>
+    <string name="triggers_summary">Управление автоматическими фоновыми триггерами</string>
+
+    <!-- Settings Backup -->
+    <string name="settings_backup">Резервное копирование и восстановление</string>
+    <string name="export_settings">Экспортировать настройки</string>
+    <string name="export_settings_summary">Сохранить все настройки приложения в файл</string>
+    <string name="import_settings">Импортировать настройки</string>
+    <string name="import_settings_summary">Восстановить настройки из файла</string>
+    <string name="export_settings_success">Настройки успешно экспортированы</string>
+    <string name="export_settings_failed">Не удалось экспортировать настройки</string>
+    <string name="import_settings_success">Настройки успешно импортированы</string>
+    <string name="import_settings_failed">Не удалось импортировать настройки</string>
+
+    <!-- App Info Dialog -->
+    <string name="hide_app">Скрыть приложение</string>
+    <string name="protect_app">Защитить приложение</string>
+
+    <!-- Widget Config -->
+    <string name="widget_settings">Настройки виджета</string>
+    <string name="widget_bg_size">Размер фона: %1$d dp</string>
+    <string name="widget_select_trigger">Выберите триггер</string>
+    <string name="widget_icon_color">Цвет значка</string>
+    <string name="widget_bg_color">Цвет фона</string>
+    <string name="widget_show_trigger_name">Показывать название триггера</string>
+    <string name="widget_no_triggers_warning">Нет доступных ручных триггеров. Добавьте триггер без правил для настройки виджета.</string>
+    <string name="widget_select_color">Выбрать цвет</string>
+    <string name="widget_brightness">Яркость</string>
+    <string name="widget_opacity">Непрозрачность</string>
+    <string name="widget_select">Выбрать</string>
+    <string name="widget_list_title">Список приложений Shappky</string>
+    <string name="widget_list_auto_bg">Автоматический цвет фона</string>
+    <string name="widget_list_ram_bar">Панель использования ОЗУ</string>
+    <string name="widget_list_apps_title">Список приложений</string>
+    <string name="disable_battery_optimization_title">Игнорировать оптимизацию батареи</string>
+    <string name="disable_battery_optimization_summary">Отключить ограничения энергосбережения, чтобы виджет работал и обновлялся в фоновом режиме</string>
+    <string name="battery_optimization_already_disabled">Оптимизация батареи уже отключена для этого приложения</string>
+    <string name="trigger_service_active">Служба триггеров Shappky активна</string>
+    <string name="trigger_channel_name">Триггеры Shappky</string>
+    <string name="trigger_channel_desc">Уведомления об очистке памяти по триггерам Shappky</string>
+    <string name="shappky_trigger">Shappky - Триггер</string>
+    <string name="please_select_trigger">Пожалуйста, выберите триггер в настройках</string>
+
+    <!-- Hardcoded strings fixes -->
+    <string name="filter_content_desc">Фильтр</string>
+    <string name="regex_pattern_label">Регулярное выражение</string>
+    <string name="regex_placeholder"></string>
+    <string name="not_found_format">%1$s: Не найдено</string>
+    <string name="pid_label">PID</string>
+    <string name="user_label">Пользователь</string>
+    <string name="is_foreground_label">На переднем плане</string>
+    <string name="is_persistent_label">Постоянное</string>
+    <string name="cpu_usage_label">Использование ЦП</string>
+    <string name="threads_label">Потоки</string>
+    <string name="total_ram_usage_label">Общее использование ОЗУ</string>
+    <string name="all_app_processes">Все процессы приложения</string>
+    <string name="close">Закрыть</string>
+    <string name="no">Нет</string>
+    <string name="pid_format">PID: %1$s</string>
+    <string name="run_content_desc">Запустить</string>
+    <string name="add_content_desc">Добавить</string>
+    <string name="delete_rule_content_desc">Удалить правило</string>
+    <string name="tasker_configuration">Конфигурация Tasker</string>
+    <string name="select_action">Выберите действие:</string>
+    <string name="tasker_section_service">Служба Shappky</string>
+    <string name="start_shappky_service_action">Включить службу Shappky</string>
+    <string name="stop_shappky_service_action">Отключить службу Shappky</string>
+    <string name="tasker_section_triggers">Триггеры</string>
+    <string name="execute_trigger_action">Запустить триггер</string>
+    <string name="enable_trigger_action">Включить триггер</string>
+    <string name="disable_trigger_action">Отключить триггер</string>
+    <string name="select_trigger_label">Выберите триггер:</string>
+    <string name="no_triggers_available">Нет доступных триггеров. Пожалуйста, сначала создайте его в Shappky.</string>
+    <string name="trigger_name_fallback">Триггер %1$s</string>
+    <string name="failed_to_start_service">Не удалось запустить службу: %1$s</string>
+    <string name="failed_to_stop_service">Не удалось остановить службу: %1$s</string>
+    <string name="no_shell_permission_error">Права оболочки (Root/Shizuku) не предоставлены</string>
+    <string name="trigger_not_found_error">Триггер с ID %1$s не найден</string>
+    <string name="no_trigger_id_error">ID триггера не указан</string>
+
+    <string name="failed_to_stop_apps">Не удалось остановить приложения</string>
+</resources>

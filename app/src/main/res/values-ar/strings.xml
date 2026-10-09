@@ -50,6 +50,10 @@
         <item>English</item>
         <item>العربية</item>
         <item>中文</item>
+        <item>Русский</item>
+        <item>हिन्दी</item>
+        <item>Deutsch</item>
+        <item>Français</item>
     </string-array>
     <string name="dynamic_colors">الألوان الديناميكية</string>
     <string name="dynamic_colors_summary">استخدام ألوان خلفية الجهاز</string>

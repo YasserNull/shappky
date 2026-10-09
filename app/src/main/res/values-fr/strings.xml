@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Shappky</string>
+    <string name="app_name_en">Shappky</string>
+    <string name="app_name_ar">شابكي</string>
+
+    <!-- Settings -->
+    <string name="force_kill_protected_title">Voulez-vous forcer l\'arrêt de cette application ?</string>
+    <string name="force_kill_protected_message">Cette application figure dans la liste des applications protégées, voulez-vous forcer son arrêt ?</string>
+    <string name="yes">Oui</string>
+    <string name="settings">Paramètres</string>
+    <string name="show_user_apps">Afficher les applications utilisateur</string>
+    <string name="show_user_apps_summary">Afficher les applications installées par l\'utilisateur dans la liste</string>
+    <string name="show_system_apps">Afficher les applications système</string>
+    <string name="show_system_apps_summary">Afficher les applications système dans la liste</string>
+    <string name="show_persistent_apps">Afficher les applications persistantes</string>
+    <string name="show_persistent_apps_summary">Afficher les applications persistantes qui refusent de s\'arrêter dans la liste</string>
+    <string name="show_protected_apps">Afficher les applications protégées</string>
+    <string name="show_protected_apps_summary">Afficher les applications protégées dans la liste</string>
+    <string name="apps_auto_refresh">Actualisation auto des applications</string>
+    <string name="apps_auto_refresh_interval_title">Intervalle d\'actualisation auto des applications</string>
+    <string name="protected_apps_list_title">Liste des applications protégées</string>
+    <string name="protected_apps_list_summary">Sélectionner les applications protégées à ignorer au niveau de l\'application</string>
+    <string name="launcher">Lanceur d\'applications</string>
+    <string name="keyboard">Clavier</string>
+    <string name="wallpaper">Fond d\'écran</string>
+    <string name="widgets">Widgets</string>
+    <string name="android_services">Services Android</string>
+    <string name="google_android_services">Services Google Android</string>
+    <string name="auto_background_apps">Applications s\'exécutant automatiquement en arrière-plan</string>
+    <string name="ram_usage_bar_refresh_ms">Actualisation de la barre d\'utilisation de la RAM</string>
+    <string name="ram_usage_bar_refresh_interval_title">Intervalle d\'actualisation de la barre d\'utilisation de la RAM</string>
+    <string name="refresh_interval_value">%1$d ms</string>
+    <string name="refresh_interval_sec">%1$d s</string>
+    <string name="refresh_interval_min">%1$d min</string>
+    <string name="refresh_interval_ms">Intervalle d\'actualisation (ms)</string>
+    <string name="min_interval_warning">L\'intervalle minimum est de %1$d ms</string>
+    <string name="reset">Réinitialiser</string>
+    <string-array name="theme_options">
+        <item>Sombre</item>
+        <item>Clair</item>
+        <item>Noir</item>
+    </string-array>
+    <string name="theme">Thème</string>
+    <string name="theme_summary">Changer le thème de l\'application</string>
+    <string name="theme_dialog_title">Choisir le thème</string>
+    <string name="language">Langue</string>
+    <string name="language_summary">Changer la langue de l\'application</string>
+    <string name="language_dialog_title">Choisir la langue</string>
+    <string-array name="language_options">
+        <item>Paramètres par défaut</item>
+        <item>English</item>
+        <item>العربية</item>
+        <item>中文</item>
+        <item>Русский</item>
+        <item>हिन्दी</item>
+        <item>Deutsch</item>
+        <item>Français</item>
+    </string-array>
+    <string-array name="language_values" translatable="false">
+        <item>system</item>
+        <item>en</item>
+        <item>ar</item>
+        <item>zh-CN</item>
+        <item>ru</item>
+        <item>hi</item>
+        <item>de</item>
+        <item>fr</item>
+    </string-array>
+    <string name="dynamic_colors">Couleurs dynamiques</string>
+    <string name="dynamic_colors_summary">Utiliser les couleurs de Material You</string>
+    <string name="permission_mode">Mode d\'autorisation</string>
+    <string name="permission_mode_summary">Choisir Shizuku ou Root</string>
+    <string name="permission_mode_dialog_title">Choisir le mode d\'autorisation</string>
+    <string name="permission_mode_root">Root</string>
+    <string name="permission_mode_shizuku">Shizuku</string>
+    <string name="permission_denied">Autorisation refusée</string>
+    <string name="running_apps_default">Applications en cours d\'exécution :</string>
+    <string name="running_apps_count">Applications en cours d\'exécution : %1$d</string>
+    <string name="ram_usage">Utilisation de la RAM : %1$s Mo / %2$s Mo</string>
+    <string name="ram_usage_unknown">Utilisation de la RAM : --</string>
+    <string name="sort_apps">Trier les applications</string>
+    <string name="sort_apps_title">Trier les applications par</string>
+    <string name="sort_by_name">Nom</string>
+    <string name="sort_by_ram_usage">Utilisation de la RAM</string>
+    <string name="sort_by_cpu_usage">Utilisation du processeur</string>
+    <string name="sort_by_type">Type</string>
+    <string name="sort_descending">Décroissant</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Annuler</string>
+    <string name="save">Enregistrer</string>
+    <string name="search_apps">Rechercher des applications</string>
+    <string name="apps_filter">Masquer des applications de la liste</string>
+    <string name="filter_dialog_title">Sélectionnez les applications à masquer</string>
+    <string name="donate">Faire un don</string>
+    <string name="donate_summary">Soutenir le développeur</string>
+    <string name="donate_url" translatable="false">https://ko-fi.com/yassernull</string>
+    <string name="source_code">Code source</string>
+    <string name="source_code_summary">Ouvrir le dépôt du projet</string>
+    <string name="source_code_url" translatable="false">https://github.com/YasserNull/shappky</string>
+    <string name="refresh">Actualiser</string>
+    <string name="more">Plus</string>
+    <string name="select_all">Tout sélectionner</string>
+    <string name="unselect_all">Tout désélectionner</string>
+    <string name="force_stop">Forcer l\'arrêt</string>
+    <string name="force_stop_selected">Forcer l\'arrêt de la sélection</string>
+    <string name="selected">Sélectionné</string>
+    <string name="back">Retour</string>
+    <string name="full_screen">Plein écran</string>
+    <string name="full_screen_summary">Masquer la barre d\'état et utiliser le plein écran</string>
+    <string name="shappky_service">Service Shappky</string>
+    <string name="shappky_service_running">En cours d\'exécution...</string>
+    <string name="shappky_service_notification_text">Arrêt des applications en arrière-plan...</string>
+    <string name="ram_freed_from_pkg">%1$s libéré(s) de %2$s</string>
+    <string name="shappky_service_channel">Service de premier plan Shappky</string>
+    <string name="shell_permission_required">Autorisation Shizuku/Root requise</string>
+    <string name="no_apps_to_kill">Aucune application à arrêter</string>
+    <string name="service_stopped">Service Shappky arrêté</string>
+    <string name="free_up_memory">Libérer %1$s</string>
+    <string name="error_getting_running_apps">Erreur lors de l\'obtention des applications en cours d\'exécution : %1$s</string>
+    <string name="restart_required_title">Redémarrage requis</string>
+    <string name="restart_required_message">Veuillez redémarrer l\'application pour appliquer cette modification.</string>
+    <string name="restart_now">Redémarrer</string>
+    <string name="restart_later">Plus tard</string>
+
+    <!-- Triggers -->
+    <string name="triggers">Déclencheurs</string>
+    <string name="add_trigger">Ajouter un déclencheur</string>
+    <string name="edit_trigger">Modifier le déclencheur</string>
+    <string name="trigger_name">Nom du déclencheur</string>
+    <string name="select_apps">Sélectionner des applications</string>
+    <string name="user_apps">Applications utilisateur</string>
+    <string name="system_apps">Applications système</string>
+    <string name="persistent_apps">Applications persistantes</string>
+    <string name="protected_apps">Applications protégées</string>
+    <string name="exclude_apps">Exclure des applications</string>
+    <string name="manually_select_apps">Sélectionner des applications manuellement</string>
+    <string name="triggers_empty">Aucun déclencheur ajouté</string>
+    <string name="delete_trigger">Supprimer le déclencheur</string>
+    <string name="delete_trigger_confirm_message">Êtes-vous sûr de vouloir supprimer ce déclencheur ?</string>
+    <string name="delete">Supprimer</string>
+    <string name="trigger_executed">Déclencheur exécuté : %1$s</string>
+    <string name="trigger_name_empty">Veuillez entrer un nom pour le déclencheur</string>
+    <string name="default_trigger_name">Déclencheur %1$d</string>
+
+    <!-- Rules -->
+    <string name="rules">Règles</string>
+    <string name="add_rule">Ajouter une règle</string>
+    <string name="rule_app_opened">Lors de l\'ouverture d\'une application</string>
+    <string name="rule_ram_limit">Quand la RAM atteint une limite</string>
+    <string name="rule_app_ram_exceeded">Quand une application consomme une limite de RAM</string>
+    <string name="rule_phone_sleep">Quand le téléphone se met en veille</string>
+    <string name="rule_phone_wake">Quand le téléphone sort de veille</string>
+    <string name="rule_specific_time">À une heure précise</string>
+
+    <string name="select_condition">Sélectionner une condition</string>
+    <string name="ram_limit_mb">Limite de RAM (Mo)</string>
+    <string name="duration_minutes">Durée (Minutes)</string>
+    <string name="rule_summary_app_opened">Lors de l\'ouverture : %1$s</string>
+    <string name="rule_summary_ram_limit">Quand la RAM atteint %1$s Mo</string>
+    <string name="rule_summary_app_ram">Quand %1$s dépasse %2$s Mo</string>
+    <string name="rule_summary_phone_sleep">Après la mise en veille : %1$d min</string>
+    <string name="rule_summary_phone_sleep_immediate">À la mise en veille du téléphone</string>
+    <string name="rule_summary_phone_wake">À la sortie de veille du téléphone</string>
+    <string name="rule_summary_specific_time">À %1$02d:%2$02d</string>
+    <string name="rules_empty">Aucune règle ajoutée pour le moment</string>
+
+    <!-- Enable/Disable Rules -->
+    <string name="enable_rules_title">Activer les règles</string>
+    <string name="add_enable_rule">Ajouter une règle d\'activation</string>
+    <string name="no_enable_rules">Aucune règle d\'activation ajoutée</string>
+    <string name="shappky_service_enabled_notification_text">Le service Shappky a été activé automatiquement.</string>
+    <string name="disable_rules_title">Désactiver les règles</string>
+    <string name="add_disable_rule">Ajouter une règle de désactivation</string>
+    <string name="no_disable_rules">Aucune règle de désactivation ajoutée</string>
+    <string name="shappky_service_disabled_notification_text">Le service Shappky a été désactivé automatiquement.</string>
+    <string name="trigger_enabled_notification_text">Le déclencheur a été activé automatiquement.</string>
+    <string name="trigger_disabled_notification_text">Le déclencheur a été désactivé automatiquement.</string>
+
+    <!-- New Rules -->
+    <string name="rule_app_inactivity">après une période d\'inactivité</string>
+    <string name="rule_service_state">Lorsque l\'état du service change</string>
+    <string name="rule_kill_oldest">Forcer l\'arrêt de la plus ancienne application de la liste automatiquement</string>
+    <string name="rule_app_resumed">Lors de la reprise d\'une application</string>
+    <string name="rule_app_paused">Lors de la mise en pause d\'une application</string>
+    <string name="rule_app_exited">À la fermeture d\'une application</string>
+    <string name="rule_app_killed">Lors de l\'arrêt d\'une application</string>
+    <string name="rule_auto_background_started">Forcer l\'arrêt de l\'application lorsqu\'elle s\'exécute automatiquement en arrière-plan</string>
+
+    <string name="inactivity_duration">Durée d\'inactivité (Minutes)</string>
+    <string name="select_services">Sélectionner des services</string>
+
+    <string name="service_wifi">Wi-Fi</string>
+    <string name="service_bluetooth">Bluetooth</string>
+    <string name="service_mobile_data">Données mobiles</string>
+    <string name="service_airplane_mode">Mode avion</string>
+    <string name="service_gps">GPS/Localisation</string>
+    <string name="service_hotspot">Point d\'accès</string>
+    <string name="service_dnd">Ne pas déranger</string>
+    <string name="service_nfc">NFC</string>
+
+    <string name="rule_summary_app_inactivity">Forcer l\'arrêt de %1$s après %2$d min d\'inactivité</string>
+    <string name="rule_summary_service_state">Forcer l\'arrêt quand le service change : %1$s</string>
+    <string name="rule_summary_kill_oldest">Forcer l\'arrêt de la plus ancienne application automatiquement : %1$d min</string>
+    <string name="rule_summary_app_resumed">Lors de la reprise : %1$s</string>
+    <string name="rule_summary_app_exited">À la fermeture : %1$s</string>
+    <string name="rule_summary_app_killed">Lors de l\'arrêt par Shappky : %1$s</string>
+    <string name="rule_summary_app_paused">Lors de la mise en pause : %1$s</string>
+    <string name="rule_summary_auto_background_started">Forcer l\'arrêt de l\'application lorsqu\'elle s\'exécute automatiquement en arrière-plan</string>
+
+    <string name="service_active">Actif</string>
+    <string name="service_inactive">Inactif</string>
+
+    <string name="customize_service">Personnaliser le service</string>
+    <string name="customize_service_summary">Personnaliser le service Shappky</string>
+    <string name="service_execution">Exécution</string>
+    <string name="kill_when_reach_ram_limit">Forcer l\'arrêt à l\'atteinte d\'une limite de RAM</string>
+    <string name="service_duration">Durée du service</string>
+    <string name="duration_5s">5 secondes</string>
+    <string name="duration_10s">10 secondes</string>
+    <string name="duration_15s">15 secondes</string>
+    <string name="duration_30s">30 secondes</string>
+    <string name="duration_1m">1 minute</string>
+    <string name="duration_2m">2 minutes</string>
+    <string name="duration_5m">5 minutes</string>
+    <string name="duration_10m">10 minutes</string>
+    <string name="duration_15m">15 minutes</string>
+    <string name="duration_30m">30 minutes</string>
+    <string name="service_kill_all_on_ram_limit">Forcer l\'arrêt de toutes les applications à l\'atteinte d\'une certaine limite de RAM</string>
+    <string name="service_kill_app_on_ram_limit">Forcer l\'arrêt de l\'application lorsqu\'elle atteint une certaine limite de RAM</string>
+    <string name="ram_limit_enabled_summary">Seuil : %1$s Mo</string>
+
+    <!-- Settings Categories -->
+    <string name="settings_permissions">Autorisations</string>
+    <string name="settings_service">Paramètres du service</string>
+    <string name="settings_ram_usage_bar">Barre d\'utilisation de la RAM</string>
+    <string name="settings_apps_list">Liste des applications</string>
+    <string name="settings_about">À propos</string>
+    <string name="triggers_summary">Gérer les déclencheurs d\'arrière-plan automatisés</string>
+
+    <!-- Settings Backup -->
+    <string name="settings_backup">Sauvegarde et restauration</string>
+    <string name="export_settings">Exporter les paramètres</string>
+    <string name="export_settings_summary">Enregistrer tous les paramètres de l\'application dans un fichier</string>
+    <string name="import_settings">Importer les paramètres</string>
+    <string name="import_settings_summary">Restaurer les paramètres depuis un fichier</string>
+    <string name="export_settings_success">Paramètres exportés avec succès</string>
+    <string name="export_settings_failed">Échec de l\'exportation des paramètres</string>
+    <string name="import_settings_success">Paramètres importés avec succès</string>
+    <string name="import_settings_failed">Échec de l\'importation des paramètres</string>
+
+    <!-- App Info Dialog -->
+    <string name="hide_app">Masquer l\'application</string>
+    <string name="protect_app">Protéger l\'application</string>
+
+    <!-- Widget Config -->
+    <string name="widget_settings">Paramètres du widget</string>
+    <string name="widget_bg_size">Taille de l\'arrière-plan : %1$d dp</string>
+    <string name="widget_select_trigger">Sélectionner un déclencheur</string>
+    <string name="widget_icon_color">Couleur de l\'icône</string>
+    <string name="widget_bg_color">Couleur de l\'arrière-plan</string>
+    <string name="widget_show_trigger_name">Afficher le nom du déclencheur</string>
+    <string name="widget_no_triggers_warning">Aucun déclencheur manuel disponible. Ajoutez un déclencheur sans règles pour configurer le widget.</string>
+    <string name="widget_select_color">Sélectionner la couleur</string>
+    <string name="widget_brightness">Luminosité</string>
+    <string name="widget_opacity">Opacité</string>
+    <string name="widget_select">Sélectionner</string>
+    <string name="widget_list_title">Liste des applications Shappky</string>
+    <string name="widget_list_auto_bg">Couleur d\'arrière-plan automatique</string>
+    <string name="widget_list_ram_bar">Barre d\'utilisation de la RAM</string>
+    <string name="widget_list_apps_title">Liste des applications</string>
+    <string name="disable_battery_optimization_title">Ignorer l\'optimisation de la batterie</string>
+    <string name="disable_battery_optimization_summary">Désactiver les restrictions d\'économie d\'énergie pour garantir que le widget fonctionne et se met à jour en continu en arrière-plan</string>
+    <string name="battery_optimization_already_disabled">L\'optimisation de la batterie est déjà désactivée pour cette application</string>
+    <string name="trigger_service_active">Le service de déclencheurs Shappky est actif</string>
+    <string name="trigger_channel_name">Déclencheurs Shappky</string>
+    <string name="trigger_channel_desc">Notifications pour le nettoyage de la mémoire par les déclencheurs Shappky</string>
+    <string name="shappky_trigger">Shappky - Déclencheur</string>
+    <string name="please_select_trigger">Veuillez sélectionner un déclencheur dans les paramètres</string>
+
+    <!-- Hardcoded strings fixes -->
+    <string name="filter_content_desc">Filtre</string>
+    <string name="regex_pattern_label">Modèle Regex</string>
+    <string name="regex_placeholder"></string>
+    <string name="not_found_format">%1$s : Introuvable</string>
+    <string name="pid_label">PID</string>
+    <string name="user_label">Utilisateur</string>
+    <string name="is_foreground_label">Au premier plan</string>
+    <string name="is_persistent_label">Est persistant</string>
+    <string name="cpu_usage_label">Utilisation du processeur</string>
+    <string name="threads_label">Fils d\'exécution</string>
+    <string name="total_ram_usage_label">Utilisation totale de la RAM</string>
+    <string name="all_app_processes">Tous les processus de l\'application</string>
+    <string name="close">Fermer</string>
+    <string name="no">Non</string>
+    <string name="pid_format">PID : %1$s</string>
+    <string name="run_content_desc">Exécuter</string>
+    <string name="add_content_desc">Ajouter</string>
+    <string name="delete_rule_content_desc">Supprimer la règle</string>
+    <string name="tasker_configuration">Configuration Tasker</string>
+    <string name="select_action">Sélectionner l\'action :</string>
+    <string name="tasker_section_service">Service Shappky</string>
+    <string name="start_shappky_service_action">Activer le service Shappky</string>
+    <string name="stop_shappky_service_action">Désactiver le service Shappky</string>
+    <string name="tasker_section_triggers">Déclencheurs</string>
+    <string name="execute_trigger_action">Exécuter le déclencheur</string>
+    <string name="enable_trigger_action">Activer le déclencheur</string>
+    <string name="disable_trigger_action">Désactiver le déclencheur</string>
+    <string name="select_trigger_label">Sélectionner le déclencheur :</string>
+    <string name="no_triggers_available">Aucun déclencheur disponible. Veuillez en créer un dans Shappky d\'abord.</string>
+    <string name="trigger_name_fallback">Déclencheur %1$s</string>
+    <string name="failed_to_start_service">Échec du démarrage du service : %1$s</string>
+    <string name="failed_to_stop_service">Échec de l\'arrêt du service : %1$s</string>
+    <string name="no_shell_permission_error">Aucune autorisation shell (Root/Shizuku) accordée</string>
+    <string name="trigger_not_found_error">Déclencheur avec l\'ID %1$s introuvable</string>
+    <string name="no_trigger_id_error">Aucun ID de déclencheur fourni</string>
+
+    <string name="failed_to_stop_apps">Échec de l\'arrêt des applications</string>
+</resources>

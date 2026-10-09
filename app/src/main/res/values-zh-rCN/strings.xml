@@ -58,6 +58,10 @@
         <item>English</item>
         <item>العربية</item>
         <item>中文</item>
+        <item>Русский</item>
+        <item>हिन्दी</item>
+        <item>Deutsch</item>
+        <item>Français</item>
     </string-array>
     <string name="dynamic_colors">动态取色</string>
     <string name="dynamic_colors_summary">使用 Material You 取色</string>

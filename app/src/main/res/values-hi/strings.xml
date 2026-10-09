@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Shappky</string>
+    <string name="app_name_en">Shappky</string>
+    <string name="app_name_ar">شابكي</string>
+
+    <!-- Settings -->
+    <string name="force_kill_protected_title">क्या आप इस ऐप को बंद करना चाहते हैं?</string>
+    <string name="force_kill_protected_message">यह ऐप संरक्षित ऐप्स सूची में है, क्या आप इसे बलपूर्वक रोकना चाहते हैं?</string>
+    <string name="yes">हाँ</string>
+    <string name="settings">सेटिंग्स</string>
+    <string name="show_user_apps">उपयोगकर्ता ऐप्स दिखाएं</string>
+    <string name="show_user_apps_summary">सूची में उपयोगकर्ता द्वारा इंस्टॉल किए गए एप्लिकेशन दिखाएं</string>
+    <string name="show_system_apps">सिस्टम ऐप्स दिखाएं</string>
+    <string name="show_system_apps_summary">सूची में सिस्टम एप्लिकेशन प्रदर्शित करें</string>
+    <string name="show_persistent_apps">लगातार ऐप्स दिखाएं</string>
+    <string name="show_persistent_apps_summary">सूची में वे लगातार ऐप्स दिखाएं जो रुकने से इनकार करते हैं</string>
+    <string name="show_protected_apps">संरक्षित ऐप्स दिखाएं</string>
+    <string name="show_protected_apps_summary">सूची में संरक्षित ऐप्स दिखाएं</string>
+    <string name="apps_auto_refresh">ऐप्स ऑटो रिफ्रेश</string>
+    <string name="apps_auto_refresh_interval_title">ऐप्स ऑटो रिफ्रेश अंतराल</string>
+    <string name="protected_apps_list_title">संरक्षित ऐप्स सूची</string>
+    <string name="protected_apps_list_summary">एप्लिकेशन स्तर पर बायपास किए जाने वाले संरक्षित ऐप्स चुनें</string>
+    <string name="launcher">लॉन्चर</string>
+    <string name="keyboard">कीबोर्ड</string>
+    <string name="wallpaper">वॉलपेपर</string>
+    <string name="widgets">विजेट</string>
+    <string name="android_services">Android सेवाएँ</string>
+    <string name="google_android_services">Google Android सेवाएँ</string>
+    <string name="auto_background_apps">ऑटो-रनिंग बैकग्राउंड ऐप्स</string>
+    <string name="ram_usage_bar_refresh_ms">RAM उपयोग बार रिफ्रेश</string>
+    <string name="ram_usage_bar_refresh_interval_title">RAM उपयोग बार रिफ्रेश अंतराल</string>
+    <string name="refresh_interval_value">%1$d एमएस</string>
+    <string name="refresh_interval_sec">%1$d सेकंड</string>
+    <string name="refresh_interval_min">%1$d मिनट</string>
+    <string name="refresh_interval_ms">रिफ्रेश अंतराल (एमएस)</string>
+    <string name="min_interval_warning">न्यूनतम अंतराल %1$d एमएस है</string>
+    <string name="reset">रीसेट करें</string>
+    <string-array name="theme_options">
+        <item>गहरा</item>
+        <item>सफ़ेद</item>
+        <item>काला</item>
+    </string-array>
+    <string name="theme">थीम</string>
+    <string name="theme_summary">एप्लिकेशन थीम बदलें</string>
+    <string name="theme_dialog_title">थीम चुनें</string>
+    <string name="language">भाषा</string>
+    <string name="language_summary">एप्लिकेशन भाषा बदलें</string>
+    <string name="language_dialog_title">भाषा चुनें</string>
+    <string-array name="language_options">
+        <item>सिस्टम डिफ़ॉल्ट</item>
+        <item>English</item>
+        <item>العربية</item>
+        <item>中文</item>
+        <item>Русский</item>
+        <item>हिन्दी</item>
+        <item>Deutsch</item>
+        <item>Français</item>
+    </string-array>
+    <string-array name="language_values" translatable="false">
+        <item>system</item>
+        <item>en</item>
+        <item>ar</item>
+        <item>zh-CN</item>
+        <item>ru</item>
+        <item>hi</item>
+        <item>de</item>
+        <item>fr</item>
+    </string-array>
+    <string name="dynamic_colors">गतिशील रंग</string>
+    <string name="dynamic_colors_summary">Material You रंगों का उपयोग करें</string>
+    <string name="permission_mode">अनुमति मोड</string>
+    <string name="permission_mode_summary">Shizuku या Root चुनें</string>
+    <string name="permission_mode_dialog_title">अनुमति मोड चुनें</string>
+    <string name="permission_mode_root">Root</string>
+    <string name="permission_mode_shizuku">Shizuku</string>
+    <string name="permission_denied">अनुमति अस्वीकृत</string>
+    <string name="running_apps_default">चल रहे ऐप्स:</string>
+    <string name="running_apps_count">चल रहे ऐप्स: %1$d</string>
+    <string name="ram_usage">RAM उपयोग: %1$sMB / %2$sMB</string>
+    <string name="ram_usage_unknown">RAM उपयोग: --</string>
+    <string name="sort_apps">ऐप्स सॉर्ट करें</string>
+    <string name="sort_apps_title">ऐप्स इस आधार पर सॉर्ट करें</string>
+    <string name="sort_by_name">नाम</string>
+    <string name="sort_by_ram_usage">RAM उपयोग</string>
+    <string name="sort_by_cpu_usage">CPU उपयोग</string>
+    <string name="sort_by_type">प्रकार</string>
+    <string name="sort_descending">अवरोही</string>
+    <string name="ok">ठीक है</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="save">सहेजें</string>
+    <string name="search_apps">ऐप्स खोजें</string>
+    <string name="apps_filter">सूची से ऐप्स छिपाएं</string>
+    <string name="filter_dialog_title">वे ऐप्स चुनें जिन्हें आप छिपाना चाहते हैं</string>
+    <string name="donate">दान करें</string>
+    <string name="donate_summary">डेवलपर का समर्थन करें</string>
+    <string name="donate_url" translatable="false">https://ko-fi.com/yassernull</string>
+    <string name="source_code">स्रोत कोड</string>
+    <string name="source_code_summary">प्रोजेक्ट रिपॉजिटरी खोलें</string>
+    <string name="source_code_url" translatable="false">https://github.com/YasserNull/shappky</string>
+    <string name="refresh">रिफ्रेश करें</string>
+    <string name="more">और</string>
+    <string name="select_all">सभी का चयन करे</string>
+    <string name="unselect_all">सभी अचयनित करें</string>
+    <string name="force_stop">बलपूर्वक रोकें</string>
+    <string name="force_stop_selected">चयनित को बलपूर्वक रोकें</string>
+    <string name="selected">चयनित</string>
+    <string name="back">पीछे</string>
+    <string name="full_screen">पूर्ण स्क्रीन</string>
+    <string name="full_screen_summary">स्थिति बार छुपाएं और पूर्ण स्क्रीन का उपयोग करें</string>
+    <string name="shappky_service">Shappky सेवा</string>
+    <string name="shappky_service_running">चल रहा है...</string>
+    <string name="shappky_service_notification_text">बैकग्राउंड ऐप्स बंद किए जा रहे हैं...</string>
+    <string name="ram_freed_from_pkg">%2$s से %1$s मुक्त किया गया</string>
+    <string name="shappky_service_channel">Shappky अग्रभूमि सेवा</string>
+    <string name="shell_permission_required">Shizuku/Root अनुमति आवश्यक है</string>
+    <string name="no_apps_to_kill">बंद करने के लिए कोई ऐप नहीं है</string>
+    <string name="service_stopped">Shappky सेवा बंद हो गई</string>
+    <string name="free_up_memory">%1$s खाली करें</string>
+    <string name="error_getting_running_apps">चल रहे ऐप्स प्राप्त करने में त्रुटि: %1$s</string>
+    <string name="restart_required_title">पुनरारंभ आवश्यक है</string>
+    <string name="restart_required_message">कृपया इस बदलाव को लागू करने के लिए ऐप को पुनरारंभ करें।</string>
+    <string name="restart_now">पुनरारंभ करें</string>
+    <string name="restart_later">बाद में</string>
+
+    <!-- Triggers -->
+    <string name="triggers">ट्रिगर</string>
+    <string name="add_trigger">ट्रिगर जोड़ें</string>
+    <string name="edit_trigger">ट्रिगर संपादित करें</string>
+    <string name="trigger_name">ट्रिगर नाम</string>
+    <string name="select_apps">ऐप्स चुनें</string>
+    <string name="user_apps">उपयोगकर्ता ऐप्स</string>
+    <string name="system_apps">सिस्टम ऐप्स</string>
+    <string name="persistent_apps">लगातार ऐप्स</string>
+    <string name="protected_apps">संरक्षित ऐप्स</string>
+    <string name="exclude_apps">ऐप्स छोड़ें</string>
+    <string name="manually_select_apps">मैन्युअल रूप से ऐप्स चुनें</string>
+    <string name="triggers_empty">अभी तक कोई ट्रिगर नहीं जोड़ा गया</string>
+    <string name="delete_trigger">ट्रिगर हटाएं</string>
+    <string name="delete_trigger_confirm_message">क्या आप वाकई इस ट्रिगर को हटाना चाहते हैं?</string>
+    <string name="delete">हटाएं</string>
+    <string name="trigger_executed">ट्रिगर निष्पादित: %1$s</string>
+    <string name="trigger_name_empty">कृपया ट्रिगर नाम दर्ज करें</string>
+    <string name="default_trigger_name">ट्रिगर %1$d</string>
+
+    <!-- Rules -->
+    <string name="rules">नियम</string>
+    <string name="add_rule">नियम जोड़ें</string>
+    <string name="rule_app_opened">जब कोई ऐप खोलें</string>
+    <string name="rule_ram_limit">जब RAM सीमा तक पहुँच जाए</string>
+    <string name="rule_app_ram_exceeded">जब कोई ऐप RAM की सीमा का उपभोग करता है</string>
+    <string name="rule_phone_sleep">जब फोन स्लीप में जाता है</string>
+    <string name="rule_phone_wake">जब फोन स्लीप से उठता है</string>
+    <string name="rule_specific_time">एक विशिष्ट समय पर</string>
+
+    <string name="select_condition">स्थिति चुनें</string>
+    <string name="ram_limit_mb">RAM सीमा (एमबी)</string>
+    <string name="duration_minutes">अवधि (मिनट)</string>
+    <string name="rule_summary_app_opened">खोलते समय: %1$s</string>
+    <string name="rule_summary_ram_limit">जब RAM %1$s एमबी तक पहुँच जाए</string>
+    <string name="rule_summary_app_ram">जब %1$s %2$s एमबी से अधिक हो जाए</string>
+    <string name="rule_summary_phone_sleep">स्लीप के बाद: %1$d मिनट</string>
+    <string name="rule_summary_phone_sleep_immediate">जब फोन सोता है</string>
+    <string name="rule_summary_phone_wake">जब फोन उठता है</string>
+    <string name="rule_summary_specific_time">%1$02d:%2$02d पर</string>
+    <string name="rules_empty">अभी तक कोई नियम नहीं जोड़ा गया</string>
+
+    <!-- Enable/Disable Rules -->
+    <string name="enable_rules_title">नियम सक्षम करें</string>
+    <string name="add_enable_rule">सक्षम नियम जोड़ें</string>
+    <string name="no_enable_rules">कोई सक्षम नियम नहीं जोड़ा गया</string>
+    <string name="shappky_service_enabled_notification_text">Shappky सेवा स्वचालित रूप से सक्षम कर दी गई है।</string>
+    <string name="disable_rules_title">नियम अक्षम करें</string>
+    <string name="add_disable_rule">अक्षम नियम जोड़ें</string>
+    <string name="no_disable_rules">कोई अक्षम नियम नहीं जोड़ा गया</string>
+    <string name="shappky_service_disabled_notification_text">Shappky सेवा स्वचालित रूप से अक्षम कर दी गई है।</string>
+    <string name="trigger_enabled_notification_text">ट्रिगर स्वचालित रूप से सक्षम कर दिया गया है।</string>
+    <string name="trigger_disabled_notification_text">ट्रिगर स्वचालित रूप से अक्षम कर दिया गया है।</string>
+
+    <!-- New Rules -->
+    <string name="rule_app_inactivity">निष्क्रियता की अवधि के बाद</string>
+    <string name="rule_service_state">जब सेवा की स्थिति बदलती है</string>
+    <string name="rule_kill_oldest">सूची में सबसे पुराने ऐप को स्वचालित रूप से बंद करें</string>
+    <string name="rule_app_resumed">जब ऐप फिर से शुरू हो</string>
+    <string name="rule_app_paused">जब ऐप रोका जाए</string>
+    <string name="rule_app_exited">जब ऐप से बाहर निकलें</string>
+    <string name="rule_app_killed">जब कोई ऐप बंद करें</string>
+    <string name="rule_auto_background_started">ऐप को बंद करें जब वह बैकग्राउंड में ऑटो-रन हो</string>
+
+    <string name="inactivity_duration">निष्क्रियता अवधि (मिनट)</string>
+    <string name="select_services">सेवाएँ चुनें</string>
+
+    <string name="service_wifi">WiFi</string>
+    <string name="service_bluetooth">ब्लूटूथ</string>
+    <string name="service_mobile_data">मोबाइल डेटा</string>
+    <string name="service_airplane_mode">विमान मोड</string>
+    <string name="service_gps">GPS/स्थान</string>
+    <string name="service_hotspot">हॉटस्पॉट</string>
+    <string name="service_dnd">परेशान न करें</string>
+    <string name="service_nfc">NFC</string>
+
+    <string name="rule_summary_app_inactivity">%2$d मिनट की निष्क्रियता के बाद %1$s को बंद करें</string>
+    <string name="rule_summary_service_state">जब सेवा बदले तो बंद करें: %1$s</string>
+    <string name="rule_summary_kill_oldest">सबसे पुराने ऐप को स्वचालित रूप से बंद करें: %1$d मिनट</string>
+    <string name="rule_summary_app_resumed">जब फिर से शुरू हो: %1$s</string>
+    <string name="rule_summary_app_exited">बाहर निकलते समय: %1$s</string>
+    <string name="rule_summary_app_killed">जब Shappky द्वारा बंद किया जाए: %1$s</string>
+    <string name="rule_summary_app_paused">जब रोका जाए: %1$s</string>
+    <string name="rule_summary_auto_background_started">बैकग्राउंड में ऑटो-रन होने पर ऐप बंद करें</string>
+
+    <string name="service_active">सक्रिय</string>
+    <string name="service_inactive">निष्क्रिय</string>
+
+    <string name="customize_service">सेवा अनुकूलित करें</string>
+    <string name="customize_service_summary">Shappky सेवा अनुकूलित करें</string>
+    <string name="service_execution">निष्पादन</string>
+    <string name="kill_when_reach_ram_limit">RAM सीमा तक पहुँचने पर बंद करें</string>
+    <string name="service_duration">सेवा अवधि</string>
+    <string name="duration_5s">5 सेकंड</string>
+    <string name="duration_10s">10 सेकंड</string>
+    <string name="duration_15s">15 सेकंड</string>
+    <string name="duration_30s">30 सेकंड</string>
+    <string name="duration_1m">1 मिनट</string>
+    <string name="duration_2m">2 मिनट</string>
+    <string name="duration_5m">5 मिनट</string>
+    <string name="duration_10m">10 मिनट</string>
+    <string name="duration_15m">15 मिनट</string>
+    <string name="duration_30m">30 मिनट</string>
+    <string name="service_kill_all_on_ram_limit">निश्चित RAM सीमा तक पहुँचने पर सभी ऐप्स को बंद करें</string>
+    <string name="service_kill_app_on_ram_limit">निश्चित RAM सीमा तक पहुँचने पर ऐप को बंद करें</string>
+    <string name="ram_limit_enabled_summary">सीमा: %1$s एमबी</string>
+
+    <!-- Settings Categories -->
+    <string name="settings_permissions">अनुमतियाँ</string>
+    <string name="settings_service">सेवा सेटिंग्स</string>
+    <string name="settings_ram_usage_bar">RAM उपयोग बार</string>
+    <string name="settings_apps_list">ऐप्स सूची</string>
+    <string name="settings_about">के बारे में</string>
+    <string name="triggers_summary">स्वचालित बैकग्राउंड ट्रिगर्स प्रबंधित करें</string>
+
+    <!-- Settings Backup -->
+    <string name="settings_backup">बैकअप और पुनर्स्थापना</string>
+    <string name="export_settings">सेटिंग्स निर्यात करें</string>
+    <string name="export_settings_summary">सभी ऐप सेटिंग्स को फ़ाइल में सहेजें</string>
+    <string name="import_settings">सेटिंग्स आयात करें</string>
+    <string name="import_settings_summary">फ़ाइल से सेटिंग्स पुनर्स्थापित करें</string>
+    <string name="export_settings_success">सेटिंग्स सफलतापूर्वक निर्यात की गईं</string>
+    <string name="export_settings_failed">सेटिंग्स निर्यात करने में विफल</string>
+    <string name="import_settings_success">सेटिंग्स सफलतापूर्वक आयात की गईं</string>
+    <string name="import_settings_failed">सेटिंग्स आयात करने में विफल</string>
+
+    <!-- App Info Dialog -->
+    <string name="hide_app">ऐप छिपाएं</string>
+    <string name="protect_app">ऐप संरक्षित करें</string>
+
+    <!-- Widget Config -->
+    <string name="widget_settings">विजेट सेटिंग्स</string>
+    <string name="widget_bg_size">पृष्ठभूमि का आकार: %1$d डीपी</string>
+    <string name="widget_select_trigger">ट्रिगर चुनें</string>
+    <string name="widget_icon_color">आइकन का रंग</string>
+    <string name="widget_bg_color">पृष्ठभूमि का रंग</string>
+    <string name="widget_show_trigger_name">ट्रिगर का नाम दिखाएं</string>
+    <string name="widget_no_triggers_warning">कोई मैन्युअल ट्रिगर उपलब्ध नहीं है। विजेट को कॉन्फ़िगर करने के लिए बिना नियमों वाला एक ट्रिगर जोड़ें।</string>
+    <string name="widget_select_color">रंग चुनें</string>
+    <string name="widget_brightness">चमक</string>
+    <string name="widget_opacity">अस्पष्टता</string>
+    <string name="widget_select">चुनें</string>
+    <string name="widget_list_title">Shappky ऐप्स सूची</string>
+    <string name="widget_list_auto_bg">स्वचालित पृष्ठभूमि का रंग</string>
+    <string name="widget_list_ram_bar">RAM उपयोग बार</string>
+    <string name="widget_list_apps_title">एप्लिकेशन सूची</string>
+    <string name="disable_battery_optimization_title">बैटरी अनुकूलन पर ध्यान न दें</string>
+    <string name="disable_battery_optimization_summary">यह सुनिश्चित करने के लिए कि विजेट काम करे और पृष्ठभूमि में लगातार अपडेट हो, बिजली बचाने के प्रतिबंधों को अक्षम करें</string>
+    <string name="battery_optimization_already_disabled">इस ऐप के लिए बैटरी अनुकूलन पहले से ही अक्षम है</string>
+    <string name="trigger_service_active">Shappky ट्रिगर्स सेवा सक्रिय है</string>
+    <string name="trigger_channel_name">Shappky ट्रिगर्स</string>
+    <string name="trigger_channel_desc">Shappky ट्रिगर्स मेमोरी क्लीनअप के लिए सूचनाएं</string>
+    <string name="shappky_trigger">Shappky - ट्रिगर</string>
+    <string name="please_select_trigger">कृपया सेटिंग्स से एक ट्रिगर चुनें</string>
+
+    <!-- Hardcoded strings fixes -->
+    <string name="filter_content_desc">फ़िल्टर</string>
+    <string name="regex_pattern_label">रेगेक्स पैटर्न</string>
+    <string name="regex_placeholder"></string>
+    <string name="not_found_format">%1$s: नहीं मिला</string>
+    <string name="pid_label">PID</string>
+    <string name="user_label">उपयोगकर्ता</string>
+    <string name="is_foreground_label">अग्रभूमि है</string>
+    <string name="is_persistent_label">लगातार है</string>
+    <string name="cpu_usage_label">CPU उपयोग</string>
+    <string name="threads_label">थ्रेड्स</string>
+    <string name="total_ram_usage_label">कुल RAM उपयोग</string>
+    <string name="all_app_processes">सभी ऐप प्रक्रियाएं</string>
+    <string name="close">बंद करें</string>
+    <string name="no">नहीं</string>
+    <string name="pid_format">PID: %1$s</string>
+    <string name="run_content_desc">चलाएँ</string>
+    <string name="add_content_desc">जोड़ें</string>
+    <string name="delete_rule_content_desc">नियम हटाएं</string>
+    <string name="tasker_configuration">टास्कर कॉन्फ़िगरेशन</string>
+    <string name="select_action">कार्रवाई चुनें:</string>
+    <string name="tasker_section_service">Shappky सेवा</string>
+    <string name="start_shappky_service_action">Shappky सेवा सक्षम करें</string>
+    <string name="stop_shappky_service_action">Shappky सेवा अक्षम करें</string>
+    <string name="tasker_section_triggers">ट्रिगर</string>
+    <string name="execute_trigger_action">ट्रिगर चलाएँ</string>
+    <string name="enable_trigger_action">ट्रिगर सक्षम करें</string>
+    <string name="disable_trigger_action">ट्रिगर अक्षम करें</string>
+    <string name="select_trigger_label">ट्रिगर चुनें:</string>
+    <string name="no_triggers_available">कोई ट्रिगर उपलब्ध नहीं है। कृपया पहले Shappky में एक बनाएं।</string>
+    <string name="trigger_name_fallback">ट्रिगर %1$s</string>
+    <string name="failed_to_start_service">सेवा शुरू करने में विफल: %1$s</string>
+    <string name="failed_to_stop_service">सेवा रोकने में विफल: %1$s</string>
+    <string name="no_shell_permission_error">कोई शेल (Root/Shizuku) अनुमति नहीं दी गई</string>
+    <string name="trigger_not_found_error">ID %1$s वाला ट्रिगर नहीं मिला</string>
+    <string name="no_trigger_id_error">कोई ट्रिगर ID प्रदान नहीं की गई</string>
+
+    <string name="failed_to_stop_apps">ऐप्स रोकने में विफल</string>
+</resources>
