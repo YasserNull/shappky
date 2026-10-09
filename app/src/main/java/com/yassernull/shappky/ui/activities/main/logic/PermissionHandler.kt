@@ -39,7 +39,6 @@ object PermissionHandler {
     if (grantResult == PackageManager.PERMISSION_GRANTED) {
       onGranted()
     }
-    com.yassernull.shappky.core.managers.PermissionManager.checkAndRequestBatteryOptimization(activity)
   }
 
   fun setupShizukuPermissionListener(

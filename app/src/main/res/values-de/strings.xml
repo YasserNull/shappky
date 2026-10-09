@@ -316,4 +316,9 @@
     <string name="no_trigger_id_error">Keine Auslöser-ID angegeben</string>
 
     <string name="failed_to_stop_apps">Fehler beim Beenden von Apps</string>
+    <string name="battery_optimization_title">Akku-Optimierung deaktivieren</string>
+    <string name="battery_optimization_desc">Deaktivieren Sie die Akku-Optimierung, damit Hintergrunddienste ordnungsgemäß funktionieren.</string>
+    <string name="battery_optimization_ok">OK</string>
+    <string name="battery_optimization_cancel">Abbrechen</string>
+    <string name="battery_optimization_dont_show_again">Nicht mehr anzeigen</string>
 </resources>

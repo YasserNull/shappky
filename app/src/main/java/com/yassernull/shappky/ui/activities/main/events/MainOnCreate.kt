@@ -1,12 +1,31 @@
 package com.yassernull.shappky.ui.activities.main.events
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.yassernull.shappky.App
+import com.yassernull.shappky.R
 import com.yassernull.shappky.core.managers.AutoRefreshManager
 import com.yassernull.shappky.core.managers.BackgroundAppManager
 import com.yassernull.shappky.core.managers.PermissionManager
@@ -100,7 +119,71 @@ fun MainActivity.handleOnCreate(savedInstanceState: Bundle?) {
     var selectedAppForInfo by remember { mutableStateOf<AppDetailedInfo?>(null) }
     var isFetchingInfo by remember { mutableStateOf(false) }
 
+    var showBatteryOptimizationDialog by remember {
+      val powerManager = activity.getSystemService(android.content.Context.POWER_SERVICE) as PowerManager
+      val isIgnoring = powerManager.isIgnoringBatteryOptimizations(activity.packageName)
+      val dismissed = prefs.getBoolean("battery_optimization_dialog_dismissed", false)
+      mutableStateOf(!isIgnoring && !dismissed)
+    }
+
     AppTheme {
+      if (showBatteryOptimizationDialog) {
+        var dontShowAgain by remember { mutableStateOf(false) }
+        AlertDialog(
+          onDismissRequest = {
+            if (dontShowAgain) prefs.edit().putBoolean("battery_optimization_dialog_dismissed", true).apply()
+            showBatteryOptimizationDialog = false
+          },
+          title = { Text(stringResource(R.string.battery_optimization_title)) },
+          text = {
+            Column {
+              Text(stringResource(R.string.battery_optimization_desc))
+              Spacer(Modifier.height(16.dp))
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { dontShowAgain = !dontShowAgain },
+              ) {
+                Checkbox(
+                  checked = dontShowAgain,
+                  onCheckedChange = { dontShowAgain = it },
+                )
+                Text(
+                  text = stringResource(R.string.battery_optimization_dont_show_again),
+                  modifier = Modifier.padding(start = 8.dp),
+                )
+              }
+            }
+          },
+          confirmButton = {
+            TextButton(
+              onClick = {
+                if (dontShowAgain) prefs.edit().putBoolean("battery_optimization_dialog_dismissed", true).apply()
+                showBatteryOptimizationDialog = false
+                try {
+                  val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                  intent.data = Uri.parse("package:${activity.packageName}")
+                  activity.startActivity(intent)
+                } catch (e: Exception) {
+                  e.printStackTrace()
+                }
+              },
+            ) {
+              Text(stringResource(R.string.battery_optimization_ok))
+            }
+          },
+          dismissButton = {
+            TextButton(
+              onClick = {
+                if (dontShowAgain) prefs.edit().putBoolean("battery_optimization_dialog_dismissed", true).apply()
+                showBatteryOptimizationDialog = false
+              },
+            ) {
+              Text(stringResource(R.string.battery_optimization_cancel))
+            }
+          },
+        )
+      }
+
       MainContent(
         apps = AppsListLogic.appsDataList,
         ramState = AppsListLogic.ramState,

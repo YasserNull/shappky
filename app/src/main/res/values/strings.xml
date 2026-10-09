@@ -315,4 +315,9 @@
     <string name="no_trigger_id_error">No Trigger ID provided</string>
 
     <string name="failed_to_stop_apps">Failed to stop apps</string>
+    <string name="battery_optimization_title">Disable Battery Optimization</string>
+    <string name="battery_optimization_desc">Disable battery optimization for background services to work properly.</string>
+    <string name="battery_optimization_ok">OK</string>
+    <string name="battery_optimization_cancel">Cancel</string>
+    <string name="battery_optimization_dont_show_again">Don\'t show again</string>
 </resources>

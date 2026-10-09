@@ -316,4 +316,9 @@
     <string name="no_trigger_id_error">ID триггера не указан</string>
 
     <string name="failed_to_stop_apps">Не удалось остановить приложения</string>
+    <string name="battery_optimization_title">Отключить оптимизацию батареи</string>
+    <string name="battery_optimization_desc">Отключите оптимизацию батареи для правильной работы фоновых служб.</string>
+    <string name="battery_optimization_ok">ОК</string>
+    <string name="battery_optimization_cancel">Отмена</string>
+    <string name="battery_optimization_dont_show_again">Больше не показывать</string>
 </resources>

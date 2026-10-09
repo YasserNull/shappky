@@ -316,4 +316,9 @@
     <string name="no_trigger_id_error">कोई ट्रिगर ID प्रदान नहीं की गई</string>
 
     <string name="failed_to_stop_apps">ऐप्स रोकने में विफल</string>
+    <string name="battery_optimization_title">बैटरी अनुकूलन अक्षम करें</string>
+    <string name="battery_optimization_desc">पृष्ठभूमि सेवाओं के सही ढंग से काम करने के लिए बैटरी अनुकूलन अक्षम करें।</string>
+    <string name="battery_optimization_ok">ठीक है</string>
+    <string name="battery_optimization_cancel">रद्द करें</string>
+    <string name="battery_optimization_dont_show_again">फिर मत दिखाना</string>
 </resources>

@@ -21,10 +21,6 @@ object PermissionManager {
       Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED
 
     shellManager.checkShellPermissions()
-
-    if (!needsShizukuRequest) {
-      checkAndRequestBatteryOptimization(context)
-    }
   }
 
   fun checkAndRequestBatteryOptimization(context: Context) {

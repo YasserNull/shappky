@@ -302,4 +302,9 @@
     <string name="no_trigger_id_error">لم يتم توفير معرف المشغل</string>
 
     <string name="failed_to_stop_apps">فشل إيقاف التطبيقات</string>
+    <string name="battery_optimization_title">الغاء تحسين البطارية</string>
+    <string name="battery_optimization_desc">(قم ب تحسينه) الغاء تفعيل تحسين البطارية لتعمل خدمات الخلفية</string>
+    <string name="battery_optimization_ok">موافق</string>
+    <string name="battery_optimization_cancel">الغاء</string>
+    <string name="battery_optimization_dont_show_again">عدم الإظهار مجدداً</string>
 </resources>

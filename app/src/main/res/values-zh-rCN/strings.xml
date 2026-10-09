@@ -310,4 +310,9 @@
 
     <string name="regex_placeholder"></string>
     <string name="failed_to_stop_apps">未能停止应用</string>
+    <string name="battery_optimization_title">禁用电池优化</string>
+    <string name="battery_optimization_desc">禁用电池优化以使后台服务正常工作。</string>
+    <string name="battery_optimization_ok">确定</string>
+    <string name="battery_optimization_cancel">取消</string>
+    <string name="battery_optimization_dont_show_again">不再显示</string>
 </resources>

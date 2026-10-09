@@ -316,4 +316,9 @@
     <string name="no_trigger_id_error">Aucun ID de déclencheur fourni</string>
 
     <string name="failed_to_stop_apps">Échec de l\'arrêt des applications</string>
+    <string name="battery_optimization_title">Désactiver l\'optimisation de la batterie</string>
+    <string name="battery_optimization_desc">Désactivez l\'optimisation de la batterie pour que les services en arrière-plan fonctionnent correctement.</string>
+    <string name="battery_optimization_ok">OK</string>
+    <string name="battery_optimization_cancel">Annuler</string>
+    <string name="battery_optimization_dont_show_again">Ne plus afficher</string>
 </resources>
