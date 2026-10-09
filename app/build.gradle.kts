@@ -125,6 +125,7 @@ tasks.named("preBuild") {
 }
 
 dependencies {
+  implementation("androidx.core:core-splashscreen:1.0.1")
   implementation(platform(libs.androidx.compose.bom))
   androidTestImplementation(platform(libs.androidx.compose.bom))
 

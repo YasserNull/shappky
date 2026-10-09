@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.yassernull.shappky.ui.activities.main.events.handleOnCreate
 import com.yassernull.shappky.ui.activities.main.events.handleOnDestroy
 import com.yassernull.shappky.ui.activities.main.events.handleOnPause
@@ -28,6 +29,7 @@ class MainActivity : ComponentActivity() {
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    installSplashScreen()
     super.onCreate(savedInstanceState)
     handleOnCreate(savedInstanceState)
   }
