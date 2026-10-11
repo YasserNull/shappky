@@ -69,6 +69,23 @@ class ShappkyTriggerService : Service() {
     ruleEvaluator = TriggerRuleEvaluator(this, actionExecutor, stateTracker, foregroundTracker, shellManager, handler, executor)
     actionExecutor.onServiceStateChanged = { ruleEvaluator.clearCooldowns() }
 
+    createNotificationChannel()
+
+    val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
+      .setContentTitle(getString(R.string.trigger_channel_name))
+      .setContentText(getString(R.string.trigger_service_active))
+      .setSmallIcon(R.drawable.ic_shappky)
+      .setOngoing(true)
+      .build()
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      startForeground(2, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+    } else {
+      startForeground(2, notification)
+    }
+    isRunning = true
+
+    // Monitors loop on `isRunning`, so they must start only after the flag is set.
     TriggerForegroundMonitor(
       context = this,
       handler = handler,
@@ -91,22 +108,6 @@ class ShappkyTriggerService : Service() {
       sharedState = sharedState,
       isRunning = { isRunning },
     ).start()
-
-    createNotificationChannel()
-
-    val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
-      .setContentTitle(getString(R.string.trigger_channel_name))
-      .setContentText(getString(R.string.trigger_service_active))
-      .setSmallIcon(R.drawable.ic_shappky)
-      .setOngoing(true)
-      .build()
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-      startForeground(2, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-    } else {
-      startForeground(2, notification)
-    }
-    isRunning = true
 
     val screenFilter = IntentFilter().apply {
       addAction(Intent.ACTION_SCREEN_ON)
